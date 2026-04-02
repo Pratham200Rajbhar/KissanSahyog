@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload, PlusCircle, Tractor, ShieldAlert, FlaskConical, Sun, CloudRain, Lightbulb } from "lucide-react";
+import { Upload, PlusCircle, Tractor, ShieldAlert, Sun, CloudRain, Lightbulb } from "lucide-react";
 import { useLocation } from "../components/LocationContext";
 import Link from "next/link";
 import { useLanguage } from "../context/LanguageContext";
