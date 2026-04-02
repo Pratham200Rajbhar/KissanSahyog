@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Menu, Sun, Moon, Globe, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useLanguage, Language } from "./../context/LanguageContext";
+import { signIn } from "next-auth/react";
 
 export default function Navbar() {
   const [theme, setTheme] = useState("dark");
@@ -97,12 +98,12 @@ export default function Navbar() {
           >
             {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
-          <Link
-            href="/dashboard"
+          <button
+            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
             className="hidden md:block bg-primary-container text-on-primary-container px-6 py-2 rounded-full font-bold hover:bg-white/5 hover:-translate-y-1 transition-all duration-300 active:scale-95 transform"
           >
             {t("Login")}
-          </Link>
+          </button>
           <button className="md:hidden text-primary">
             <Menu className="w-6 h-6" />
           </button>

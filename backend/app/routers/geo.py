@@ -1,11 +1,12 @@
 import asyncio
 import httpx
 import traceback
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, Depends
 from typing import Dict, Any
 from app.services.weather_service import get_nasa_averages
+from app.core.security import get_current_user
 
-router = APIRouter(prefix="/geo", tags=["Geocoding"])
+router = APIRouter(prefix="/geo", tags=["Geocoding"], dependencies=[Depends(get_current_user)])
 
 @router.get("/reverse")
 async def reverse_geocode(lat: float = Query(...), lon: float = Query(...)) -> Dict[str, Any]:

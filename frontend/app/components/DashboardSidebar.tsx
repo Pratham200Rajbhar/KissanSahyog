@@ -23,13 +23,12 @@ export default function DashboardSidebar() {
 
   const navLinks = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+    { name: "Analysis & Report", href: "/dashboard/analysis", icon: TrendingUp },
     { name: "Yield Prediction", href: "/dashboard/yield-prediction", icon: TrendingUp },
     { name: "Disease Detection", href: "/dashboard/disease-detection", icon: Stethoscope },
     { name: "Crop Recommendation", href: "/dashboard/crop-recommendation", icon: Sprout },
     { name: "Fertilizer Recommendation", href: "/dashboard/recommendations", icon: Sparkles },
-
     { name: "Map Insights", href: "/dashboard/map-insights", icon: MapIcon },
-
   ];
 
   return (

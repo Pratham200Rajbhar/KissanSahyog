@@ -108,12 +108,28 @@ class YieldPredictionModel:
 # Singleton instance
 model_instance = None
 
-async def predict_yield(input_data: YieldPredictionInput) -> YieldPredictionOutput:
+async def predict_yield(input_data: YieldPredictionInput, user_id: str = None) -> YieldPredictionOutput:
     global model_instance
     if model_instance is None:
         model_instance = YieldPredictionModel()
         
     predicted_val, shap_vals = model_instance.predict(input_data)
+    
+    if user_id:
+        try:
+            from app.core.supabase_client import get_supabase_client
+            supabase = get_supabase_client()
+            supabase.table("yield_predictions").insert({
+                "user_id": user_id,
+                "crop": input_data.crop,
+                "state_name": input_data.state_name,
+                "district_name": input_data.dist_name,
+                "area_ha": input_data.area_ha,
+                "predicted_yield": round(predicted_val, 2),
+                "risk_score": 0.15
+            }).execute()
+        except Exception as e:
+            print(f"Failed to persist yield prediction: {e}")
     
     return YieldPredictionOutput(
         predicted_yield=round(predicted_val, 2),

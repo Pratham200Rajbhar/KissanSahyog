@@ -1,14 +1,16 @@
 "use client";
 
-import { Search, Languages, Bell, Sun, Moon, Globe, ChevronDown } from "lucide-react";
+import { Search, Languages, Bell, Sun, Moon, Globe, ChevronDown, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useLanguage, Language } from "../context/LanguageContext";
+import { useSession, signOut } from "next-auth/react";
 
 export default function DashboardTopNav() {
   const [theme, setTheme] = useState("dark");
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const { lang, setLang, t } = useLanguage();
+  const { data: session } = useSession();
 
   useEffect(() => {
     if (document.documentElement.classList.contains("light")) {
@@ -34,7 +36,9 @@ export default function DashboardTopNav() {
     setLang(selectedLang);
     setLangDropdownOpen(false);
   };
-  const userName = "Dev Farmer 👨‍🌾";
+  
+  const userName = session?.user?.name || "Farmer";
+  const userImage = session?.user?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuAhkX2dBHRRRgS3sO2D2j7AqZRW5uiW24OUcDS5kYZMqAhzzpebWOVzzCVNyIRAz5Rmz9tRQoYC_nOMwhkfaTjmj5D1RyRQXIHHeRMeaxCuCipVmnaJcS0T9tES4odHW1VERPb9tiOncncbFjGsNt-x5rg45WkrLyjH7v97dCyjDTQ_0L6rRGzCmNwlIFK2T50BOGQfve0wXzmyqdPkqKAERb6Tol5EWshdPPfwefjxl1w6sPPAogCTvKBJj1LtCISR1yDCM_oaT3AD";
 
 
   return (
@@ -83,17 +87,26 @@ export default function DashboardTopNav() {
           <Bell className="w-5 h-5" />
           <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_#4edea3]"></span>
         </button>
+        
+        <button 
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-300"
+          aria-label="Sign Out"
+        >
+          <LogOut className="w-5 h-5" />
+        </button>
+
         <div className="h-8 w-[1px] bg-outline-variant/20 mx-2"></div>
         <div className="flex items-center gap-3 group cursor-pointer">
           <div className="text-right">
             <p className="font-headline text-sm font-bold text-on-surface leading-tight">{userName}</p>
             <p className="font-label text-[10px] text-slate-500 tracking-wider">{t("PREMIUM TIER")}</p>
           </div>
-          <div className="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5 transition-transform group-hover:scale-105">
+          <div className="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5 transition-transform group-hover:scale-105 overflow-hidden">
             <Image
               alt="User Profile"
               className="w-full h-full rounded-full object-cover"
-              src="https://lh3.googleusercontent.com/aida-public/AB6AXuAhkX2dBHRRRgS3sO2D2j7AqZRW5uiW24OUcDS5kYZMqAhzzpebWOVzzCVNyIRAz5Rmz9tRQoYC_nOMwhkfaTjmj5D1RyRQXIHHeRMeaxCuCipVmnaJcS0T9tES4odHW1VERPb9tiOncncbFjGsNt-x5rg45WkrLyjH7v97dCyjDTQ_0L6rRGzCmNwlIFK2T50BOGQfve0wXzmyqdPkqKAERb6Tol5EWshdPPfwefjxl1w6sPPAogCTvKBJj1LtCISR1yDCM_oaT3AD"
+              src={userImage}
               width={40}
               height={40}
             />

@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends, Query
 from app.schemas.market import MarketPriceOutput
 from app.services import market_service
+from app.core.security import get_current_user
 
-router = APIRouter(prefix="/market", tags=["Market"])
+router = APIRouter(prefix="/market", tags=["Market"], dependencies=[Depends(get_current_user)])
 
 @router.get("/prices", response_model=MarketPriceOutput)
 async def fetch_market_prices_endpoint(

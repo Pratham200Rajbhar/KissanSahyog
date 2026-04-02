@@ -96,7 +96,7 @@ def load_crop_model(crop_type: str):
             
     return _models[target_crop]
 
-async def detect_disease(image: UploadFile, crop_type: str) -> DiseaseDetectionOutput:
+async def detect_disease(image: UploadFile, crop_type: str, user_id: str = None) -> DiseaseDetectionOutput:
     """Performs inference on the uploaded image using the specified crop model."""
     tf = get_tf()
     
@@ -130,6 +130,20 @@ async def detect_disease(image: UploadFile, crop_type: str) -> DiseaseDetectionO
         disease_name = crop_info["labels"][index]
         remedy = crop_info["remedies"][disease_name]
         
+        if user_id:
+            try:
+                from app.core.supabase_client import get_supabase_client
+                supabase = get_supabase_client()
+                supabase.table("disease_detections").insert({
+                    "user_id": user_id,
+                    "crop": crop_type,
+                    "disease_name": disease_name,
+                    "confidence": confidence,
+                    "remedy": remedy
+                }).execute()
+            except Exception as e:
+                print(f"Failed to persist disease detection: {e}")
+
         return DiseaseDetectionOutput(
             disease=disease_name,
             confidence=confidence,

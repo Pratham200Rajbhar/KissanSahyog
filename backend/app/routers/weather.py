@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Depends
 from app.services import weather_service
+from app.core.security import get_current_user
 
-router_weather = APIRouter(prefix="/weather", tags=["Weather"])
+router_weather = APIRouter(prefix="/weather", tags=["Weather"], dependencies=[Depends(get_current_user)])
 
 @router_weather.get("")
 async def get_weather_endpoint(

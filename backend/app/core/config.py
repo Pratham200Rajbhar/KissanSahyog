@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     soilgrids_api_url: str = "https://rest.isric.org/soilgrids/v2.0/properties/query"
     cors_origins: str | List[str] = "*"
     rate_limit_per_minute: int = 100
+    nextauth_secret: str = ""
+    google_client_id: str = ""
+    google_client_secret: str = ""
 
     model_config = SettingsConfigDict(
         env_file=".env", 

@@ -7,7 +7,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from app.core.config import settings
 
-from app.routers import predict, recommend, detect, schedule, market, weather, admin, geo
+from app.routers import predict, recommend, detect, schedule, market, weather, admin, geo, history
 
 limiter = Limiter(key_func=get_remote_address, default_limits=[f"{settings.rate_limit_per_minute}/minute"])
 
@@ -58,6 +58,7 @@ app.include_router(market.router, prefix=api_prefix)
 app.include_router(weather.router_weather, prefix=api_prefix)
 app.include_router(admin.router, prefix=api_prefix)
 app.include_router(geo.router, prefix=api_prefix)
+app.include_router(history.router, prefix=api_prefix)
 
 from app.routers import protected
 app.include_router(protected.router, prefix=api_prefix)

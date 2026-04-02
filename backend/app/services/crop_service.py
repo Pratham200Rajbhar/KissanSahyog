@@ -62,12 +62,30 @@ class CropRecommendationModel:
 # Singleton instance
 _model_instance = None
 
-async def recommend_crop(input_data: CropRecommendationInput) -> CropRecommendationOutput:
+async def recommend_crop(input_data: CropRecommendationInput, user_id: str = None) -> CropRecommendationOutput:
     global _model_instance
     if _model_instance is None:
         _model_instance = CropRecommendationModel()
         
     recommendations = _model_instance.predict(input_data)
     
+    if user_id and len(recommendations) > 0:
+        try:
+            import json
+            from app.core.supabase_client import get_supabase_client
+            supabase = get_supabase_client()
+            
+            top_rec = recommendations[0]
+            recs_dict = [{"crop": r.crop, "confidence": r.confidence} for r in recommendations]
+            
+            supabase.table("crop_recommendations").insert({
+                "user_id": user_id,
+                "top_crop": top_rec.crop,
+                "confidence": top_rec.confidence,
+                "recommendations_json": recs_dict
+            }).execute()
+        except Exception as e:
+            print(f"Failed to persist crop recommendation: {e}")
+            
     return CropRecommendationOutput(recommendations=recommendations)
 

@@ -36,13 +36,9 @@ async def get_current_user(
     if not token:
         raise HTTPException(status_code=401, detail="Authentication credentials were not provided (Missing Cookie)")
 
-    secret = getattr(settings, "NEXTAUTH_SECRET", None)
+    secret = settings.nextauth_secret
     if not secret:
-        # fallback to OS env if not in pydantic model
-        import os
-        secret = os.environ.get("NEXTAUTH_SECRET")
-        if not secret:
-            raise HTTPException(status_code=500, detail="NEXTAUTH_SECRET is not configured on the server")
+        raise HTTPException(status_code=500, detail="NEXTAUTH_SECRET is not configured on the server")
 
     key = get_nextauth_decryption_key(secret)
 
