@@ -50,32 +50,7 @@ export default function Navbar() {
         <Link href="/" className="text-2xl font-extrabold tracking-tighter text-primary">
           KissanSahyog
         </Link>
-        <div className="hidden md:flex gap-8 items-center font-headline text-sm tracking-wide">
-          <Link
-            href="/dashboard/map-insights"
-            className="text-primary font-bold border-b-2 border-primary pb-1 active:scale-95 transform transition-transform"
-          >
-            {t("nav.ecosystem")}
-          </Link>
-          <Link
-            href="/dashboard/yield-prediction"
-            className="text-slate-300 hover:text-primary transition-colors active:scale-95 transform transition-transform"
-          >
-            {t("nav.predictions")}
-          </Link>
-          <Link
-            href="/dashboard/disease-detection"
-            className="text-slate-300 hover:text-primary transition-colors active:scale-95 transform transition-transform"
-          >
-            {t("nav.intelligence")}
-          </Link>
-          <Link
-            href="/dashboard/recommendations"
-            className="text-slate-300 hover:text-primary transition-colors active:scale-95 transform transition-transform"
-          >
-            {t("nav.recommendations")}
-          </Link>
-        </div>
+
         <div className="flex items-center gap-2 md:gap-4">
           <div className="relative">
             <button 

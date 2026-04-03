@@ -42,10 +42,7 @@ export default function LandingPage() {
               {t("landing.start_prediction")}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </button>
-            <button className="px-8 py-4 glass-panel border border-white/10 text-on-surface font-bold rounded-xl hover:bg-white/10 hover:border-white/20 transition-all duration-300 flex items-center gap-2">
-              <PlayCircle className="w-5 h-5" />
-              {t("landing.watch_demo")}
-            </button>
+
           </div>
 
 
