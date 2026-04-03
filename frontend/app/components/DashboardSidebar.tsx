@@ -67,10 +67,13 @@ export default function DashboardSidebar() {
       </nav>
 
       <div className="px-4 py-8 space-y-2">
-        <button className="w-full flex items-center gap-4 text-slate-400 hover:text-white px-6 py-4 font-label text-[13px] tracking-wide uppercase hover:backdrop-blur-3xl hover:bg-white/5 rounded-full transition-all duration-500">
+        <Link 
+          href={`${pathname}?settings=true`}
+          className="w-full flex items-center gap-4 text-slate-400 hover:text-white px-6 py-4 font-label text-[13px] tracking-wide uppercase hover:backdrop-blur-3xl hover:bg-white/5 rounded-full transition-all duration-500"
+        >
           <Settings className="w-5 h-5" />
           <span>{t("sidebar.settings")}</span>
-        </button>
+        </Link>
         <button className="w-full flex items-center gap-4 text-slate-400 hover:text-white px-6 py-4 font-label text-[13px] tracking-wide uppercase hover:backdrop-blur-3xl hover:bg-white/5 rounded-full transition-all duration-500">
           <HelpCircle className="w-5 h-5" />
           <span>{t("sidebar.support")}</span>

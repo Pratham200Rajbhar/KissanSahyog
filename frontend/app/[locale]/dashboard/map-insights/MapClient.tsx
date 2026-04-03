@@ -14,7 +14,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
 import { getSentinelHubToken } from "./actions";
-import { Search, MapPin, Navigation } from "lucide-react";
+import { Search, MapPin, Navigation, Droplet, AlertTriangle, Download, X, Lightbulb, TrendingUp, CheckCircle, Maximize, Minimize } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 // Fix default leaflet marker icons (broken in webpack/Next.js)
@@ -51,6 +51,21 @@ function FlyToLocation({ lat, lng }: { lat: number; lng: number }) {
     map.flyTo([lat, lng], 13, { duration: 1.5 });
   }, [lat, lng, map]);
   return null;
+}
+
+function getMockData(lat: number, lng: number) {
+  const seed = Math.abs(lat + lng) * 10000;
+  const ndviScore = 0.4 + (seed % 50) / 100;
+  const moisture = 30 + (seed % 50);
+  const expectedYield = 2.0 + (seed % 40) / 10;
+  const hasAlert = seed % 10 > 5;
+  return {
+    ndviScore: ndviScore.toFixed(2),
+    ndviStatus: ndviScore > 0.7 ? "Optimal" : ndviScore > 0.5 ? "Moderate" : "Low Vitality",
+    moisture: Math.round(moisture),
+    expectedYield: expectedYield.toFixed(1),
+    hasAlert,
+  };
 }
 
 export default function MapClient() {
@@ -90,7 +105,32 @@ export default function MapClient() {
   const [ndviBbox, setNdviBbox] = useState<[number, number, number, number] | null>(null);
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string>("");
+  const [showInsights, setShowInsights] = useState(true);
   const prevNdviUrl = useRef<string | null>(null);
+
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const mapRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+    document.addEventListener("fullscreenchange", handleFsChange);
+    return () => document.removeEventListener("fullscreenchange", handleFsChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!mapRef.current) return;
+    if (!document.fullscreenElement) {
+      mapRef.current.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  };
+
+  const mockData = location ? getMockData(location.lat, location.lng) : { ndviScore: '0.00', ndviStatus: 'Unknown', moisture: 0, expectedYield: '0.0', hasAlert: false };
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -233,6 +273,7 @@ export default function MapClient() {
 
       setNdviUrl(url);
       setNdviBbox(bbox);
+      setShowInsights(true);
       setStatus("");
     } catch {
       const msg = t("map.failed");
@@ -361,7 +402,18 @@ export default function MapClient() {
       )}
 
       {/* Map Section */}
-      <div className="relative flex-1 rounded-2xl overflow-hidden glass-panel border border-outline-variant shadow-2xl min-h-[400px] z-10">
+      <div 
+        ref={mapRef}
+        className={`relative flex-1 rounded-2xl overflow-hidden glass-panel border border-outline-variant shadow-2xl min-h-[400px] z-10 ${isFullscreen ? 'fixed inset-0 z-[9999] rounded-none' : ''}`}
+      >
+        <button
+          onClick={toggleFullscreen}
+          className="absolute top-[80px] left-3 z-[1000] bg-surface/90 hover:bg-surface border border-white/10 p-2 rounded-lg shadow-lg text-white/80 hover:text-white transition-all backdrop-blur-md"
+          title={isFullscreen ? "Exit Fullscreen" : "Fullscreen View"}
+        >
+          {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+        </button>
+
         <MapContainer
           center={center}
           zoom={13}
@@ -410,22 +462,105 @@ export default function MapClient() {
           </div>
         )}
 
-        {/* Floating Legend */}
-        {ndviUrl && (
-          <div className="absolute bottom-6 right-6 z-[999] bg-surface/95 backdrop-blur-xl border border-white/10 p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
-            <h4 className="text-[11px] font-extrabold uppercase tracking-[0.2em] mb-4 text-on-surface pl-1">
-              {t("map.legend_title")}
-            </h4>
-            <div className="flex flex-col gap-3">
-              {NDVI_LEGEND.map(({ color, label }) => (
-                <div key={label} className="flex items-center gap-3 text-sm text-on-surface/90 font-medium tracking-wide">
-                  <span
-                    className="w-5 h-5 rounded-md shadow-inner border border-black/20"
-                    style={{ backgroundColor: color }}
-                  />
-                  {label}
+        {/* Active Insight Panel */}
+        {location && showInsights && (
+          <div className="absolute top-6 right-6 z-[999] bg-surface/80 backdrop-blur-2xl border border-white/10 p-5 rounded-[20px] shadow-[0_12px_40px_rgba(0,0,0,0.5)] w-[300px] flex flex-col gap-4 text-white text-left font-sans animate-fade-in-down overflow-hidden">
+            {/* Subtle glow effect behind */}
+            <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div className="flex justify-between items-start relative z-10">
+              <div className="relative z-10 mb-1">
+                <h3 className="font-headline font-extrabold text-lg mb-0.5 truncate tracking-tight">{searchQuery || "Green Valley Estate"}</h3>
+              </div>
+            </div>
+
+            <div className="relative z-10 grid grid-cols-2 gap-3">
+              <div className="bg-black/20 backdrop-blur-md rounded-xl p-3 border border-white/5 flex flex-col justify-between hover:border-white/10 transition-colors shadow-inner">
+                <div className="flex items-center gap-1.5 text-white/50 text-[9px] font-bold uppercase tracking-widest mb-2">
+                  <Droplet className="w-3.5 h-3.5 text-[#E8B65A]" />
+                  Moisture
                 </div>
-              ))}
+                <div>
+                  <div className="text-xl font-extrabold tracking-tighter mb-1.5">{mockData.moisture}%</div>
+                  <div className="h-1 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-[#E8B65A]/50 to-[#E8B65A]" style={{ width: `${mockData.moisture}%` }}></div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-black/20 backdrop-blur-md rounded-xl p-3 border border-white/5 flex flex-col justify-between hover:border-white/10 transition-colors shadow-inner">
+                <div className="flex items-center gap-1.5 text-white/50 text-[9px] font-bold uppercase tracking-widest mb-2">
+                  <TrendingUp className="w-3.5 h-3.5 text-primary" />
+                  Est. Yield
+                </div>
+                <div>
+                  <div className="text-xl font-extrabold tracking-tighter text-primary mb-1">{mockData.expectedYield} <span className="text-[10px] font-medium text-white/40 tracking-normal">t/ha</span></div>
+                  <span className="text-primary text-[9px] font-bold bg-primary/10 px-1.5 py-0.5 rounded inline-block">↑ +0.4 t</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative z-10">
+              {mockData.hasAlert ? (
+                <div className="bg-gradient-to-r from-red-950/60 to-red-900/30 border border-red-500/40 rounded-xl p-3 flex gap-3 items-start shadow-sm relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-16 h-16 border-[16px] border-red-500/5 rounded-full -mt-6 -mr-6 group-hover:scale-110 transition-transform duration-500"></div>
+                  <div className="w-8 h-8 rounded-full bg-red-500/20 flex items-center justify-center shrink-0 border border-red-500/30">
+                    <AlertTriangle className="w-4 h-4 text-red-400" />
+                  </div>
+                  <div>
+                    <div className="text-red-100 text-[10px] font-extrabold uppercase tracking-widest mb-1">Attention Required</div>
+                    <div className="text-red-100/70 text-[10px] font-medium leading-normal">Low Nitrogen area detected. Consider targeted fertilization to fix deficiency.</div>
+                  </div>
+                </div>
+              ) : (
+                <div className="bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-xl p-3 flex gap-3 items-start shadow-sm relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-16 h-16 border-[16px] border-primary/5 rounded-full -mt-6 -mr-6 group-hover:scale-110 transition-transform duration-500"></div>
+                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/30">
+                    <CheckCircle className="w-4 h-4 text-primary" />
+                  </div>
+                  <div>
+                    <div className="text-white text-[10px] font-extrabold uppercase tracking-widest mb-1 block">Optimal Conditions</div>
+                    <div className="text-white/60 text-[10px] font-medium leading-normal">No critical anomalies detected in the selected field area.</div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Removed phenology and report sections for cleaner view */}
+          </div>
+        )}
+
+        {/* Bottom Left Panel: Vegetation Index */}
+        {location && (
+          <div className="absolute bottom-6 left-6 z-[999] bg-surface/80 backdrop-blur-2xl border border-white/10 p-4 rounded-[20px] shadow-[0_12px_40px_rgba(0,0,0,0.5)] w-[260px] text-white font-sans animate-fade-in-up">
+            <div className="flex items-center gap-2 mb-3 text-primary">
+              <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center border border-primary/20">
+                <TrendingUp className="w-3.5 h-3.5" />
+              </div>
+              <h4 className="font-headline font-extrabold text-sm text-white tracking-wider">Vegetation Index</h4>
+            </div>
+
+            <div className="flex justify-between text-[9px] font-bold text-white/40 mb-2 uppercase tracking-widest">
+              <span>Low</span>
+              <span>High</span>
+            </div>
+            <div className="w-full h-1.5 rounded-full overflow-hidden flex mb-5 shadow-inner">
+               <div className="h-full bg-[#E85A5A] flex-[1]"></div>
+               <div className="h-full bg-[#E8B65A] flex-[1]"></div>
+               <div className="h-full bg-[#CCDC33] flex-[1]"></div>
+               <div className="h-full bg-[#4CB828] flex-[1]"></div>
+               <div className="h-full bg-[#0D610D] flex-[1]"></div>
+            </div>
+
+            <div className="flex gap-3">
+              <div className="bg-black/20 backdrop-blur-md rounded-xl p-3 border border-white/5 flex-1 relative overflow-hidden group hover:border-white/10 transition-colors">
+                <div className="text-[9px] font-bold uppercase tracking-widest text-white/50 mb-1">Avg Score</div>
+                <div className="text-xl font-extrabold tracking-tighter">{mockData.ndviScore}</div>
+              </div>
+              <div className="bg-black/20 backdrop-blur-md rounded-xl p-3 border border-white/5 flex-1 relative overflow-hidden group hover:border-white/10 transition-colors flex flex-col justify-end">
+                <div className="text-[9px] font-bold uppercase tracking-widest text-white/50 mb-1">Status</div>
+                <div className="text-sm font-bold truncate tracking-tight" style={{color: mockData.ndviStatus === 'Optimal' ? '#4CB828' : mockData.ndviStatus === 'Moderate' ? '#CCDC33' : '#E8B65A'}}>{mockData.ndviStatus}</div>
+              </div>
             </div>
           </div>
         )}

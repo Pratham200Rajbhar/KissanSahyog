@@ -104,10 +104,12 @@ export default function DashboardTopNav() {
         </button>
 
         <div className="h-8 w-[1px] bg-outline-variant/20 mx-2"></div>
-        <div className="flex items-center gap-3 group cursor-pointer">
-          <div className="text-right">
+        <div 
+          className="flex items-center gap-3 group cursor-pointer"
+          onClick={() => router.push(`${pathname}?settings=true`)}
+        >
+          <div className="text-right flex items-center h-full">
             <p className="font-headline text-sm font-bold text-on-surface leading-tight">{userName}</p>
-            <p className="font-label text-[10px] text-slate-500 tracking-wider">{t("topnav.premium_tier")}</p>
           </div>
           <div className="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5 transition-transform group-hover:scale-105 overflow-hidden">
             <Image

@@ -204,14 +204,16 @@ export default function YieldPrediction() {
                   {t("yield.district_focus")}
                   <GpsIndicator isVisible={!!location.district && formData.dist_name === location.district} />
                 </label>
-                <input 
-                  type="text"
+                <select 
                   name="dist_name"
                   value={formData.dist_name}
                   onChange={handleInputChange}
                   className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
-                  placeholder="e.g. Pune"
-                />
+                >
+                  {(DISTRICTS_BY_STATE[formData.state_name] || []).map(d => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="space-y-2">

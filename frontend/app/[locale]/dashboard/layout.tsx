@@ -1,6 +1,8 @@
 import DashboardSidebar from "../../components/DashboardSidebar";
 import DashboardTopNav from "../../components/DashboardTopNav";
 import { LocationProvider } from "../../components/LocationContext";
+import SettingsModal from "../../components/SettingsModal";
+import { Suspense } from "react";
 
 export default function DashboardLayout({
   children,
@@ -15,6 +17,9 @@ export default function DashboardLayout({
           <DashboardTopNav />
           {children}
         </main>
+        <Suspense fallback={null}>
+          <SettingsModal />
+        </Suspense>
       </div>
     </LocationProvider>
   );
