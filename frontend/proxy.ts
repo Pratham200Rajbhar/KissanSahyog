@@ -18,18 +18,26 @@ const authMiddleware = withAuth(
 );
 
 export default function middleware(req: NextRequest) {
-  // Check if it's a dashboard route (with or without locale prefix)
-  const isDashboard = req.nextUrl.pathname.match(/\/(hi|en|gu|mr|bn|ta|te)\/dashboard/) || 
-                      req.nextUrl.pathname.startsWith('/dashboard');
+  const { pathname } = req.nextUrl;
+  
+  // 1. Check if it's a dashboard route
+  // Locale-prefixed dashboard: /en/dashboard, /hi/dashboard, etc.
+  // Non-prefixed dashboard: /dashboard
+  const isDashboard = pathname.match(/\/(hi|en|gu)\/dashboard/) || 
+                      pathname === '/dashboard' || 
+                      pathname.startsWith('/dashboard/');
   
   if (isDashboard) {
+    // For dashboard, we apply auth first, then intl
     return (authMiddleware as NextMiddlewareWithAuth)(req as unknown as NextRequestWithAuth, {} as NextFetchEvent);
   }
   
+  // 2. For all other routes, just apply intl (this handles the redirect from / to /en etc)
   return intlMiddleware(req);
 }
 
 export const config = {
-  // Match only internationalized pathnames
-  matcher: ['/', '/(hi|en|gu|mr|bn|ta|te)/:path*']
+  // Matcher for internationalized routes
+  // This matches all routes EXCEPT _next, _vercel, and static files
+  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
 };

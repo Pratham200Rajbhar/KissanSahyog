@@ -15,6 +15,29 @@ const STATES = [
   'Uttar Pradesh', 'Uttarakhand', 'West Bengal'
 ];
 
+const DISTRICTS_BY_STATE: Record<string, string[]> = {
+  'Andhra Pradesh': ['Anantapur', 'Chittoor', 'East Godavari', 'Guntur', 'Krishna', 'Kurnool', 'Prakasam', 'Srikakulam', 'Visakhapatnam', 'Vizianagaram', 'West Godavari', 'Kadapa', 'Nellore'],
+  'Assam': ['Baksa', 'Barpeta', 'Biswanath', 'Bongaigaon', 'Cachar', 'Charaideo', 'Chirang', 'Darrang', 'Dhemaji', 'Dhubri', 'Dibrugarh', 'Goalpara', 'Golaghat', 'Hailakandi', 'Hojai', 'Jorhat', 'Kamrup', 'Kamrup Metropolitan', 'Karbi Anglong', 'Karimganj', 'Kokrajhar', 'Lakhimpur', 'Majuli', 'Morigaon', 'Nagaon', 'Nalbari', 'Sivasagar', 'Sonitpur', 'South Salmara-Mankachar', 'Tinsukia', 'Udalguri', 'West Karbi Anglong'],
+  'Bihar': ['Araria', 'Arwal', 'Aurangabad', 'Banka', 'Begusarai', 'Bhagalpur', 'Bhojpur', 'Buxar', 'Darbhanga', 'East Champaran', 'Gaya', 'Gopalganj', 'Jamui', 'Jehanabad', 'Kaimur', 'Katihar', 'Khagaria', 'Kishanganj', 'Lakhisarai', 'Madhepura', 'Madhubani', 'Munger', 'Muzaffarpur', 'Nalanda', 'Nawada', 'Patna', 'Purnia', 'Rohtas', 'Saharsa', 'Samastipur', 'Saran', 'Sheikhpura', 'Sheohar', 'Sitamarhi', 'Siwan', 'Supaul', 'Vaishali', 'West Champaran'],
+  'Chhattisgarh': ['Balod', 'Baloda Bazar', 'Balrampur', 'Bastar', 'Bemetara', 'Bijapur', 'Bilaspur', 'Dantewada', 'Dhamtari', 'Durg', 'Gariaband', 'Janjgir-Champa', 'Jashpur', 'Kabirdham', 'Kanker', 'Kondagaon', 'Korba', 'Koriya', 'Mahasamund', 'Mungeli', 'Narayanpur', 'Raigarh', 'Raipur', 'Rajnandgaon', 'Sukma', 'Surajpur', 'Surguja'],
+  'Gujarat': ['Ahmedabad', 'Amreli', 'Anand', 'Aravalli', 'Banaskantha', 'Bharuch', 'Bhavnagar', 'Botad', 'Chhota Udepur', 'Dahod', 'Dang', 'Devbhoomi Dwarka', 'Gandhinagar', 'Gir Somnath', 'Jamnagar', 'Junagadh', 'Kheda', 'Kutch', 'Mahisagar', 'Mehsana', 'Morbi', 'Narmada', 'Navsari', 'Panchmahal', 'Patan', 'Porbandar', 'Rajkot', 'Sabarkantha', 'Surat', 'Surendranagar', 'Tapi', 'Vadodara', 'Valsad'],
+  'Haryana': ['Ambala', 'Bhiwani', 'Charkhi Dadri', 'Faridabad', 'Fatehabad', 'Gurugram', 'Hisar', 'Jhajjar', 'Jind', 'Kaithal', 'Karnal', 'Kurukshetra', 'Mahendragarh', 'Nuh', 'Palwal', 'Panchkula', 'Panipat', 'Rewari', 'Rohtak', 'Sirsa', 'Sonipat', 'Yamunanagar'],
+  'Himachal Pradesh': ['Bilaspur', 'Chamba', 'Hamirpur', 'Kangra', 'Kinnaur', 'Kullu', 'Lahaul and Spiti', 'Mandi', 'Shimla', 'Sirmaur', 'Solan', 'Una'],
+  'Jharkhand': ['Bokaro', 'Chatra', 'Deoghar', 'Dhanbad', 'Dumka', 'East Singhbhum', 'Garhwa', 'Giridih', 'Godda', 'Gumla', 'Hazaribagh', 'Jamtara', 'Khunti', 'Koderma', 'Latehar', 'Lohardaga', 'Pakur', 'Palamu', 'Ramgarh', 'Ranchi', 'Sahibganj', 'Seraikela Kharsawan', 'Simdega', 'West Singhbhum'],
+  'Karnataka': ['Bagalkot', 'Ballari', 'Belagavi', 'Bengaluru Rural', 'Bengaluru Urban', 'Bidar', 'Chamarajanagar', 'Chikkaballapur', 'Chikkamagaluru', 'Chitradurga', 'Dakshina Kannada', 'Davanagere', 'Dharwad', 'Gadag', 'Hassan', 'Haveri', 'Kalaburagi', 'Kodagu', 'Kolar', 'Koppal', 'Mandya', 'Mysuru', 'Raichur', 'Ramanagara', 'Shivamogga', 'Tumakuru', 'Udupi', 'Uttara Kannada', 'Vijayapura', 'Yadgir'],
+  'Kerala': ['Alappuzha', 'Ernakulam', 'Idukki', 'Kannur', 'Kasaragod', 'Kollam', 'Kottayam', 'Kozhikode', 'Malappuram', 'Palakkad', 'Pathanamthitta', 'Thiruvananthapuram', 'Thrissur', 'Wayanad'],
+  'Madhya Pradesh': ['Agar Malwa', 'Alirajpur', 'Anuppur', 'Ashoknagar', 'Balaghat', 'Barwani', 'Betul', 'Bhind', 'Bhopal', 'Burhanpur', 'Chhatarpur', 'Chhindwara', 'Damoh', 'Datia', 'Dewas', 'Dhar', 'Dindori', 'Guna', 'Gwalior', 'Harda', 'Hoshangabad', 'Indore', 'Jabalpur', 'Jhabua', 'Katni', 'Khandwa', 'Khargone', 'Mandla', 'Mandsaur', 'Morena', 'Narsinghpur', 'Neemuch', 'Panna', 'Raisen', 'Rajgarh', 'Ratlam', 'Rewa', 'Sagar', 'Satna', 'Sehore', 'Seoni', 'Shahdol', 'Shajapur', 'Sheopur', 'Shivpuri', 'Sidhi', 'Singrauli', 'Tikamgarh', 'Ujjain', 'Umaria', 'Vidisha'],
+  'Maharashtra': ['Ahmednagar', 'Akola', 'Amravati', 'Aurangabad', 'Beed', 'Bhandara', 'Buldhana', 'Chandrapur', 'Dhule', 'Gadchiroli', 'Gondia', 'Hingoli', 'Jalgaon', 'Jalna', 'Kolhapur', 'Latur', 'Mumbai City', 'Mumbai Suburban', 'Nagpur', 'Nanded', 'Nandurbar', 'Nashik', 'Osmanabad', 'Palghar', 'Parbhani', 'Pune', 'Raigad', 'Ratnagiri', 'Sangli', 'Satara', 'Sindhudurg', 'Solapur', 'Thane', 'Wardha', 'Washim', 'Yavatmal'],
+  'Orissa': ['Angul', 'Balangir', 'Balasore', 'Bargarh', 'Bhadrak', 'Boudh', 'Cuttack', 'Deogarh', 'Dhenkanal', 'Gajapati', 'Ganjam', 'Jagatsinghapur', 'Jajpur', 'Jharsuguda', 'Kalahandi', 'Kandhamal', 'Kendrapara', 'Kendujhar', 'Khordha', 'Koraput', 'Malkangiri', 'Mayurbhanj', 'Nabarangpur', 'Nayagarh', 'Nuapada', 'Puri', 'Rayagada', 'Sambalpur', 'Sonepur', 'Sundargarh'],
+  'Punjab': ['Amritsar', 'Barnala', 'Bathinda', 'Faridkot', 'Fatehgarh Sahib', 'Fazilka', 'Ferozepur', 'Gurdaspur', 'Hoshiarpur', 'Jalandhar', 'Kapurthala', 'Ludhiana', 'Mansa', 'Moga', 'Muktsar', 'Pathankot', 'Patiala', 'Rupnagar', 'Sahibzada Ajit Singh Nagar', 'Sangrur', 'Shahid Bhagat Singh Nagar', 'Sri Muktsar Sahib', 'Tarn Taran'],
+  'Rajasthan': ['Ajmer', 'Alwar', 'Banswara', 'Baran', 'Barmer', 'Bharatpur', 'Bhilwara', 'Bikaner', 'Bundi', 'Chittorgarh', 'Churu', 'Dausa', 'Dholpur', 'Dungarpur', 'Hanumangarh', 'Jaipur', 'Jaisalmer', 'Jalore', 'Jhalawar', 'Jhunjhunu', 'Jodhpur', 'Karauli', 'Kota', 'Nagaur', 'Pali', 'Pratapgarh', 'Rajsamand', 'Sawai Madhopur', 'Sikar', 'Sirohi', 'Sri Ganganagar', 'Tonk', 'Udaipur'],
+  'Tamil Nadu': ['Ariyalur', 'Chengalpattu', 'Chennai', 'Coimbatore', 'Cuddalore', 'Dharmapuri', 'Dindigul', 'Erode', 'Kallakurichi', 'Kancheepuram', 'Karur', 'Krishnagiri', 'Madurai', 'Mayiladuthurai', 'Nagapattinam', 'Namakkal', 'Nilgiris', 'Perambalur', 'Pudukkottai', 'Ramanathapuram', 'Ranipet', 'Salem', 'Sivaganga', 'Tenkasi', 'Thanjavur', 'Theni', 'Thoothukudi', 'Tiruchirappalli', 'Tirunelveli', 'Tirupathur', 'Tiruppur', 'Tiruvallur', 'Tiruvannamalai', 'Tiruvarur', 'Vellore', 'Viluppuram', 'Virudhunagar'],
+  'Telangana': ['Adilabad', 'Bhadradri Kothagudem', 'Hyderabad', 'Jagtial', 'Jangaon', 'Jayashankar Bhupalpally', 'Jogulamba Gadwal', 'Kamareddy', 'Karimnagar', 'Khammam', 'Kumuram Bheem Asifabad', 'Mahabubabad', 'Mahabubnagar', 'Mancherial', 'Medak', 'Medchal Malkajgiri', 'Mulugu', 'Nagarkurnool', 'Nalgonda', 'Narayanpet', 'Nirmal', 'Nizamabad', 'Peddapalli', 'Rajanna Sircilla', 'Rangareddy', 'Sangareddy', 'Siddipet', 'Suryapet', 'Vikarabad', 'Wanaparthy', 'Warangal Rural', 'Warangal Urban', 'Yadadri Bhuvanagiri'],
+  'Uttar Pradesh': ['Agra', 'Aligarh', 'Allahabad', 'Ambedkar Nagar', 'Amethi', 'Amroha', 'Auraiya', 'Azamgarh', 'Baghpat', 'Bahraich', 'Ballia', 'Balrampur', 'Banda', 'Barabanki', 'Bareilly', 'Basti', 'Bhadohi', 'Bijnor', 'Budaun', 'Bulandshahr', 'Chandauli', 'Chitrakoot', 'Deoria', 'Etah', 'Etawah', 'Faizabad', 'Farrukhabad', 'Fatehpur', 'Firozabad', 'Gautam Buddha Nagar', 'Ghaziabad', 'Ghazipur', 'Gonda', 'Gorakhpur', 'Hamirpur', 'Hapur', 'Hardoi', 'Hathras', 'Jalaun', 'Jaunpur', 'Jhansi', 'Kannauj', 'Kanpur Dehat', 'Kanpur Nagar', 'Kasganj', 'Kaushambi', 'Kheri', 'Kushinagar', 'Lalitpur', 'Lucknow', 'Maharajganj', 'Mahoba', 'Mainpuri', 'Mathura', 'Mau', 'Meerut', 'Mirzapur', 'Moradabad', 'Muzaffarnagar', 'Pilibhit', 'Pratapgarh', 'Raebareli', 'Rampur', 'Saharanpur', 'Sambhal', 'Sant Kabir Nagar', 'Shahjahanpur', 'Shamli', 'Shravasti', 'Siddharthnagar', 'Sitapur', 'Sonbhadra', 'Sultanpur', 'Unnao', 'Varanasi'],
+  'Uttarakhand': ['Almora', 'Bageshwar', 'Chamoli', 'Champawat', 'Dehradun', 'Haridwar', 'Nainital', 'Pauri Garhwal', 'Pithoragarh', 'Rudraprayag', 'Tehri Garhwal', 'Udham Singh Nagar', 'Uttarkashi'],
+  'West Bengal': ['Alipurduar', 'Bankura', 'Birbhum', 'Cooch Behar', 'Dakshin Dinajpur', 'Darjeeling', 'Hooghly', 'Howrah', 'Jalpaiguri', 'Jhargram', 'Kalimpong', 'Kolkata', 'Malda', 'Murshidabad', 'Nadia', 'North 24 Parganas', 'Paschim Bardhaman', 'Paschim Medinipur', 'Purba Bardhaman', 'Purba Medinipur', 'Purulia', 'South 24 Parganas', 'Uttar Dinajpur']
+};
+
 interface YieldResult {
   predicted_yield: number;
   unit: string;
@@ -25,15 +48,15 @@ interface YieldFormData {
   crop: string;
   state_name: string;
   dist_name: string;
-  area_ha: number;
-  temperature_c: number;
-  humidity_percentage: number;
-  rainfall_mm: number;
-  wind_speed_m_s: number;
-  solar_radiation_mj_m2_day: number;
-  n_req_kg_per_ha: number;
-  p_req_kg_per_ha: number;
-  k_req_kg_per_ha: number;
+  area_ha: number | "";
+  temperature_c: number | "";
+  humidity_percentage: number | "";
+  rainfall_mm: number | "";
+  wind_speed_m_s: number | "";
+  solar_radiation_mj_m2_day: number | "";
+  n_req_kg_per_ha: number | "";
+  p_req_kg_per_ha: number | "";
+  k_req_kg_per_ha: number | "";
 }
 
 export default function YieldPrediction() {
@@ -41,17 +64,17 @@ export default function YieldPrediction() {
   const t = useTranslations();
   const [formData, setFormData] = useState<YieldFormData>({
     crop: 'rice',
-    state_name: '',
+    state_name: 'Gujarat',
     dist_name: '',
-    area_ha: 0.0,
-    temperature_c: 0.0,
-    humidity_percentage: 0.0,
-    rainfall_mm: 0.0,
-    wind_speed_m_s: 0.0,
-    solar_radiation_mj_m2_day: 0.0,
-    n_req_kg_per_ha: 0.0,
-    p_req_kg_per_ha: 0.0,
-    k_req_kg_per_ha: 0.0,
+    area_ha: "",
+    temperature_c: "",
+    humidity_percentage: "",
+    rainfall_mm: "",
+    wind_speed_m_s: "",
+    solar_radiation_mj_m2_day: "",
+    n_req_kg_per_ha: "",
+    p_req_kg_per_ha: "",
+    k_req_kg_per_ha: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -74,10 +97,20 @@ export default function YieldPrediction() {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
-    setFormData((prev: YieldFormData) => ({
-      ...prev,
-      [name]: type === 'number' ? parseFloat(value) : value
-    }));
+    
+    setFormData((prev: YieldFormData) => {
+      const newData = {
+        ...prev,
+        [name]: type === 'number' ? (value === "" ? "" : parseFloat(value)) : value
+      };
+
+      // Auto-update district if state changes
+      if (name === 'state_name' && DISTRICTS_BY_STATE[value]) {
+        newData.dist_name = DISTRICTS_BY_STATE[value][0];
+      }
+
+      return newData;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -87,15 +120,20 @@ export default function YieldPrediction() {
     setResult(null);
 
     try {
-      const apiUrl = "http://localhost:8000/api";
+      const apiUrl = "/api";
       
+      // Convert empty strings to 0 for backend validation
+      const submissionData = Object.entries(formData).reduce((acc, [key, value]) => {
+        acc[key] = value === "" ? 0 : value;
+        return acc;
+      }, {} as Record<string, string | number>);
+
       const response = await fetch(`${apiUrl}/predict/yield`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submissionData),
       });
 
       if (!response.ok) {
@@ -117,9 +155,9 @@ export default function YieldPrediction() {
       <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <span className="font-label text-xs font-bold uppercase tracking-[0.2em] text-primary mb-2 block">
-            {t("Predictive Intelligence")}
+            {t("dashboard.intelligence")}
           </span>
-          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">{t("Yield Simulation")}</h2>
+          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">{t("yield.simulation_title")}</h2>
         </div>
         <LocationDetector />
       </div>
@@ -128,14 +166,14 @@ export default function YieldPrediction() {
         <div className="md:col-span-8 glass-panel p-8 rounded-2xl border border-outline-variant/10 shadow-2xl">
           <h3 className="font-headline text-xl font-bold mb-8 flex items-center gap-3 text-white">
             <Calculator className="w-6 h-6 text-primary" />
-            {t("Field Parameters")}
+            {t("yield.field_parameters")}
           </h3>
           
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {/* Categorical Inputs */}
               <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("Crop Variety")}</label>
+                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("yield.crop_variety")}</label>
                 <select 
                   name="crop"
                   value={formData.crop}
@@ -148,7 +186,7 @@ export default function YieldPrediction() {
               
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("State Registry")}
+                  {t("yield.state_registry")}
                   <GpsIndicator isVisible={!!location.state && formData.state_name === location.state} />
                 </label>
                 <select 
@@ -163,7 +201,7 @@ export default function YieldPrediction() {
 
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("District Focus")}
+                  {t("yield.district_focus")}
                   <GpsIndicator isVisible={!!location.district && formData.dist_name === location.district} />
                 </label>
                 <input 
@@ -177,13 +215,14 @@ export default function YieldPrediction() {
               </div>
 
               <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("Cultivation Area (ha)")}</label>
+                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("yield.area_ha")}</label>
                 <input 
                   type="number" 
                   step="0.01"
                   name="area_ha"
                   value={formData.area_ha}
                   onChange={handleInputChange}
+                  placeholder="e.g. 5.5"
                   className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all" 
                 />
               </div>
@@ -191,7 +230,7 @@ export default function YieldPrediction() {
               {/* Environmental Details */}
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("Temperature (°C)")}
+                  {t("yield.temp")}
                   <GpsIndicator isVisible={location.temperature !== null && formData.temperature_c === location.temperature} />
                 </label>
                 <input 
@@ -199,13 +238,14 @@ export default function YieldPrediction() {
                   name="temperature_c"
                   value={formData.temperature_c}
                   onChange={handleInputChange}
+                  placeholder="e.g. 28.5"
                   className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("Avg Humidity (%)")}
+                  {t("yield.humidity")}
                   <GpsIndicator isVisible={location.humidity !== null && formData.humidity_percentage === location.humidity} />
                 </label>
                 <input 
@@ -213,13 +253,14 @@ export default function YieldPrediction() {
                   name="humidity_percentage"
                   value={formData.humidity_percentage}
                   onChange={handleInputChange}
+                  placeholder="e.g. 60.0"
                   className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("Annual Rainfall (mm)")}
+                  {t("yield.rainfall")}
                   <GpsIndicator isVisible={location.rainfall !== null && formData.rainfall_mm === location.rainfall} />
                 </label>
                 <input 
@@ -227,28 +268,31 @@ export default function YieldPrediction() {
                   name="rainfall_mm"
                   value={formData.rainfall_mm}
                   onChange={handleInputChange}
+                  placeholder="e.g. 100.0"
                   className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("Wind Velocity (m/s)")}</label>
+                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("yield.wind")}</label>
                 <input 
                   type="number"
                   name="wind_speed_m_s"
                   value={formData.wind_speed_m_s}
                   onChange={handleInputChange}
+                  placeholder="e.g. 15.0"
                   className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("Solar Intensity (MJ/m²)")}</label>
+                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("yield.solar")}</label>
                 <input 
                   type="number"
                   name="solar_radiation_mj_m2_day"
                   value={formData.solar_radiation_mj_m2_day}
                   onChange={handleInputChange}
+                  placeholder="e.g. 20.0"
                   className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
                 />
               </div>
@@ -256,39 +300,42 @@ export default function YieldPrediction() {
               {/* Nutrients - User requirements */}
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("N Capacity (kg/ha)")}
+                  {t("yield.n_cap")}
                 </label>
                 <input 
                   type="number"
                   name="n_req_kg_per_ha"
                   value={formData.n_req_kg_per_ha}
                   onChange={handleInputChange}
+                  placeholder="e.g. 120"
                   className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("P Capacity (kg/ha)")}
+                  {t("yield.p_cap")}
                 </label>
                 <input 
                   type="number"
                   name="p_req_kg_per_ha"
                   value={formData.p_req_kg_per_ha}
                   onChange={handleInputChange}
+                  placeholder="e.g. 60"
                   className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
                 />
               </div>
 
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("K Capacity (kg/ha)")}
+                  {t("yield.k_cap")}
                 </label>
                 <input 
                   type="number"
                   name="k_req_kg_per_ha"
                   value={formData.k_req_kg_per_ha}
                   onChange={handleInputChange}
+                  placeholder="e.g. 40"
                   className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
                 />
               </div>
@@ -301,10 +348,10 @@ export default function YieldPrediction() {
               {loading ? (
                 <>
                   <Loader2 className="w-6 h-6 animate-spin" />
-                  {t("Processing Vectors...")}
+                  {t("yield.processing_vectors")}
                 </>
               ) : (
-                t("Execute Predictive Modeling")
+                t("yield.execute_modeling")
               )}
             </button>
           </form>
@@ -318,8 +365,8 @@ export default function YieldPrediction() {
                  <TrendingUp className="w-8 h-8" />
                </div>
                <div>
-                  <h4 className="font-bold text-lg font-headline text-white">{t("Predicted Output")}</h4>
-                  <p className="text-xs text-slate-400 uppercase tracking-widest">{t("Quantum Simulation")}</p>
+                  <h4 className="font-bold text-lg font-headline text-white">{t("yield.predicted_output")}</h4>
+                  <p className="text-xs text-slate-400 uppercase tracking-widest">{t("yield.quantum_sim")}</p>
                </div>
              </div>
              
@@ -332,13 +379,13 @@ export default function YieldPrediction() {
                  
                  <div className="p-4 bg-primary/5 rounded-xl border border-primary/10 flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-primary" />
-                    <span className="text-sm font-semibold text-primary">{t("Stable Estimation")}</span>
+                    <span className="text-sm font-semibold text-primary">{t("yield.stable_estimation")}</span>
                  </div>
 
                  <div className="space-y-4 pt-4 border-t border-outline-variant/10">
                     <div className="flex justify-between text-xs font-bold uppercase text-slate-400">
-                      <span>{t("Feature Impact")}</span>
-                      <span>{t("Weight")}</span>
+                      <span>{t("yield.feature_impact")}</span>
+                      <span>{t("yield.weight")}</span>
                     </div>
                     {Object.entries(result.shap_values).map(([key, val]) => (
                       <div key={key} className="space-y-1">
@@ -374,9 +421,9 @@ export default function YieldPrediction() {
                <CloudSun className="w-6 h-6" />
              </div>
              <div>
-                <h4 className="font-bold text-sm tracking-tight mb-1 text-white">{t("Weather Context Sync")}</h4>
+                <h4 className="font-bold text-sm tracking-tight mb-1 text-white">{t("weather.sync_title")}</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  {t("Real-time environmental synchronization enabled for")} {formData.state_name}.
+                  {t("weather.sync_desc")} {formData.state_name}.
                 </p>
              </div>
           </div>

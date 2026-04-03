@@ -11,7 +11,7 @@ export default function DashboardLayout({
     <LocationProvider>
       <div className="relative min-h-screen bg-background text-on-surface">
         <DashboardSidebar />
-        <main className="ml-72 min-h-screen pt-20 px-8 pb-12">
+        <main className="ml-[22rem] min-h-screen pt-20 px-8 pb-12">
           <DashboardTopNav />
           {children}
         </main>

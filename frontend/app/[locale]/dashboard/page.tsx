@@ -53,7 +53,7 @@ export default function DashboardOverview() {
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/history/summary", {
+        const res = await axios.get("/api/history/summary", {
           withCredentials: true // Pass next-auth cookies
         });
         setHistory(res.data);
@@ -80,40 +80,40 @@ export default function DashboardOverview() {
 
   const kpis = [
     {
-      title: t("Latest Yield Prediction"),
+      title: t("dashboard.latest_yield"),
       value: latestYield ? latestYield.predicted_yield : "---",
       unit: latestYield ? "kg/ha" : "",
       icon: Tractor,
       iconClass: "text-primary",
       bgClass: "bg-primary/10",
-      pill: latestYield ? latestYield.crop : t("Awaiting Data"),
+      pill: latestYield ? latestYield.crop : t("dashboard.awaiting_simulation"),
     },
     {
-      title: t("Top Crop Recommendation"),
+      title: t("dashboard.top_crop"),
       value: latestCrop ? latestCrop.top_crop : "---",
       unit: "",
       icon: Sprout,
       iconClass: "text-tertiary",
       bgClass: "bg-tertiary/10",
-      pill: latestCrop ? `${(latestCrop.confidence * 100).toFixed(0)}% Match` : t("Pending Analysis"),
+      pill: latestCrop ? `${(latestCrop.confidence * 100).toFixed(0)}% Match` : t("common.syncing"),
     },
     {
-      title: t("Recent Disease Detection"),
+      title: t("dashboard.recent_disease"),
       value: latestDisease ? latestDisease.disease_name : "---",
       unit: "",
       icon: Activity,
       iconClass: "text-[#10b981]",
       bgClass: "bg-[#10b981]/10",
-      pill: latestDisease ? latestDisease.crop : t("No Issues"),
+      pill: latestDisease ? latestDisease.crop : t("dashboard.no_issues"),
     },
     {
-      title: t("Live Temperature"),
+      title: t("dashboard.live_temperature"),
       value: location.temperature ? Math.round(location.temperature).toString() : "---",
       unit: "°C",
       icon: Sun,
       iconClass: "text-orange-400",
       bgClass: "bg-orange-400/10",
-      pill: location.humidity ? `${Math.round(location.humidity)}% ${t("Humidity")}` : t("NASA Syncing"),
+      pill: location.humidity ? `${Math.round(location.humidity)}% ${t("common.humidity")}` : t("dashboard.nasa_syncing"),
     },
   ];
 
@@ -122,21 +122,21 @@ export default function DashboardOverview() {
       <div className="mb-10 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <span className="font-label text-xs font-bold uppercase tracking-[0.2em] text-primary mb-2 block">
-            {t("System Overview")}
+            {t("navigation.system_overview")}
           </span>
-          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">{t("Main Dashboard")}</h2>
+          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">{t("navigation.main_dashboard")}</h2>
         </div>
         <div className="flex gap-4">
           <Link href="/dashboard/disease-detection">
             <button className="flex items-center gap-2 px-6 py-3 rounded-full bg-surface-container-high border border-outline-variant/10 text-slate-200 font-label text-sm font-semibold hover:bg-surface-container-highest transition-all duration-300">
               <Upload className="text-primary w-5 h-5" />
-              {t("Upload Disease Image")}
+              {t("disease.upload_title")}
             </button>
           </Link>
           <Link href="/dashboard/yield-prediction">
             <button className="flex items-center gap-2 px-6 py-3 rounded-full liquid-pill text-[#0b1326] font-label text-sm font-bold hover:brightness-110 active:scale-95 transition-all shadow-xl shadow-primary/20">
               <PlusCircle className="w-5 h-5" />
-              {t("Predict New Yield")}
+              {t("yield.predict_new")}
             </button>
           </Link>
         </div>
@@ -172,21 +172,21 @@ export default function DashboardOverview() {
       {/* Bento Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Yield Projection Chart */}
-        <div className="lg:col-span-8 glass-panel rounded-xl p-8 border border-outline-variant/5 relative overflow-hidden flex flex-col">
+        <div className="lg:col-span-8 glass-panel rounded-xl p-8 border border-outline-variant/5 relative overflow-hidden flex flex-col min-h-[400px]">
           <div className="flex justify-between items-center mb-6">
             <div>
-              <h4 className="font-headline text-xl font-bold text-white">{t("Historical Yield Projections")}</h4>
-              <p className="font-label text-sm text-slate-400">{t("Your recent prediction runs")}</p>
+              <h4 className="font-headline text-xl font-bold text-white">{t("dashboard.historical_projections")}</h4>
+              <p className="font-label text-sm text-slate-400">{t("dashboard.recent_runs")}</p>
             </div>
           </div>
           
-          <div className="flex-1 w-full min-h-[250px] relative">
+          <div className="flex-1 w-full relative">
             {loading ? (
               <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-slate-500 font-label text-sm uppercase tracking-widest animate-pulse">{t("Loading history...")}</p>
+                <p className="text-slate-500 font-label text-sm uppercase tracking-widest animate-pulse">{t("dashboard.loading_history")}</p>
               </div>
             ) : chartData.length > 0 ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer width="100%" height={300}>
                 <AreaChart data={chartData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <defs>
                     <linearGradient id="colorYield" x1="0" y1="0" x2="0" y2="1">
@@ -206,7 +206,7 @@ export default function DashboardOverview() {
               </ResponsiveContainer>
             ) : (
               <div className="absolute inset-0 flex items-center justify-center">
-                <p className="text-slate-500 font-label text-sm uppercase tracking-widest bg-[#0b1326]/80 px-4 py-2 rounded-full border border-white/5">{t("No Data Yet. Predict Your First Yield!")}</p>
+                <p className="text-slate-500 font-label text-sm uppercase tracking-widest bg-[#0b1326]/80 px-4 py-2 rounded-full border border-white/5">{t("dashboard.no_data_yield")}</p>
               </div>
             )}
           </div>
@@ -214,12 +214,12 @@ export default function DashboardOverview() {
 
         {/* Environment Radar (Kept intact for real-time sensing) */}
         <div className="lg:col-span-4 glass-panel rounded-xl p-8 border border-outline-variant/5">
-          <h4 className="font-headline text-xl font-bold mb-6 text-white">{t("Live Environment Sync")}</h4>
+          <h4 className="font-headline text-xl font-bold mb-6 text-white">{t("dashboard.live_env_sync")}</h4>
           <div className="space-y-6">
             <div className="flex flex-col gap-1">
               <div className="flex justify-between items-center text-xs font-label uppercase tracking-widest text-slate-400 mb-1">
-                <span>{t("Rainfall Confidence")}</span>
-                <span className="font-bold text-white">{location.rainfall ? t("High") : "---"}</span>
+                <span>{t("dashboard.rainfall_confidence")}</span>
+                <span className="font-bold text-white">{location.rainfall ? t("common.high") : "---"}</span>
               </div>
               <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
                 <div className={`bg-tertiary h-full transition-all duration-1000 ${location.rainfall ? "w-[85%]" : "w-0"}`} />
@@ -228,8 +228,8 @@ export default function DashboardOverview() {
             
             <div className="flex flex-col gap-1">
               <div className="flex justify-between items-center text-xs font-label uppercase tracking-widest text-slate-400 mb-1">
-                <span>{t("Temp Variation")}</span>
-                <span className="font-bold text-white">{location.temperature ? t("Normal") : "---"}</span>
+                <span>{t("dashboard.temp_variation")}</span>
+                <span className="font-bold text-white">{location.temperature ? t("common.normal") : "---"}</span>
               </div>
               <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
                 <div className={`bg-primary h-full transition-all duration-1000 ${location.temperature ? "w-[60%]" : "w-0"}`} />
@@ -238,7 +238,7 @@ export default function DashboardOverview() {
 
             <div className="mt-8 p-4 bg-primary/5 rounded-xl border border-primary/10">
               <p className="text-[10px] text-slate-400 font-label leading-relaxed uppercase tracking-wider">
-                <span className="text-primary font-bold">Status:</span> {locLoading ? t("Checking NASA Data...") : t("System Operational & Synced")}
+                <span className="text-primary font-bold">Status:</span> {locLoading ? t("dashboard.checking_nasa") : t("dashboard.operational_synced")}
               </p>
             </div>
           </div>
@@ -248,8 +248,8 @@ export default function DashboardOverview() {
         <div className="lg:col-span-12 glass-panel rounded-xl p-8 border border-outline-variant/5">
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h4 className="font-headline text-xl font-bold text-white">{t("Farmer Action Items")}</h4>
-              <p className="font-label text-sm text-slate-400">{t("Priority alerts based on your history against current conditions")}</p>
+              <h4 className="font-headline text-xl font-bold text-white">{t("dashboard.action_items")}</h4>
+              <p className="font-label text-sm text-slate-400">{t("dashboard.priority_alerts")}</p>
             </div>
           </div>
 
@@ -263,7 +263,7 @@ export default function DashboardOverview() {
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-orange-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-orange-400/10">{t("Live Alert")}</span>
+                    <span className="text-orange-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-orange-400/10">{t("dashboard.live_alert")}</span>
                   </div>
                   <h5 className="font-headline text-base font-bold text-white group-hover:text-orange-400 transition-colors">Temperature Normal</h5>
                   <p className="text-sm text-slate-400 mt-1">Current soil temp ({Math.round(location.temperature)}°C) is ideal for sowing major crops.</p>
@@ -279,7 +279,7 @@ export default function DashboardOverview() {
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-red-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-red-400/10">{t("Post-Scan Action")}</span>
+                    <span className="text-red-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-red-400/10">{t("dashboard.post_scan")}</span>
                     <span className="text-[10px] text-slate-500 font-medium">For {latestDisease.crop}</span>
                   </div>
                   <h5 className="font-headline text-base font-bold text-white group-hover:text-red-400 transition-colors">Treat {latestDisease.disease_name}</h5>
@@ -293,7 +293,7 @@ export default function DashboardOverview() {
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-[#10b981] text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-[#10b981]/10">{t("Suggestion")}</span>
+                    <span className="text-[#10b981] text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-[#10b981]/10">{t("dashboard.suggestion")}</span>
                   </div>
                   <h5 className="font-headline text-base font-bold text-white group-hover:text-[#10b981] transition-colors">Scan Your Crops</h5>
                   <p className="text-sm text-slate-400 mt-1">Found a suspicious leaf? Take a photo and upload it anomaly detection.</p>
@@ -309,7 +309,7 @@ export default function DashboardOverview() {
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-primary/10">{t("Next Season")}</span>
+                    <span className="text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-primary/10">{t("dashboard.next_season")}</span>
                   </div>
                   <h5 className="font-headline text-base font-bold text-white group-hover:text-primary transition-colors">Consider {latestCrop.top_crop}</h5>
                   <p className="text-sm text-slate-400 mt-1">Based on you recent soil analysis, {latestCrop.top_crop} is highly recommended.</p>
@@ -322,7 +322,7 @@ export default function DashboardOverview() {
                 </div>
                 <div className="flex-1">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-primary/10">{t("Growth Plan")}</span>
+                    <span className="text-primary text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-primary/10">{t("dashboard.growth_plan")}</span>
                   </div>
                   <h5 className="font-headline text-base font-bold text-white group-hover:text-primary transition-colors">Start Planning</h5>
                   <p className="text-sm text-slate-400 mt-1">Get AI crop recommendations based on your soil and regional weather data.</p>

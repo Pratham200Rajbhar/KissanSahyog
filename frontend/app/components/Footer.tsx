@@ -17,19 +17,19 @@ export default function Footer() {
         </div>
         <div className="flex flex-wrap justify-center gap-8 font-label text-xs uppercase tracking-[0.1em]">
           <Link href="/dashboard/map-insights" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
-            {t("Ecosystem")}
+            {t("nav.ecosystem")}
           </Link>
           <Link href="/dashboard/disease-detection" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
-            {t("Intelligence")}
+            {t("nav.intelligence")}
           </Link>
           <Link href="#" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
-            {t("Network")}
+            {t("footer.network")}
           </Link>
           <Link href="#" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
-            {t("Privacy")}
+            {t("footer.privacy")}
           </Link>
           <Link href="#" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
-            {t("Terms")}
+            {t("footer.terms")}
           </Link>
         </div>
         <div className="flex gap-4">

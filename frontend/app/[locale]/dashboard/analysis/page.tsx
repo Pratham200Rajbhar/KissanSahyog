@@ -68,11 +68,7 @@ export default function AnalysisPage() {
   useEffect(() => {
     const fetchFullHistory = async () => {
       try {
-        const res = await fetch("http://localhost:8000/api/history/full", {
-          headers: {
-            "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
-          }
-        });
+        const res = await fetch("/api/history/full");
         if (!res.ok) throw new Error("Failed to fetch history");
         const data = await res.json();
         setHistory(data);
@@ -107,15 +103,15 @@ export default function AnalysisPage() {
     // Title
     doc.setFontSize(22);
     doc.setTextColor(34, 197, 94);
-    doc.text(t("AgriAI Farmer Report"), pageWidth / 2, 20, { align: "center" });
+    doc.text(t("analysis.report_title"), pageWidth / 2, 20, { align: "center" });
     
     doc.setFontSize(10);
     doc.setTextColor(100);
     
     // Add date range info
-    let subtitle = `${t("Generated on:")} ${new Date().toLocaleString()}`;
+    let subtitle = `${t("analysis.generated_on")} ${new Date().toLocaleString()}`;
     if (startDate || endDate) {
-      subtitle += ` | ${t("Filters:")} ${startDate || t("Start Date")} ${t("to")} ${endDate || t("Present")}`;
+      subtitle += ` | ${t("analysis.filters")} ${startDate || t("analysis.start_date")} ${t("analysis.to")} ${endDate || t("analysis.present")}`;
     }
     doc.text(subtitle, pageWidth / 2, 28, { align: "center" });
 
@@ -125,7 +121,7 @@ export default function AnalysisPage() {
     if (downloadOptions.yields && filteredYields.length > 0) {
       doc.setFontSize(14);
       doc.setTextColor(40);
-      doc.text(t("Yield Predictions History"), 14, finalY);
+      doc.text(t("analysis.yield_history"), 14, finalY);
       
       const yieldData = filteredYields.map((y) => [
         new Date(y.created_at).toLocaleDateString(),
@@ -137,7 +133,7 @@ export default function AnalysisPage() {
 
       autoTable(doc, {
         startY: finalY + 5,
-        head: [[t('Date'), t('Crop'), t('Location'), t('Area (ha)'), t('Predicted Yield')]],
+        head: [[t("analysis.date"), t("analysis.crop"), t("analysis.location"), t("analysis.area"), t("analysis.yield_unit")]],
         body: yieldData,
         theme: 'grid',
         headStyles: { fillColor: [34, 197, 94] }
@@ -150,7 +146,7 @@ export default function AnalysisPage() {
       if (finalY > 250) { doc.addPage(); finalY = 20; }
       doc.setFontSize(14);
       doc.setTextColor(40);
-      doc.text(t("Crop Health & Disease Logs"), 14, finalY);
+      doc.text(t("analysis.disease_logs"), 14, finalY);
       
       const diseaseData = filteredDiseases.map((d) => [
         new Date(d.created_at).toLocaleDateString(),
@@ -162,7 +158,7 @@ export default function AnalysisPage() {
 
       autoTable(doc, {
         startY: finalY + 5,
-        head: [[t('Date'), t('Crop'), t('Disease'), t('Confidence'), t('Recommended Remedy')]],
+        head: [[t("analysis.date"), t("analysis.crop"), t("analysis.disease"), t("analysis.confidence"), t("analysis.remedy")]],
         body: diseaseData,
         theme: 'grid',
         headStyles: { fillColor: [239, 68, 68] },
@@ -176,7 +172,7 @@ export default function AnalysisPage() {
       if (finalY > 250) { doc.addPage(); finalY = 20; }
       doc.setFontSize(14);
       doc.setTextColor(40);
-      doc.text(t("AI Crop Recommendations"), 14, finalY);
+      doc.text(t("analysis.crop_recs"), 14, finalY);
       
       const recData = filteredCrops.map((c) => [
         new Date(c.created_at).toLocaleDateString(),
@@ -187,7 +183,7 @@ export default function AnalysisPage() {
 
       autoTable(doc, {
         startY: finalY + 5,
-        head: [[t('Date'), t('Top Recommendation'), t('Confidence'), t('Other Options Taken')]],
+        head: [[t("analysis.date"), t("analysis.top_rec"), t("analysis.confidence"), t("analysis.other_options")]],
         body: recData,
         theme: 'grid',
         headStyles: { fillColor: [59, 130, 246] }
@@ -205,7 +201,7 @@ export default function AnalysisPage() {
     return (
       <div className="mt-8 flex flex-col items-center justify-center min-h-[50vh]">
         <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
-        <h2 className="text-white font-headline text-xl">{t("Loading complete history...")}</h2>
+        <h2 className="text-white font-headline text-xl">{t("analysis.loading")}</h2>
       </div>
     );
   }
@@ -224,20 +220,20 @@ export default function AnalysisPage() {
                 <X className="w-5 h-5" />
               </button>
               <h3 className="font-headline text-xl text-white font-bold flex items-center gap-2">
-                <Filter className="text-primary w-5 h-5"/> {t("Customize Report")}
+                <Filter className="text-primary w-5 h-5"/> {t("analysis.customize_report")}
               </h3>
-              <p className="text-sm text-slate-400 mt-1">{t("Select data sections and perfectly filter your exported PDF.")}</p>
+              <p className="text-sm text-slate-400 mt-1">{t("analysis.customize_desc")}</p>
             </div>
             
             <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
               {/* Date Filters Section inside Modal */}
               <div className="mb-6 bg-white/5 p-4 rounded-xl border border-white/5">
                 <h4 className="font-label text-xs uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
-                  <Calendar className="w-4 h-4"/> {t("Export Date Range")}
+                  <Calendar className="w-4 h-4"/> {t("analysis.export_range")}
                 </h4>
                 <div className="flex gap-4">
                   <div className="flex-1">
-                    <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">{t("Start Date")}</label>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">{t("analysis.start_date")}</label>
                     <input 
                       type="date" 
                       value={startDate}
@@ -246,7 +242,7 @@ export default function AnalysisPage() {
                     />
                   </div>
                   <div className="flex-1">
-                    <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">{t("End Date")}</label>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">{t("analysis.end_date")}</label>
                     <input 
                       type="date" 
                       value={endDate}
@@ -257,7 +253,7 @@ export default function AnalysisPage() {
                 </div>
               </div>
 
-              <h4 className="font-label text-xs uppercase tracking-wider text-slate-400 mb-3">{t("Include Sections")}</h4>
+              <h4 className="font-label text-xs uppercase tracking-wider text-slate-400 mb-3">{t("analysis.include_sections")}</h4>
               <div className="space-y-3">
                 {/* Yield Option */}
                 <button 
@@ -269,8 +265,8 @@ export default function AnalysisPage() {
                       <Tractor className="w-4 h-4" />
                     </div>
                     <div className="text-left">
-                      <div className="font-bold text-sm">{t("Yield Predictions")}</div>
-                      <div className="text-xs opacity-70">{filteredYields.length} {t("records in range")}</div>
+                      <div className="font-bold text-sm">{t("analysis.yield_predictions")}</div>
+                      <div className="text-xs opacity-70">{filteredYields.length} {t("analysis.records_range")}</div>
                     </div>
                   </div>
                   {downloadOptions.yields && <Check className="w-5 h-5 text-primary" />}
@@ -286,8 +282,8 @@ export default function AnalysisPage() {
                       <Activity className="w-4 h-4" />
                     </div>
                     <div className="text-left">
-                      <div className="font-bold text-sm">{t("Disease Detections")}</div>
-                      <div className="text-xs opacity-70">{filteredDiseases.length} {t("records in range")}</div>
+                      <div className="font-bold text-sm">{t("analysis.disease_detections")}</div>
+                      <div className="text-xs opacity-70">{filteredDiseases.length} {t("analysis.records_range")}</div>
                     </div>
                   </div>
                   {downloadOptions.diseases && <Check className="w-5 h-5 text-red-400" />}
@@ -303,8 +299,8 @@ export default function AnalysisPage() {
                       <Lightbulb className="w-4 h-4" />
                     </div>
                     <div className="text-left">
-                      <div className="font-bold text-sm">{t("Recommendations")}</div>
-                      <div className="text-xs opacity-70">{filteredCrops.length} {t("records in range")}</div>
+                      <div className="font-bold text-sm">{t("analysis.recommendations")}</div>
+                      <div className="text-xs opacity-70">{filteredCrops.length} {t("analysis.records_range")}</div>
                     </div>
                   </div>
                   {downloadOptions.recommendations && <Check className="w-5 h-5 text-blue-400" />}
@@ -319,7 +315,7 @@ export default function AnalysisPage() {
                 className="w-full flex justify-center items-center gap-2 px-6 py-4 rounded-xl bg-primary text-[#0b1326] font-label text-base font-bold hover:brightness-110 active:scale-95 transition-all shadow-xl shadow-primary/20 disabled:opacity-50 disabled:pointer-events-none"
               >
                 <Download className="w-5 h-5" />
-                {t("Generate My Report")}
+                {t("analysis.generate_report")}
               </button>
             </div>
 
@@ -330,10 +326,10 @@ export default function AnalysisPage() {
       <div className="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-6">
         <div>
           <span className="font-label text-xs font-bold uppercase tracking-[0.2em] text-primary mb-2 block">
-            {t("Data Hub")}
+            {t("analysis.data_hub")}
           </span>
-          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">{t("Full History")}</h2>
-          <p className="text-slate-400 mt-2">{t("View all your chronological past logs in one place.")}</p>
+          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">{t("analysis.full_history")}</h2>
+          <p className="text-slate-400 mt-2">{t("analysis.history_desc")}</p>
         </div>
         
         {/* Actions */}
@@ -343,7 +339,7 @@ export default function AnalysisPage() {
             className="flex items-center gap-2 px-6 py-4 rounded-xl bg-primary text-[#0b1326] font-label text-sm font-bold hover:brightness-110 active:scale-95 transition-all shadow-xl shadow-primary/20 whitespace-nowrap"
           >
             <Download className="w-5 h-5" />
-            {t("Download Now")}
+            {t("analysis.download_now")}
           </button>
         </div>
       </div>
@@ -353,19 +349,19 @@ export default function AnalysisPage() {
           onClick={() => setActiveTab("yield")}
           className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-label text-sm transition-all duration-300 ${activeTab === 'yield' ? 'bg-primary/20 text-primary font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <Tractor className="w-4 h-4" /> {t("Yields")} ({history.yield_predictions.length})
+          <Tractor className="w-4 h-4" /> {t("analysis.yields_tab")} ({history.yield_predictions.length})
         </button>
         <button 
           onClick={() => setActiveTab("disease")}
           className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-label text-sm transition-all duration-300 ${activeTab === 'disease' ? 'bg-red-400/20 text-red-400 font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <Activity className="w-4 h-4" /> {t("Diseases")} ({history.disease_detections.length})
+          <Activity className="w-4 h-4" /> {t("analysis.diseases_tab")} ({history.disease_detections.length})
         </button>
         <button 
           onClick={() => setActiveTab("recommend")}
           className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-label text-sm transition-all duration-300 ${activeTab === 'recommend' ? 'bg-blue-400/20 text-blue-400 font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <Lightbulb className="w-4 h-4" /> {t("Recommendations")} ({history.crop_recommendations.length})
+          <Lightbulb className="w-4 h-4" /> {t("analysis.recommendations")} ({history.crop_recommendations.length})
         </button>
       </div>
 
@@ -377,11 +373,11 @@ export default function AnalysisPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-white/5 text-slate-300 font-label text-xs uppercase tracking-wider border-b border-primary/20">
-                  <th className="p-4 py-5 font-bold">{t("Date")}</th>
-                  <th className="p-4 py-5 font-bold">{t("Crop")}</th>
-                  <th className="p-4 py-5 font-bold">{t("Location")}</th>
-                  <th className="p-4 py-5 font-bold">{t("Area (ha)")}</th>
-                  <th className="p-4 py-5 font-bold text-right">{t("Yield (kg/ha)")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.date")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.crop")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.location")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.area")}</th>
+                  <th className="p-4 py-5 font-bold text-right">{t("analysis.yield_unit")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 text-sm text-slate-300 font-label">
@@ -397,7 +393,7 @@ export default function AnalysisPage() {
                   <tr>
                     <td colSpan={5} className="p-12 text-center text-slate-500 font-label flex-col items-center flex justify-center">
                       <Tractor className="w-12 h-12 mb-4 opacity-50 text-primary"/>
-                      <p className="text-lg font-bold">{t("No yield predictions found.")}</p>
+                      <p className="text-lg font-bold">{t("analysis.no_yields")}</p>
                     </td>
                   </tr>
                 )}
@@ -412,11 +408,11 @@ export default function AnalysisPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-red-400/5 text-slate-300 font-label text-xs uppercase tracking-wider border-b border-red-400/20">
-                  <th className="p-4 py-5 font-bold">{t("Date")}</th>
-                  <th className="p-4 py-5 font-bold">{t("Crop")}</th>
-                  <th className="p-4 py-5 font-bold">{t("Disease")}</th>
-                  <th className="p-4 py-5 font-bold">{t("Confidence")}</th>
-                  <th className="p-4 py-5 font-bold">{t("Remedy Action")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.date")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.crop")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.disease")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.confidence")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.remedy_action")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 text-sm text-slate-300 font-label">
@@ -434,7 +430,7 @@ export default function AnalysisPage() {
                   <tr>
                     <td colSpan={5} className="p-12 text-center text-slate-500 font-label flex-col items-center flex justify-center">
                       <Activity className="w-12 h-12 mb-4 opacity-50 text-red-400"/>
-                      <p className="text-lg font-bold">{t("No disease detections found.")}</p>
+                      <p className="text-lg font-bold">{t("analysis.no_diseases")}</p>
                     </td>
                   </tr>
                 )}
@@ -449,10 +445,10 @@ export default function AnalysisPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-blue-400/5 text-slate-300 font-label text-xs uppercase tracking-wider border-b border-blue-400/20">
-                  <th className="p-4 py-5 font-bold">{t("Date")}</th>
-                  <th className="p-4 py-5 font-bold text-blue-400">{t("Match")}</th>
-                  <th className="p-4 py-5 font-bold">{t("Confidence")}</th>
-                  <th className="p-4 py-5 font-bold">{t("Other Options Analyzed")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.date")}</th>
+                  <th className="p-4 py-5 font-bold text-blue-400">{t("analysis.match")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.confidence")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.other_analyzed")}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5 text-sm text-slate-300 font-label">
@@ -473,7 +469,7 @@ export default function AnalysisPage() {
                   <tr>
                     <td colSpan={4} className="p-12 text-center text-slate-500 font-label flex-col items-center flex justify-center">
                       <Lightbulb className="w-12 h-12 mb-4 opacity-50 text-blue-400"/>
-                      <p className="text-lg font-bold">{t("No crop recommendations logged.")}</p>
+                      <p className="text-lg font-bold">{t("analysis.no_recommendations")}</p>
                     </td>
                   </tr>
                 )}

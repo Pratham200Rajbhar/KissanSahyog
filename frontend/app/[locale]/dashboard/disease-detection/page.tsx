@@ -55,7 +55,7 @@ export default function DiseaseDetection() {
     formData.append("crop_type", selectedCrop);
 
     try {
-      const apiUrl = "http://localhost:8000/api";
+      const apiUrl = "/api";
       const response = await fetch(`${apiUrl}/detect/disease`, {
         method: "POST",
         body: formData,
@@ -93,13 +93,13 @@ export default function DiseaseDetection() {
           className="text-center md:text-left"
         >
           <span className="font-label text-xs font-bold uppercase tracking-[0.2em] text-primary mb-2 block">
-            {t("Computer Vision")}
+            {t("dashboard.intelligence")}
           </span>
           <h2 className="font-headline text-5xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white to-slate-400">
-            {t("AI Disease Detection")}
+            {t("disease.ai_detection")}
           </h2>
           <p className="text-slate-400 mt-3 text-lg leading-relaxed max-w-2xl">
-            {t("Instantly identify pathogenic infections in your crops using our advanced neural analysis system.")}
+            {t("disease.description")}
           </p>
         </motion.div>
         <LocationDetector />
@@ -113,13 +113,13 @@ export default function DiseaseDetection() {
             
             <h3 className="font-headline text-xl font-bold mb-6 flex items-center gap-2">
               <Leaf className="w-5 h-5 text-primary" />
-              {t("Configure Analysis")}
+              {t("disease.configure")}
               <GpsIndicator isVisible={!!location.latitude} />
             </h3>
 
             {/* Crop Selection */}
             <div className="mb-8">
-              <label className="block text-xs font-label text-slate-500 uppercase tracking-wider mb-3">{t("Target Crop")}</label>
+              <label className="block text-xs font-label text-slate-500 uppercase tracking-wider mb-3">{t("disease.target_crop")}</label>
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                 {CROP_OPTIONS.map((crop) => (
                   <button
@@ -132,7 +132,7 @@ export default function DiseaseDetection() {
                     }`}
                   >
                     <span className="text-2xl mb-1">{crop.icon}</span>
-                    <span className="text-[10px] font-bold text-center">{t(crop.name)}</span>
+                    <span className="text-[10px] font-bold text-center">{t(`disease.${crop.id.toLowerCase()}`)}</span>
                   </button>
                 ))}
               </div>
@@ -166,7 +166,7 @@ export default function DiseaseDetection() {
                   />
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
                     <p className="text-white font-bold text-sm bg-primary/80 px-4 py-2 rounded-full flex items-center gap-2">
-                      <RefreshCw className="w-4 h-4" /> {t("Change Image")}
+                      <RefreshCw className="w-4 h-4" /> {t("disease.change_image")}
                     </p>
                   </div>
                 </div>
@@ -175,8 +175,8 @@ export default function DiseaseDetection() {
                   <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center mb-6 ring-4 ring-primary/5 animate-pulse">
                     <UploadCloud className="w-10 h-10 text-primary" />
                   </div>
-                  <p className="font-bold text-xl text-white mb-2">{t("Click to Upload")}</p>
-                  <p className="text-slate-500 text-sm">{t("JPG, PNG or HEIC formats")}</p>
+                  <p className="font-bold text-xl text-white mb-2">{t("disease.upload_placeholder")}</p>
+                  <p className="text-slate-500 text-sm">{t("disease.formats_hint")}</p>
                 </>
               )}
             </div>
@@ -185,7 +185,7 @@ export default function DiseaseDetection() {
                   {/* ... same inside ... */}
                   <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity rounded-xl">
                     <p className="text-white font-bold text-sm bg-primary/80 px-4 py-2 rounded-full flex items-center gap-2">
-                      <RefreshCw className="w-4 h-4" /> {t("Change Image")}
+                      <RefreshCw className="w-4 h-4" /> {t("disease.change_image")}
                     </p>
                   </div>
             </div>
@@ -201,12 +201,12 @@ export default function DiseaseDetection() {
                 {loading ? (
                   <>
                     <Loader2 className="w-6 h-6 animate-spin" />
-                    {t("Analyzing Sample...")}
+                    {t("disease.analyzing")}
                   </>
                 ) : (
                   <>
                     <ShieldCheck className="w-6 h-6" />
-                    {t("Start AI Diagnostic")}
+                    {t("disease.start_diagnostic")}
                   </>
                 )}
               </motion.button>
@@ -230,7 +230,7 @@ export default function DiseaseDetection() {
           <div className="glass-panel h-full min-h-[500px] p-8 rounded-2xl border border-white/5 bg-surface-container-low shadow-2xl flex flex-col">
             <h3 className="font-headline text-xl font-bold mb-6 flex items-center gap-2">
               <RefreshCw className={`w-5 h-5 text-primary ${loading ? 'animate-spin' : ''}`} />
-              {t("Analysis Real-time Feed")}
+              {t("disease.realtime_feed")}
             </h3>
 
             <div className="flex-grow flex flex-col items-center justify-center relative">
@@ -247,8 +247,8 @@ export default function DiseaseDetection() {
                       <FileImage className="w-10 h-10 opacity-30" />
                     </div>
                     <div className="max-w-xs">
-                      <p className="font-bold text-lg text-slate-400 mb-2">{t("No active scan")}</p>
-                      <p className="text-sm">{t("Upload a crop image and select your crop type to begin analysis.")}</p>
+                      <p className="font-bold text-lg text-slate-400 mb-2">{t("disease.no_active_scan")}</p>
+                      <p className="text-sm">{t("disease.instructions")}</p>
                     </div>
                   </motion.div>
                 )}
@@ -268,7 +268,7 @@ export default function DiseaseDetection() {
                       </div>
                     </div>
                     <div className="text-center">
-                      <p className="font-bold text-2xl text-white mb-2">{t("Analyzing Bio-Markers")}</p>
+                      <p className="font-bold text-2xl text-white mb-2">{t("disease.analyzing_biomarkers")}</p>
                       <div className="flex gap-1 justify-center">
                         <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.3s]" />
                         <span className="w-2 h-2 bg-primary rounded-full animate-bounce [animation-delay:-0.15s]" />
@@ -292,7 +292,7 @@ export default function DiseaseDetection() {
                         ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
                         : 'bg-red-500/20 text-red-400 border border-red-500/30'
                       }`}>
-                        {result.disease.toLowerCase().includes('healthy') ? t('Safe Status') : t('Disease Detected')}
+                        {result.disease.toLowerCase().includes('healthy') ? t('disease.safe_status') : t('disease.detected')}
                       </div>
                       <h4 className="font-headline text-4xl font-black text-white">{result.disease}</h4>
                     </div>
@@ -300,10 +300,10 @@ export default function DiseaseDetection() {
                     {/* Stats Grid */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="p-6 rounded-2xl bg-surface-container border border-white/5">
-                        <p className="text-xs font-label text-slate-500 uppercase mb-4 tracking-tighter">{t("Confidence Index")}</p>
+                        <p className="text-xs font-label text-slate-500 uppercase mb-4 tracking-tighter">{t("disease.confidence_index")}</p>
                         <div className="flex items-end justify-between mb-2">
                           <span className="text-4xl font-black font-headline text-primary">{(result.confidence * 100).toFixed(1)}%</span>
-                          <span className="text-slate-400 text-xs mb-1">{t("High Accuracy")}</span>
+                          <span className="text-slate-400 text-xs mb-1">{t("disease.high_accuracy")}</span>
                         </div>
                         <div className="w-full h-3 bg-white/5 rounded-full overflow-hidden">
                           <motion.div 
@@ -316,14 +316,14 @@ export default function DiseaseDetection() {
                       </div>
 
                       <div className="p-6 rounded-2xl bg-surface-container border border-white/5">
-                        <p className="text-xs font-label text-slate-500 uppercase mb-4 tracking-tighter">{t("Quick Mitigation")}</p>
+                        <p className="text-xs font-label text-slate-500 uppercase mb-4 tracking-tighter">{t("disease.quick_mitigation")}</p>
                         <div className="flex items-center gap-4">
                           <div className="p-4 rounded-xl bg-primary/10 border border-primary/20">
                             <ShieldCheck className="w-8 h-8 text-primary" />
                           </div>
                           <div>
-                            <p className="font-bold text-white leading-tight">{t("Recommended actions available")}</p>
-                            <p className="text-slate-400 text-xs mt-1">{t("AI verified solution")}</p>
+                            <p className="font-bold text-white leading-tight">{t("disease.actions_available")}</p>
+                            <p className="text-slate-400 text-xs mt-1">{t("disease.verified_solution")}</p>
                           </div>
                         </div>
                       </div>
@@ -334,7 +334,7 @@ export default function DiseaseDetection() {
                       <div className="absolute -top-10 -right-10 w-40 h-40 bg-primary/5 blur-3xl rounded-full" />
                       <h5 className="font-bold text-white mb-4 flex items-center gap-2">
                         <AlertCircle className="w-5 h-5 text-primary" />
-                        {t("Management Strategy")}
+                        {t("disease.management_strategy")}
                       </h5>
                       <p className="text-slate-300 leading-relaxed text-lg mb-6">
                         {result.remedy}
@@ -342,7 +342,7 @@ export default function DiseaseDetection() {
                       
                       <div className="flex flex-wrap gap-3">
                         <button onClick={resetDetection} className="px-6 py-2 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-sm transition-colors flex items-center gap-2">
-                          <RefreshCw className="w-4 h-4" /> {t("Rescan Crop")}
+                          <RefreshCw className="w-4 h-4" /> {t("disease.rescan")}
                         </button>
                       </div>
                     </div>

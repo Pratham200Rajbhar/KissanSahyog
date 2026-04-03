@@ -1,6 +1,6 @@
 "use client";
 
-import { Menu, Sun, Moon, Globe, ChevronDown } from "lucide-react";
+import { Menu, Sun, Moon, Globe, ChevronDown, Loader2 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link, usePathname, useRouter } from "../../i18n/routing";
@@ -9,16 +9,13 @@ import { signIn } from "next-auth/react";
 const localeNames: Record<string, string> = {
   en: "English",
   hi: "हिन्दी",
-  gu: "ગુજરાતી",
-  mr: "मराठी",
-  bn: "বাংলা",
-  ta: "தமிழ்",
-  te: "తెలుగు"
+  gu: "ગુજરાતી"
 };
 
 export default function Navbar() {
   const [theme, setTheme] = useState("dark");
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const t = useTranslations();
   const locale = useLocale();
   const router = useRouter();
@@ -58,25 +55,25 @@ export default function Navbar() {
             href="/dashboard/map-insights"
             className="text-primary font-bold border-b-2 border-primary pb-1 active:scale-95 transform transition-transform"
           >
-            {t("Ecosystem")}
+            {t("nav.ecosystem")}
           </Link>
           <Link
             href="/dashboard/yield-prediction"
             className="text-slate-300 hover:text-primary transition-colors active:scale-95 transform transition-transform"
           >
-            {t("Predictions")}
+            {t("nav.predictions")}
           </Link>
           <Link
             href="/dashboard/disease-detection"
             className="text-slate-300 hover:text-primary transition-colors active:scale-95 transform transition-transform"
           >
-            {t("Intelligence")}
+            {t("nav.intelligence")}
           </Link>
           <Link
             href="/dashboard/recommendations"
             className="text-slate-300 hover:text-primary transition-colors active:scale-95 transform transition-transform"
           >
-            {t("Recommendations")}
+            {t("nav.recommendations")}
           </Link>
         </div>
         <div className="flex items-center gap-2 md:gap-4">
@@ -112,10 +109,15 @@ export default function Navbar() {
             {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
           </button>
           <button
-            onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-            className="hidden md:block bg-primary-container text-on-primary-container px-6 py-2 rounded-full font-bold hover:bg-white/5 hover:-translate-y-1 transition-all duration-300 active:scale-95 transform"
+            onClick={() => {
+              setIsLoggingIn(true);
+              signIn("google", { callbackUrl: "/dashboard" });
+            }}
+            disabled={isLoggingIn}
+            className="hidden md:flex items-center gap-2 bg-primary-container text-on-primary-container px-6 py-2 rounded-full font-bold hover:bg-white/5 hover:-translate-y-1 transition-all duration-300 active:scale-95 transform disabled:opacity-70 disabled:cursor-not-allowed"
           >
-            {t("Login")}
+            {isLoggingIn && <Loader2 className="w-4 h-4 animate-spin" />}
+            {isLoggingIn ? t("nav.logging_in") : t("nav.login")}
           </button>
           <button className="md:hidden text-primary">
             <Menu className="w-6 h-6" />

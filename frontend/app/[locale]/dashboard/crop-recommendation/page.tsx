@@ -29,14 +29,14 @@ export default function CropRecommendationPage() {
 
   const { location } = useLocation();
   const t = useTranslations();
-  const [formData, setFormData] = useState<Record<FormDataKey, number>>({
-    N: 0,
-    P: 0,
-    K: 0,
-    pH: 0.0,
-    temperature: 0.0,
-    humidity: 0.0,
-    rainfall: 0.0,
+  const [formData, setFormData] = useState<Record<FormDataKey, number | "">>({
+    N: "",
+    P: "",
+    K: "",
+    pH: "",
+    temperature: "",
+    humidity: "",
+    rainfall: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -46,7 +46,7 @@ export default function CropRecommendationPage() {
   // Auto-fill from location
   useEffect(() => {
     if (location.temperature !== null) {
-      setFormData((prev: Record<FormDataKey, number>) => ({
+      setFormData((prev: Record<FormDataKey, number | "">) => ({
         ...prev,
         temperature: location.temperature ?? prev.temperature,
         humidity: location.humidity ?? prev.humidity,
@@ -56,7 +56,8 @@ export default function CropRecommendationPage() {
   }, [location]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: parseFloat(e.target.value) || 0 });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value === "" ? "" : parseFloat(value) });
   };
 
   const handlePredict = async (e: React.FormEvent) => {
@@ -66,12 +67,18 @@ export default function CropRecommendationPage() {
     setRecommendations([]);
 
     try {
-      const apiUrl = "http://localhost:8000/api";
+      const apiUrl = "/api";
       
+      // Convert empty strings to 0 for backend validation
+      const submissionData = Object.entries(formData).reduce((acc, [key, value]) => {
+        acc[key] = value === "" ? 0 : value;
+        return acc;
+      }, {} as Record<string, string | number>);
+
       const res = await fetch(`${apiUrl}/recommend/crop`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(submissionData),
       });
 
       if (!res.ok) {
@@ -97,14 +104,14 @@ export default function CropRecommendationPage() {
               <Sprout className="w-5 h-5 text-primary" />
             </div>
             <span className="font-label text-xs font-bold uppercase tracking-[0.2em] text-primary">
-              {t("AI Advisory Engine")}
+              {t("crop.advisory_engine")}
             </span>
           </div>
           <h1 className="font-headline text-4xl md:text-5xl font-black tracking-tight text-white">
-            {t("Crop")} <span className="text-primary">{t("Recommendation")}</span>
+            {t("crop.title_crop")} <span className="text-primary">{t("crop.title_recommendation")}</span>
           </h1>
           <p className="mt-3 text-slate-400 font-label max-w-xl">
-            {t("Our neural engine analyzes soil chemistry and environmental variables to recommend the most sustainable and profitable crops for your specific terrain.")}
+            {t("crop.description")}
           </p>
         </div>
         <div className="pb-2">
@@ -122,13 +129,13 @@ export default function CropRecommendationPage() {
             <form onSubmit={handlePredict} className="relative z-10 space-y-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
                 {[
-                  { name: "N", label: t("Nitrogen (N)"), icon: FlaskConical, unit: "mg/kg" },
-                  { name: "P", label: t("Phosphorus (P)"), icon: FlaskConical, unit: "mg/kg" },
-                  { name: "K", label: t("Potassium (K)"), icon: FlaskConical, unit: "mg/kg" },
-                  { name: "pH", label: t("Soil pH"), icon: TestTube, step: "0.1", unit: "pH" },
-                  { name: "temperature", label: t("Temperature"), icon: Thermometer, step: "0.1", unit: "°C" },
-                  { name: "humidity", label: t("Relative Humidity"), icon: Droplets, step: "0.1", unit: "%" },
-                  { name: "rainfall", label: t("Annual Rainfall"), icon: CloudRain, step: "0.1", unit: "mm" },
+                  { name: "N", label: t("crop.nitrogen"), icon: FlaskConical, unit: "mg/kg" },
+                  { name: "P", label: t("crop.phosphorus"), icon: FlaskConical, unit: "mg/kg" },
+                  { name: "K", label: t("crop.potassium"), icon: FlaskConical, unit: "mg/kg" },
+                  { name: "pH", label: t("crop.soil_ph"), icon: TestTube, step: "0.1", unit: "pH" },
+                  { name: "temperature", label: t("crop.temp"), icon: Thermometer, step: "0.1", unit: "°C" },
+                  { name: "humidity", label: t("crop.humidity"), icon: Droplets, step: "0.1", unit: "%" },
+                  { name: "rainfall", label: t("crop.rainfall"), icon: CloudRain, step: "0.1", unit: "mm" },
                 ].map((field) => {
                   const isGpsFilled = (
                     (field.name === 'temperature' && location.temperature === formData.temperature) ||
@@ -151,6 +158,7 @@ export default function CropRecommendationPage() {
                         value={formData[field.name as FormDataKey]}
                         onChange={handleChange}
                         step={field.step || "1"}
+                        placeholder={`e.g. ${field.name === 'pH' ? '6.5' : field.name === 'temperature' ? '25.0' : field.name === 'humidity' ? '80.0' : field.name === 'rainfall' ? '100.0' : '50'}`}
                         className="w-full bg-white/[0.03] border border-white/5 rounded-2xl p-4 text-sm font-label focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/30 transition-all text-white"
                         required
                       />
@@ -172,11 +180,11 @@ export default function CropRecommendationPage() {
                 {loading ? (
                   <>
                     <div className="w-5 h-5 border-2 border-slate-500 border-t-transparent rounded-full animate-spin" />
-                    {t("Calculating Probabilities...")}
+                    {t("crop.calculating")}
                   </>
                 ) : (
                   <>
-                    {t("Predict Optimal Crops")}
+                    {t("crop.predict_btn")}
                     <ChevronRight className="w-5 h-5" />
                   </>
                 )}
@@ -199,7 +207,7 @@ export default function CropRecommendationPage() {
             
             <div className="relative z-10 flex-1 flex flex-col">
               <h3 className="font-label text-xs uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-primary" /> {t("Recommendation Matrix")}
+                <CheckCircle2 className="w-4 h-4 text-primary" /> {t("crop.matrix")}
               </h3>
 
               {recommendations.length > 0 ? (
@@ -215,7 +223,7 @@ export default function CropRecommendationPage() {
                             "font-label text-[10px] uppercase tracking-widest",
                             index === 0 ? "text-primary" : "text-slate-500"
                           )}>
-                            {index === 0 ? t("Top Selection") : `${t("Alternative")} ${index}`}
+                            {index === 0 ? t("crop.top_selection") : `${t("crop.alternative")} ${index}`}
                           </span>
                           <h4 className="text-3xl font-headline font-black text-white capitalize">
                             {item.crop}
@@ -228,7 +236,7 @@ export default function CropRecommendationPage() {
                           )}>
                             {(item.confidence * 100).toFixed(1)}%
                           </div>
-                          <p className="text-[10px] uppercase tracking-widest text-slate-500 font-label">{t("Confidence")}</p>
+                          <p className="text-[10px] uppercase tracking-widest text-slate-500 font-label">{t("crop.confidence")}</p>
                         </div>
                       </div>
                       
@@ -247,8 +255,8 @@ export default function CropRecommendationPage() {
                   
                   <div className="mt-8 p-6 rounded-3xl bg-primary/5 border border-primary/10">
                     <p className="text-xs text-slate-300 font-label leading-relaxed">
-                      <strong className="text-primary uppercase tracking-widest block mb-1">{t("AI Insight:")}</strong>
-                      {t("The recommended crops are selected based on high adaptability to your current soil pH")} ({formData.pH}) {t("and predicted rainfall")} ({formData.rainfall}mm). {t("Consider starting with the top selection for maximum yield potential.")}
+                      <strong className="text-primary uppercase tracking-widest block mb-1">{t("crop.ai_insight")}</strong>
+                      {t("crop.adaptability_note")} ({formData.pH}) {t("crop.rainfall_note")} ({formData.rainfall}mm). {t("crop.potential_note")}
                     </p>
                   </div>
                 </div>
@@ -258,7 +266,7 @@ export default function CropRecommendationPage() {
                     <Leaf className="w-10 h-10 text-slate-500" />
                   </div>
                   <p className="font-label text-sm text-slate-400 max-w-[200px]">
-                    {t("Initialize the engine by entering soil data and environment variables.")}
+                    {t("crop.initialize_engine")}
                   </p>
                 </div>
               )}
