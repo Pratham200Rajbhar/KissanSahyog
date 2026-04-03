@@ -309,5 +309,65 @@
   "weather": {
     "sync_title": "Weather Context Sync",
     "sync_desc": "Real-time environmental synchronization enabled for"
+  },
+  "support": {
+    "title": "Farmer Support & Schemes",
+    "description": "Stay updated with the latest government initiatives and financial support systems designed to empower Indian agriculture in 2025.",
+    "search_placeholder": "Search schemes (e.g. PM-KISAN)...",
+    "official_link": "Official Website",
+    "objective": "Objective",
+    "benefits": "Key Benefits",
+    "schemes": {
+      "pm_kisan": {
+        "title": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)",
+        "objective": "To provide direct income support to small and marginal farmers.",
+        "benefits": "₹6,000 per year in three installments directly to bank accounts."
+      },
+      "pmfby": {
+        "title": "PMFBY (Pradhan Mantri Fasal Bima Yojana)",
+        "objective": "Financial support and crop insurance against natural calamities.",
+        "benefits": "Low premiums (1.5% - 5%) covering yield loss and post-harvest damage."
+      },
+      "kcc": {
+        "title": "Kisan Credit Card (KCC)",
+        "objective": "To provide adequate and timely credit support from the banking system.",
+        "benefits": "Loans up to ₹3 lakh at 7% interest with flexible repayment."
+      },
+      "pmksy": {
+        "title": "PM Krishi Sinchai Yojana (PMKSY)",
+        "objective": "To enhance physical access of water on the farm and expand cultivable area.",
+        "benefits": "Subsidies for drip and sprinkler irrigation (More Crop Per Drop)."
+      },
+      "enam": {
+        "title": "e-NAM (National Agriculture Market)",
+        "objective": "Online trading platform for agricultural commodities in India.",
+        "benefits": "Transparency in pricing and reduced dependence on middlemen."
+      },
+      "soil_health": {
+        "title": "Soil Health Card Scheme",
+        "objective": "To promote balanced use of fertilizers based on soil fertility.",
+        "benefits": "Detailed soil reports and crop-specific fertilizer recommendations."
+      },
+      "rkvy": {
+        "title": "RKVY-RAFTAAR",
+        "objective": "Holistic development of agriculture and allied sectors.",
+        "benefits": "Support for agri-business startups and infrastructure grants."
+      },
+      "aif": {
+        "title": "Agriculture Infrastructure Fund (AIF)",
+        "objective": "Post-harvest management infrastructure and community farming assets.",
+        "benefits": "Credit guarantee and interest subvention for cold storage and warehouses."
+      },
+      "pkvy": {
+        "title": "Paramparagat Krishi Vikas Yojana (PKVY)",
+        "objective": "To promote organic farming and improve soil health.",
+        "benefits": "Financial aid for organic practices and certification support."
+      },
+      "pmmsy": {
+        "title": "Pradhan Mantri Matsya Sampada Yojana (PMMSY)",
+        "objective": "Development of the fisheries sector and aquaculture.",
+        "benefits": "Subsidies for hatcheries, cold chains, and transport facilities."
+      }
+    }
   }
 }
