@@ -1,6 +1,6 @@
 {
   "Metadata": {
-    "title": "AgriAI | सटीक खेती पारिस्थितिकी तंत्र",
+    "title": "KissanSahyog | सटीक खेती पारिस्थितिकी तंत्र",
     "description": "स्थायी विकास के लिए वास्तविक समय की भविष्यवाणिय खुफिया जानकारी के साथ कृषि को सशक्त बनाना।"
   },
   "navigation": {
@@ -8,7 +8,7 @@
     "main_dashboard": "मुख्य डैशबोर्ड"
   },
   "common": {
-    "title": "AgriAI",
+    "title": "KissanSahyog",
     "precision_farming": "सटीक खेती",
     "dashboard": "डैशबोर्ड",
     "yield_prediction": "उपज का अनुमान",
@@ -39,7 +39,7 @@
     "present": "वर्तमान"
   },
   "sidebar": {
-    "app_name": "AgriAI",
+    "app_name": "KissanSahyog",
     "tagline": "सटीक खेती",
     "dashboard": "डैशबोर्ड",
     "analysis": "विश्लेषण और रिपोर्ट",
@@ -113,7 +113,7 @@
     "growth_plan": "विकास योजना"
   },
   "landing": {
-    "meta_title": "KhetSahyog | Fertile Intelligence का भविष्य",
+    "meta_title": "KissanSahyog | Fertile Intelligence का भविष्य",
     "meta_description": "सटीक खेती डैशबोर्ड और पारिस्थितिकी तंत्र",
     "v4_live": "सटीक खेती v4.0 अब लाइव है",
     "future_of": "का भविष्य",
@@ -263,7 +263,7 @@
     "legend_title": "वनस्पति सूचकांक"
   },
   "analysis": {
-    "report_title": "AgriAI किसान रिपोर्ट",
+    "report_title": "KissanSahyog किसान रिपोर्ट",
     "generated_on": "पर जनरेट किया गया:",
     "filters": "फ़िल्टर:",
     "start_date": "शुरू करने की तिथि",

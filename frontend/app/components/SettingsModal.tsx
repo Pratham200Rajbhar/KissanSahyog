@@ -26,7 +26,7 @@ export default function SettingsModal() {
   };
 
   const userName = session?.user?.name || "Farmer";
-  const userEmail = session?.user?.email || "farmer@agriai.com";
+  const userEmail = session?.user?.email || "farmer@kissansahyog.com";
   const userImage = session?.user?.image || "https://lh3.googleusercontent.com/aida-public/AB6AXuAhkX2dBHRRRgS3sO2D2j7AqZRW5uiW24OUcDS5kYZMqAhzzpebWOVzzCVNyIRAz5Rmz9tRQoYC_nOMwhkfaTjmj5D1RyRQXIHHeRMeaxCuCipVmnaJcS0T9tES4odHW1VERPb9tiOncncbFjGsNt-x5rg45WkrLyjH7v97dCyjDTQ_0L6rRGzCmNwlIFK2T50BOGQfve0wXzmyqdPkqKAERb6Tol5EWshdPPfwefjxl1w6sPPAogCTvKBJj1LtCISR1yDCM_oaT3AD";
 
   return (

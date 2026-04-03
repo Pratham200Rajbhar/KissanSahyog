@@ -10,9 +10,9 @@ export default function Footer() {
     <footer className="w-full bg-[#0b1326] border-t border-white/5">
       <div className="flex flex-col md:flex-row justify-between items-center px-12 py-16 w-full gap-8 max-w-7xl mx-auto">
         <div className="flex flex-col gap-4 items-center md:items-start">
-          <div className="text-lg font-bold text-slate-100">KhetSahyog</div>
+          <div className="text-lg font-bold text-slate-100">KissanSahyog</div>
           <p className="font-label text-xs uppercase tracking-[0.1em] text-slate-500 text-center md:text-left">
-            © 2024 KhetSahyog Ecosystem. Powered by Hyper-Natural Precision AI.
+            © 2024 KissanSahyog Ecosystem. Powered by Hyper-Natural Precision AI.
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-8 font-label text-xs uppercase tracking-[0.1em]">

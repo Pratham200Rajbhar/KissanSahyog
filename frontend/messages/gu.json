@@ -1,6 +1,6 @@
 {
   "Metadata": {
-    "title": "AgriAI | ચોકસાઈપૂર્વકની ખેતીની ઇકોસિસ્ટમ",
+    "title": "KissanSahyog | ચોકસાઈપૂર્વકની ખેતીની ઇકોસિસ્ટમ",
     "description": "ટકાઉ વિકાસ માટે રીઅલ-ટાઇમ પ્રિડિક્ટિવ ઇન્ટેલિજન્સ સાથે કૃષિને સશક્ત બનાવવી."
   },
   "navigation": {
@@ -8,7 +8,7 @@
     "main_dashboard": "મુખ્ય ડેશબોર્ડ"
   },
   "common": {
-    "title": "AgriAI",
+    "title": "KissanSahyog",
     "precision_farming": "ચોકસાઈપૂર્વકની ખેતી",
     "dashboard": "ડેશબોર્ડ",
     "yield_prediction": "ઉપજની આગાહી",
@@ -39,7 +39,7 @@
     "present": "હાજર"
   },
   "sidebar": {
-    "app_name": "AgriAI",
+    "app_name": "KissanSahyog",
     "tagline": "ચોકસાઈપૂર્વકની ખેતી",
     "dashboard": "ડેશબોર્ડ",
     "analysis": "વિશ્લેષણ અને રિપોર્ટ",
@@ -112,7 +112,7 @@
     "growth_plan": "વૃદ્ધિ યોજના"
   },
   "landing": {
-    "meta_title": "KhetSahyog | ફળદ્રુપ બુદ્ધિનું ભવિષ્ય",
+    "meta_title": "KissanSahyog | ફળદ્રુપ બુદ્ધિનું ભવિષ્ય",
     "meta_description": "ચોકસાઈપૂર્વકની ખેતી ડેશબોર્ડ અને ઇકોસિસ્ટમ",
     "v4_live": "ચોકસાઈપૂર્વકની ખેતી v4.0 હવે જીવંત છે",
     "future_of": "ભવિષ્ય",
@@ -262,7 +262,7 @@
     "legend_title": "વનસ્પતિ સૂચકાંક"
   },
   "analysis": {
-    "report_title": "AgriAI ખેડૂત રિપોર્ટ",
+    "report_title": "KissanSahyog ખેડૂત રિપોર્ટ",
     "generated_on": "જનરેટ તારીખ:",
     "filters": "ફિલ્ટર્સ:",
     "start_date": "શરૂઆતની તારીખ",

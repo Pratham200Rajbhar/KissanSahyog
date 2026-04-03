@@ -190,7 +190,7 @@ export default function AnalysisPage() {
       });
     }
 
-    doc.save(`AgriAI_Custom_Report_${new Date().getTime()}.pdf`);
+    doc.save(`KissanSahyog_Custom_Report_${new Date().getTime()}.pdf`);
   };
 
   const toggleOption = (key: 'yields' | 'diseases' | 'recommendations') => {

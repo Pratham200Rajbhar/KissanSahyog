@@ -1,6 +1,6 @@
 {
   "Metadata": {
-    "title": "AgriAI | Precision Farming Ecosystem",
+    "title": "KissanSahyog | Precision Farming Ecosystem",
     "description": "Empowering agriculture with real-time predictive intelligence for sustainable growth."
   },
   "navigation": {
@@ -8,7 +8,7 @@
     "main_dashboard": "Main Dashboard"
   },
   "common": {
-    "title": "AgriAI",
+    "title": "KissanSahyog",
     "precision_farming": "Precision Farming",
     "dashboard": "Dashboard",
     "yield_prediction": "Yield Prediction",
@@ -39,7 +39,7 @@
     "present": "Present"
   },
   "sidebar": {
-    "app_name": "AgriAI",
+    "app_name": "KissanSahyog",
     "tagline": "Precision Farming",
     "dashboard": "Dashboard",
     "analysis": "Analysis & Report",
@@ -113,7 +113,7 @@
     "growth_plan": "Growth Plan"
   },
   "landing": {
-    "meta_title": "KhetSahyog | The Future of Fertile Intelligence",
+    "meta_title": "KissanSahyog | The Future of Fertile Intelligence",
     "meta_description": "Precision Farming Dashboard and Ecosystem",
     "v4_live": "Precision Farming v4.0 Now Live",
     "future_of": "The Future of",
@@ -263,7 +263,7 @@
     "legend_title": "Vegetation Index"
   },
   "analysis": {
-    "report_title": "AgriAI Farmer Report",
+    "report_title": "KissanSahyog Farmer Report",
     "generated_on": "Generated on:",
     "filters": "Filters:",
     "start_date": "Start Date",

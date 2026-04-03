@@ -48,7 +48,7 @@ export default function Navbar() {
     <nav className="sticky top-0 w-full z-50 bg-[#0b1326]/60 backdrop-blur-[20px] shadow-[0_8px_32px_0_rgba(0,0,0,0.3)]">
       <div className="flex justify-between items-center px-8 py-4 max-w-7xl mx-auto">
         <Link href="/" className="text-2xl font-extrabold tracking-tighter text-primary">
-          KhetSahyog
+          KissanSahyog
         </Link>
         <div className="hidden md:flex gap-8 items-center font-headline text-sm tracking-wide">
           <Link
