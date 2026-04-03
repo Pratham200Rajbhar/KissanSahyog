@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { Link, usePathname } from "../../i18n/routing";
 import {
   LayoutDashboard,
   TrendingUp,
@@ -15,11 +14,11 @@ import {
 } from "lucide-react";
 
 import clsx from "clsx";
-import { useLanguage } from "../context/LanguageContext";
+import { useTranslations } from "next-intl";
 
 export default function DashboardSidebar() {
   const pathname = usePathname();
-  const { t } = useLanguage();
+  const t = useTranslations();
 
   const navLinks = [
     { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -52,7 +51,7 @@ export default function DashboardSidebar() {
           return (
             <Link
               key={link.name}
-              href={link.href}
+              href={link.href as any}
               className={clsx(
                 "flex items-center gap-4 px-6 py-4 font-label text-[13px] tracking-wide uppercase rounded-full transition-all duration-500",
                 isActive

@@ -1,15 +1,28 @@
 "use client";
 
-import Link from "next/link";
 import { Menu, Sun, Moon, Globe, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
-import { useLanguage, Language } from "./../context/LanguageContext";
+import { useTranslations, useLocale } from "next-intl";
+import { Link, usePathname, useRouter } from "../../i18n/routing";
 import { signIn } from "next-auth/react";
+
+const localeNames: Record<string, string> = {
+  en: "English",
+  hi: "हिन्दी",
+  gu: "ગુજરાતી",
+  mr: "मराठी",
+  bn: "বাংলা",
+  ta: "தமிழ்",
+  te: "తెలుగు"
+};
 
 export default function Navbar() {
   const [theme, setTheme] = useState("dark");
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
-  const { lang, setLang, t } = useLanguage();
+  const t = useTranslations();
+  const locale = useLocale();
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     if (document.documentElement.classList.contains("light")) {
@@ -31,9 +44,9 @@ export default function Navbar() {
     }
   };
 
-  const handleLangChange = (selectedLang: Language) => {
-    setLang(selectedLang);
+  const handleLangChange = (nextLocale: string) => {
     setLangDropdownOpen(false);
+    router.replace(pathname, { locale: nextLocale });
   };
 
   return (
@@ -75,18 +88,20 @@ export default function Navbar() {
               className="flex items-center gap-1 text-slate-300 hover:text-white transition-colors text-sm font-medium p-2 rounded-full hover:bg-white/5"
             >
               <Globe className="w-4 h-4" />
-              <span className="hidden sm:block">{lang}</span>
+              <span className="hidden sm:block">{localeNames[locale] || locale}</span>
               <ChevronDown className="w-3 h-3" />
             </button>
             {langDropdownOpen && (
               <div className="absolute top-full right-0 mt-2 w-32 bg-[#0b1326] border border-white/10 rounded-xl shadow-xl overflow-hidden py-1 z-50">
-                <button onClick={() => handleLangChange("English")} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-colors">English</button>
-                <button onClick={() => handleLangChange("Hindi")} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-colors">हिन्दी</button>
-                <button onClick={() => handleLangChange("Gujarati")} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-colors">ગુજરાતી</button>
-                <button onClick={() => handleLangChange("Marathi")} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-colors">मराठी</button>
-                <button onClick={() => handleLangChange("Bengali")} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-colors">বাংলা</button>
-                <button onClick={() => handleLangChange("Tamil")} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-colors">தமிழ்</button>
-                <button onClick={() => handleLangChange("Telugu")} className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-colors">తెలుగు</button>
+                {Object.entries(localeNames).map(([code, name]) => (
+                  <button 
+                    key={code}
+                    onClick={() => handleLangChange(code)} 
+                    className="w-full text-left px-4 py-2 text-sm text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
+                  >
+                    {name}
+                  </button>
+                ))}
               </div>
             )}
           </div>

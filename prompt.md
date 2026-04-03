@@ -1,21 +1,50 @@
-I have a React frontend app with a route at /dashboard/map-insights. I have Sentinel Hub (Planet Insights Platform) credentials:
+You are a senior Next.js architect.
 
-CLIENT_ID = your_client_id
+I have an existing Next.js project using [App Router / Pages Router — specify].
 
-CLIENT_SECRET = your_client_secret
-Build a minimal page that:
+Your task is to:
 
-Authenticates with Sentinel Hub OAuth (services.sentinel-hub.com) using client_credentials
+1. Analyze the full codebase structure
+2. Identify all UI text, hardcoded strings, metadata, and API-driven content
+3. Design and implement a complete multilingual system using next-intl
 
-Calls the Process API with a Sentinel-2 L2A NDVI evalscript (bands B04, B08)
+Requirements:
 
-Displays the NDVI result as a color-coded map overlay using React Leaflet
+* Support at least 2 languages (e.g., en, hi)
+* Use scalable folder structure for translations (/messages/{locale}.json)
+* Extract all hardcoded strings into translation files
+* Ensure compatibility with Server Components and Client Components
+* Implement locale-based routing (/en, /hi)
+* Add middleware for locale detection
+* Implement a language switcher component
+* Handle SEO:
 
-Shows a simple NDVI color legend (water → bare soil → low veg → dense forest)
+  * hreflang tags
+  * localized metadata (title, description)
+* Persist user language preference (cookie or localStorage)
+* Handle dynamic content (API responses, CMS data)
+* Ensure fallback language works correctly
 
-Has a "Load NDVI" button, date range picker, and bbox set to Ahmedabad, India by default
-Use: React, Axios, React Leaflet. Store credentials in .env as REACT_APP_SH_CLIENT_ID and REACT_APP_SH_CLIENT_SECRET. Keep it minimal — single page, no Redux, no extra libraries.
+Code Guidelines:
 
-cid : f0a8670d-24ce-43dc-a5a2-0f7c6c03d48d
+* Use TypeScript
+* Keep components clean and reusable
+* Avoid client-side heavy libraries unless necessary
+* Optimize for performance and minimal bundle size
 
-cs: albhfwe0wlp0ZlYqf78PZQGK10Rk3bql
+Output Format:
+
+1. Step-by-step migration plan
+2. Updated folder structure
+3. All required code changes (with file names)
+4. Example translation JSON
+5. Middleware and routing setup
+6. Language switcher implementation
+7. SEO implementation
+8. Testing checklist
+
+Important:
+
+* Do not break existing functionality
+* Refactor safely and incrementally
+* Clearly explain each major change

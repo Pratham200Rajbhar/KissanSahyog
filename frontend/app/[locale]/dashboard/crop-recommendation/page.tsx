@@ -14,10 +14,10 @@ import {
   ChevronRight
 } from "lucide-react";
 import clsx from "clsx";
-import { useLocation } from "../../components/LocationContext";
-import { LocationDetector } from "../../components/LocationDetector";
-import { GpsIndicator } from "../../components/GpsIndicator";
-import { useLanguage } from "../../context/LanguageContext";
+import { useLocation } from "../../../components/LocationContext";
+import { LocationDetector } from "../../../components/LocationDetector";
+import { GpsIndicator } from "../../../components/GpsIndicator";
+import { useTranslations } from "next-intl";
 
 interface RecommendationItem {
   crop: string;
@@ -28,7 +28,7 @@ export default function CropRecommendationPage() {
   type FormDataKey = 'N' | 'P' | 'K' | 'pH' | 'temperature' | 'humidity' | 'rainfall';
 
   const { location } = useLocation();
-  const { t } = useLanguage();
+  const t = useTranslations();
   const [formData, setFormData] = useState<Record<FormDataKey, number>>({
     N: 0,
     P: 0,
@@ -66,7 +66,7 @@ export default function CropRecommendationPage() {
     setRecommendations([]);
 
     try {
-      const apiUrl = "/api";
+      const apiUrl = "http://localhost:8000/api";
       
       const res = await fetch(`${apiUrl}/recommend/crop`, {
         method: "POST",
@@ -89,7 +89,7 @@ export default function CropRecommendationPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 animate-in fade-in duration-700">
+    <div className="max-w-6xl mx-auto py-8 px-4 animate-in fade-in duration-700 pb-12">
       <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
@@ -116,19 +116,19 @@ export default function CropRecommendationPage() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
         {/* Input Form Panel */}
         <div className="lg:col-span-7">
-          <div className="glass-panel p-8 rounded-[2.5rem] border border-white/5 relative overflow-hidden group">
+          <div className="glass-panel p-8 rounded-[2.5rem] border border-white/5 relative overflow-hidden group shadow-2xl">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-primary/10 transition-colors" />
             
             <form onSubmit={handlePredict} className="relative z-10 space-y-8">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
                 {[
-                  { name: "N", label: "Nitrogen (N)", icon: FlaskConical, unit: "mg/kg" },
-                  { name: "P", label: "Phosphorus (P)", icon: FlaskConical, unit: "mg/kg" },
-                  { name: "K", label: "Potassium (K)", icon: FlaskConical, unit: "mg/kg" },
-                  { name: "pH", label: "Soil pH", icon: TestTube, step: "0.1", unit: "pH" },
-                  { name: "temperature", label: "Temperature", icon: Thermometer, step: "0.1", unit: "°C" },
-                  { name: "humidity", label: "Relative Humidity", icon: Droplets, step: "0.1", unit: "%" },
-                  { name: "rainfall", label: "Annual Rainfall", icon: CloudRain, step: "0.1", unit: "mm" },
+                  { name: "N", label: t("Nitrogen (N)"), icon: FlaskConical, unit: "mg/kg" },
+                  { name: "P", label: t("Phosphorus (P)"), icon: FlaskConical, unit: "mg/kg" },
+                  { name: "K", label: t("Potassium (K)"), icon: FlaskConical, unit: "mg/kg" },
+                  { name: "pH", label: t("Soil pH"), icon: TestTube, step: "0.1", unit: "pH" },
+                  { name: "temperature", label: t("Temperature"), icon: Thermometer, step: "0.1", unit: "°C" },
+                  { name: "humidity", label: t("Relative Humidity"), icon: Droplets, step: "0.1", unit: "%" },
+                  { name: "rainfall", label: t("Annual Rainfall"), icon: CloudRain, step: "0.1", unit: "mm" },
                 ].map((field) => {
                   const isGpsFilled = (
                     (field.name === 'temperature' && location.temperature === formData.temperature) ||
@@ -194,7 +194,7 @@ export default function CropRecommendationPage() {
 
         {/* Results Panel */}
         <div className="lg:col-span-5 h-full">
-          <div className="glass-panel p-8 rounded-[2.5rem] border border-white/5 h-full flex flex-col relative overflow-hidden group">
+          <div className="glass-panel p-8 rounded-[2.5rem] border border-white/5 h-full flex flex-col relative overflow-hidden group shadow-2xl">
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-tertiary/5 rounded-full -ml-32 -mb-32 blur-3xl group-hover:bg-tertiary/10 transition-colors" />
             
             <div className="relative z-10 flex-1 flex flex-col">
@@ -215,7 +215,7 @@ export default function CropRecommendationPage() {
                             "font-label text-[10px] uppercase tracking-widest",
                             index === 0 ? "text-primary" : "text-slate-500"
                           )}>
-                            {index === 0 ? "Top Selection" : `Alternative ${index}`}
+                            {index === 0 ? t("Top Selection") : `${t("Alternative")} ${index}`}
                           </span>
                           <h4 className="text-3xl font-headline font-black text-white capitalize">
                             {item.crop}
@@ -228,7 +228,7 @@ export default function CropRecommendationPage() {
                           )}>
                             {(item.confidence * 100).toFixed(1)}%
                           </div>
-                          <p className="text-[10px] uppercase tracking-widest text-slate-500 font-label">Confidence</p>
+                          <p className="text-[10px] uppercase tracking-widest text-slate-500 font-label">{t("Confidence")}</p>
                         </div>
                       </div>
                       
@@ -247,8 +247,8 @@ export default function CropRecommendationPage() {
                   
                   <div className="mt-8 p-6 rounded-3xl bg-primary/5 border border-primary/10">
                     <p className="text-xs text-slate-300 font-label leading-relaxed">
-                      <strong className="text-primary uppercase tracking-widest block mb-1">AI Insight:</strong>
-                      The recommended crops are selected based on high adaptability to your current soil pH ({formData.pH}) and predicted rainfall ({formData.rainfall}mm). Consider starting with the top selection for maximum yield potential.
+                      <strong className="text-primary uppercase tracking-widest block mb-1">{t("AI Insight:")}</strong>
+                      {t("The recommended crops are selected based on high adaptability to your current soil pH")} ({formData.pH}) {t("and predicted rainfall")} ({formData.rainfall}mm). {t("Consider starting with the top selection for maximum yield potential.")}
                     </p>
                   </div>
                 </div>
@@ -258,7 +258,7 @@ export default function CropRecommendationPage() {
                     <Leaf className="w-10 h-10 text-slate-500" />
                   </div>
                   <p className="font-label text-sm text-slate-400 max-w-[200px]">
-                    Initialize the engine by entering soil data and environment variables.
+                    {t("Initialize the engine by entering soil data and environment variables.")}
                   </p>
                 </div>
               )}

@@ -1,14 +1,14 @@
 "use client";
 
-import Navbar from "./components/Navbar";
-import Footer from "./components/Footer";
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import Image from "next/image";
 import { ArrowRight, PlayCircle, Droplets, TrendingUp } from "lucide-react";
-import { useLanguage } from "./context/LanguageContext";
+import { useTranslations } from "next-intl";
 import { signIn } from "next-auth/react";
 
 export default function LandingPage() {
-  const { t } = useLanguage();
+  const t = useTranslations();
   return (
     <>
       <Navbar />

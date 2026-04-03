@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { TrendingUp, Calculator, CloudSun, AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
-import { useLocation } from "../../components/LocationContext";
-import { LocationDetector } from "../../components/LocationDetector";
-import { GpsIndicator } from "../../components/GpsIndicator";
-import { useLanguage } from "../../context/LanguageContext";
+import { useLocation } from "../../../components/LocationContext";
+import { LocationDetector } from "../../../components/LocationDetector";
+import { GpsIndicator } from "../../../components/GpsIndicator";
+import { useTranslations } from "next-intl";
 
 const CROPS = ['chickpea', 'cotton', 'maize', 'rice'];
 const STATES = [
@@ -38,7 +38,7 @@ interface YieldFormData {
 
 export default function YieldPrediction() {
   const { location } = useLocation();
-  const { t } = useLanguage();
+  const t = useTranslations();
   const [formData, setFormData] = useState<YieldFormData>({
     crop: 'rice',
     state_name: '',
@@ -87,7 +87,7 @@ export default function YieldPrediction() {
     setResult(null);
 
     try {
-      const apiUrl = "/api";
+      const apiUrl = "http://localhost:8000/api";
       
       const response = await fetch(`${apiUrl}/predict/yield`, {
         method: "POST",
@@ -119,23 +119,23 @@ export default function YieldPrediction() {
           <span className="font-label text-xs font-bold uppercase tracking-[0.2em] text-primary mb-2 block">
             {t("Predictive Intelligence")}
           </span>
-          <h2 className="font-headline text-4xl font-extrabold tracking-tight">{t("Yield Simulation")}</h2>
+          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">{t("Yield Simulation")}</h2>
         </div>
         <LocationDetector />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
         <div className="md:col-span-8 glass-panel p-8 rounded-2xl border border-outline-variant/10 shadow-2xl">
-          <h3 className="font-headline text-xl font-bold mb-8 flex items-center gap-3">
+          <h3 className="font-headline text-xl font-bold mb-8 flex items-center gap-3 text-white">
             <Calculator className="w-6 h-6 text-primary" />
-            Field Parameters
+            {t("Field Parameters")}
           </h3>
           
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {/* Categorical Inputs */}
               <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Crop Variety</label>
+                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("Crop Variety")}</label>
                 <select 
                   name="crop"
                   value={formData.crop}
@@ -148,7 +148,7 @@ export default function YieldPrediction() {
               
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  State Registry
+                  {t("State Registry")}
                   <GpsIndicator isVisible={!!location.state && formData.state_name === location.state} />
                 </label>
                 <select 
@@ -163,7 +163,7 @@ export default function YieldPrediction() {
 
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  District Focus
+                  {t("District Focus")}
                   <GpsIndicator isVisible={!!location.district && formData.dist_name === location.district} />
                 </label>
                 <input 
@@ -177,7 +177,7 @@ export default function YieldPrediction() {
               </div>
 
               <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Cultivation Area (ha)</label>
+                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("Cultivation Area (ha)")}</label>
                 <input 
                   type="number" 
                   step="0.01"
@@ -191,7 +191,7 @@ export default function YieldPrediction() {
               {/* Environmental Details */}
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  Temperature (°C)
+                  {t("Temperature (°C)")}
                   <GpsIndicator isVisible={location.temperature !== null && formData.temperature_c === location.temperature} />
                 </label>
                 <input 
@@ -205,7 +205,7 @@ export default function YieldPrediction() {
 
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  Avg Humidity (%)
+                  {t("Avg Humidity (%)")}
                   <GpsIndicator isVisible={location.humidity !== null && formData.humidity_percentage === location.humidity} />
                 </label>
                 <input 
@@ -219,7 +219,7 @@ export default function YieldPrediction() {
 
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  Annual Rainfall (mm)
+                  {t("Annual Rainfall (mm)")}
                   <GpsIndicator isVisible={location.rainfall !== null && formData.rainfall_mm === location.rainfall} />
                 </label>
                 <input 
@@ -232,7 +232,7 @@ export default function YieldPrediction() {
               </div>
 
               <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Wind Velocity (m/s)</label>
+                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("Wind Velocity (m/s)")}</label>
                 <input 
                   type="number"
                   name="wind_speed_m_s"
@@ -243,7 +243,7 @@ export default function YieldPrediction() {
               </div>
 
               <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">Solar Intensity (MJ/m²)</label>
+                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("Solar Intensity (MJ/m²)")}</label>
                 <input 
                   type="number"
                   name="solar_radiation_mj_m2_day"
@@ -256,7 +256,7 @@ export default function YieldPrediction() {
               {/* Nutrients - User requirements */}
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  N Capacity (kg/ha)
+                  {t("N Capacity (kg/ha)")}
                 </label>
                 <input 
                   type="number"
@@ -269,7 +269,7 @@ export default function YieldPrediction() {
 
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  P Capacity (kg/ha)
+                  {t("P Capacity (kg/ha)")}
                 </label>
                 <input 
                   type="number"
@@ -282,7 +282,7 @@ export default function YieldPrediction() {
 
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  K Capacity (kg/ha)
+                  {t("K Capacity (kg/ha)")}
                 </label>
                 <input 
                   type="number"
@@ -318,27 +318,27 @@ export default function YieldPrediction() {
                  <TrendingUp className="w-8 h-8" />
                </div>
                <div>
-                  <h4 className="font-bold text-lg font-headline">Predicted Output</h4>
-                  <p className="text-xs text-slate-400 uppercase tracking-widest">Quantum Simulation</p>
+                  <h4 className="font-bold text-lg font-headline text-white">{t("Predicted Output")}</h4>
+                  <p className="text-xs text-slate-400 uppercase tracking-widest">{t("Quantum Simulation")}</p>
                </div>
              </div>
              
              {result ? (
                <div className="space-y-6 relative">
                  <div className="flex items-baseline gap-2">
-                    <span className="text-5xl font-black text-on-surface tracking-tighter">{result.predicted_yield.toLocaleString()}</span>
+                    <span className="text-5xl font-black text-white tracking-tighter">{result.predicted_yield.toLocaleString()}</span>
                     <span className="text-xl font-bold text-primary">{result.unit}</span>
                  </div>
                  
                  <div className="p-4 bg-primary/5 rounded-xl border border-primary/10 flex items-center gap-3">
                     <CheckCircle2 className="w-5 h-5 text-primary" />
-                    <span className="text-sm font-semibold text-primary-fixed">Stable Estimation</span>
+                    <span className="text-sm font-semibold text-primary">{t("Stable Estimation")}</span>
                  </div>
 
                  <div className="space-y-4 pt-4 border-t border-outline-variant/10">
                     <div className="flex justify-between text-xs font-bold uppercase text-slate-400">
-                      <span>Feature Impact</span>
-                      <span>Weight</span>
+                      <span>{t("Feature Impact")}</span>
+                      <span>{t("Weight")}</span>
                     </div>
                     {Object.entries(result.shap_values).map(([key, val]) => (
                       <div key={key} className="space-y-1">
@@ -374,9 +374,9 @@ export default function YieldPrediction() {
                <CloudSun className="w-6 h-6" />
              </div>
              <div>
-                <h4 className="font-bold text-sm tracking-tight mb-1">Weather Context Sync</h4>
+                <h4 className="font-bold text-sm tracking-tight mb-1 text-white">{t("Weather Context Sync")}</h4>
                 <p className="text-xs text-slate-400 leading-relaxed">
-                  Real-time environmental synchronization enabled for {formData.state_name}.
+                  {t("Real-time environmental synchronization enabled for")} {formData.state_name}.
                 </p>
              </div>
           </div>

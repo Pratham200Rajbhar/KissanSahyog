@@ -1,16 +1,16 @@
 "use client";
 
 import { Upload, PlusCircle, Tractor, ShieldAlert, Sun, CloudRain, Lightbulb, History, Activity, Sprout } from "lucide-react";
-import { useLocation } from "../components/LocationContext";
-import Link from "next/link";
-import { useLanguage } from "../context/LanguageContext";
+import { useLocation } from "../../components/LocationContext";
+import { Link } from "../../../i18n/routing";
+import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 
 export default function DashboardOverview() {
   const { location, loading: locLoading } = useLocation();
-  const { t } = useLanguage();
+  const t = useTranslations();
   
   const [history, setHistory] = useState<{
     yield_predictions: any[],

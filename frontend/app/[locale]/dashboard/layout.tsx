@@ -1,6 +1,6 @@
-import DashboardSidebar from "../components/DashboardSidebar";
-import DashboardTopNav from "../components/DashboardTopNav";
-import { LocationProvider } from "../components/LocationContext";
+import DashboardSidebar from "../../components/DashboardSidebar";
+import DashboardTopNav from "../../components/DashboardTopNav";
+import { LocationProvider } from "../../components/LocationContext";
 
 export default function DashboardLayout({
   children,

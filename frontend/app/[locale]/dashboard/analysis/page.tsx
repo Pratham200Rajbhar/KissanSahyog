@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { Download, Loader2, Tractor, Activity, Lightbulb, Calendar, X, Check, Filter } from "lucide-react";
-import axios from "axios";
+import { useTranslations } from "next-intl";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
 export default function AnalysisPage() {
+  const t = useTranslations();
   const [history, setHistory] = useState<{
     yield_predictions: any[],
     disease_detections: any[],
@@ -34,10 +35,14 @@ export default function AnalysisPage() {
   useEffect(() => {
     const fetchFullHistory = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/api/history/full", {
-          withCredentials: true
+        const res = await fetch("http://localhost:8000/api/history/full", {
+          headers: {
+            "Authorization": `Bearer ${localStorage.getItem("token") || ""}`
+          }
         });
-        setHistory(res.data);
+        if (!res.ok) throw new Error("Failed to fetch history");
+        const data = await res.json();
+        setHistory(data);
       } catch (err) {
         console.error("Failed to load full history", err);
       } finally {
@@ -69,15 +74,15 @@ export default function AnalysisPage() {
     // Title
     doc.setFontSize(22);
     doc.setTextColor(34, 197, 94);
-    doc.text("AgriAI Farmer Report", pageWidth / 2, 20, { align: "center" });
+    doc.text(t("AgriAI Farmer Report"), pageWidth / 2, 20, { align: "center" });
     
     doc.setFontSize(10);
     doc.setTextColor(100);
     
     // Add date range info
-    let subtitle = `Generated on: ${new Date().toLocaleString()}`;
+    let subtitle = `${t("Generated on:")} ${new Date().toLocaleString()}`;
     if (startDate || endDate) {
-      subtitle += ` | Filters: ${startDate || "Start"} to ${endDate || "Present"}`;
+      subtitle += ` | ${t("Filters:")} ${startDate || t("Start Date")} ${t("to")} ${endDate || t("Present")}`;
     }
     doc.text(subtitle, pageWidth / 2, 28, { align: "center" });
 
@@ -87,7 +92,7 @@ export default function AnalysisPage() {
     if (downloadOptions.yields && filteredYields.length > 0) {
       doc.setFontSize(14);
       doc.setTextColor(40);
-      doc.text("Yield Predictions History", 14, finalY);
+      doc.text(t("Yield Predictions History"), 14, finalY);
       
       const yieldData = filteredYields.map((y) => [
         new Date(y.created_at).toLocaleDateString(),
@@ -99,7 +104,7 @@ export default function AnalysisPage() {
 
       autoTable(doc, {
         startY: finalY + 5,
-        head: [['Date', 'Crop', 'Location', 'Area', 'Predicted Yield']],
+        head: [[t('Date'), t('Crop'), t('Location'), t('Area (ha)'), t('Predicted Yield')]],
         body: yieldData,
         theme: 'grid',
         headStyles: { fillColor: [34, 197, 94] }
@@ -112,7 +117,7 @@ export default function AnalysisPage() {
       if (finalY > 250) { doc.addPage(); finalY = 20; }
       doc.setFontSize(14);
       doc.setTextColor(40);
-      doc.text("Crop Health & Disease Logs", 14, finalY);
+      doc.text(t("Crop Health & Disease Logs"), 14, finalY);
       
       const diseaseData = filteredDiseases.map((d) => [
         new Date(d.created_at).toLocaleDateString(),
@@ -124,7 +129,7 @@ export default function AnalysisPage() {
 
       autoTable(doc, {
         startY: finalY + 5,
-        head: [['Date', 'Crop', 'Disease Detected', 'Confidence', 'Recommended Remedy']],
+        head: [[t('Date'), t('Crop'), t('Disease'), t('Confidence'), t('Recommended Remedy')]],
         body: diseaseData,
         theme: 'grid',
         headStyles: { fillColor: [239, 68, 68] },
@@ -138,25 +143,25 @@ export default function AnalysisPage() {
       if (finalY > 250) { doc.addPage(); finalY = 20; }
       doc.setFontSize(14);
       doc.setTextColor(40);
-      doc.text("AI Crop Recommendations", 14, finalY);
+      doc.text(t("AI Crop Recommendations"), 14, finalY);
       
       const recData = filteredCrops.map((c) => [
         new Date(c.created_at).toLocaleDateString(),
         c.top_crop,
         `${(c.confidence * 100).toFixed(1)}%`,
-        c.recommendations_json ? JSON.stringify(c.recommendations_json.map((r: any) => r.crop).join(", ")) : '-'
+        c.recommendations_json ? c.recommendations_json.map((r: any) => r.crop).join(", ") : '-'
       ]);
 
       autoTable(doc, {
         startY: finalY + 5,
-        head: [['Date', 'Top Recommendation', 'Confidence', 'Other Options Taken']],
+        head: [[t('Date'), t('Top Recommendation'), t('Confidence'), t('Other Options Taken')]],
         body: recData,
         theme: 'grid',
         headStyles: { fillColor: [59, 130, 246] }
       });
     }
 
-    doc.save("AgriAI_Custom_Report.pdf");
+    doc.save(`AgriAI_Custom_Report_${new Date().getTime()}.pdf`);
   };
 
   const toggleOption = (key: 'yields' | 'diseases' | 'recommendations') => {
@@ -167,13 +172,13 @@ export default function AnalysisPage() {
     return (
       <div className="mt-8 flex flex-col items-center justify-center min-h-[50vh]">
         <Loader2 className="w-10 h-10 text-primary animate-spin mb-4" />
-        <h2 className="text-white font-headline text-xl">Loading complete history...</h2>
+        <h2 className="text-white font-headline text-xl">{t("Loading complete history...")}</h2>
       </div>
     );
   }
 
   return (
-    <div className="mt-8 animate-fade-in relative z-10">
+    <div className="mt-8 animate-fade-in relative z-10 px-4 pb-12">
       {/* Modal Overlay */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0b1326]/80 backdrop-blur-sm">
@@ -185,17 +190,21 @@ export default function AnalysisPage() {
               >
                 <X className="w-5 h-5" />
               </button>
-              <h3 className="font-headline text-xl text-white font-bold flex items-center gap-2"><Filter className="text-primary w-5 h-5"/> Customize Report</h3>
-              <p className="text-sm text-slate-400 mt-1">Select data sections and perfectly filter your exported PDF.</p>
+              <h3 className="font-headline text-xl text-white font-bold flex items-center gap-2">
+                <Filter className="text-primary w-5 h-5"/> {t("Customize Report")}
+              </h3>
+              <p className="text-sm text-slate-400 mt-1">{t("Select data sections and perfectly filter your exported PDF.")}</p>
             </div>
             
             <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
               {/* Date Filters Section inside Modal */}
               <div className="mb-6 bg-white/5 p-4 rounded-xl border border-white/5">
-                <h4 className="font-label text-xs uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2"><Calendar className="w-4 h-4"/> Export Date Range</h4>
+                <h4 className="font-label text-xs uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
+                  <Calendar className="w-4 h-4"/> {t("Export Date Range")}
+                </h4>
                 <div className="flex gap-4">
                   <div className="flex-1">
-                    <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">Start Date</label>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">{t("Start Date")}</label>
                     <input 
                       type="date" 
                       value={startDate}
@@ -204,7 +213,7 @@ export default function AnalysisPage() {
                     />
                   </div>
                   <div className="flex-1">
-                    <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">End Date</label>
+                    <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">{t("End Date")}</label>
                     <input 
                       type="date" 
                       value={endDate}
@@ -215,7 +224,7 @@ export default function AnalysisPage() {
                 </div>
               </div>
 
-              <h4 className="font-label text-xs uppercase tracking-wider text-slate-400 mb-3">Include Sections</h4>
+              <h4 className="font-label text-xs uppercase tracking-wider text-slate-400 mb-3">{t("Include Sections")}</h4>
               <div className="space-y-3">
                 {/* Yield Option */}
                 <button 
@@ -227,8 +236,8 @@ export default function AnalysisPage() {
                       <Tractor className="w-4 h-4" />
                     </div>
                     <div className="text-left">
-                      <div className="font-bold text-sm">Yield Predictions</div>
-                      <div className="text-xs opacity-70">{filteredYields.length} records in range</div>
+                      <div className="font-bold text-sm">{t("Yield Predictions")}</div>
+                      <div className="text-xs opacity-70">{filteredYields.length} {t("records in range")}</div>
                     </div>
                   </div>
                   {downloadOptions.yields && <Check className="w-5 h-5 text-primary" />}
@@ -244,8 +253,8 @@ export default function AnalysisPage() {
                       <Activity className="w-4 h-4" />
                     </div>
                     <div className="text-left">
-                      <div className="font-bold text-sm">Disease Detections</div>
-                      <div className="text-xs opacity-70">{filteredDiseases.length} records in range</div>
+                      <div className="font-bold text-sm">{t("Disease Detections")}</div>
+                      <div className="text-xs opacity-70">{filteredDiseases.length} {t("records in range")}</div>
                     </div>
                   </div>
                   {downloadOptions.diseases && <Check className="w-5 h-5 text-red-400" />}
@@ -261,8 +270,8 @@ export default function AnalysisPage() {
                       <Lightbulb className="w-4 h-4" />
                     </div>
                     <div className="text-left">
-                      <div className="font-bold text-sm">Recommendations</div>
-                      <div className="text-xs opacity-70">{filteredCrops.length} records in range</div>
+                      <div className="font-bold text-sm">{t("Recommendations")}</div>
+                      <div className="text-xs opacity-70">{filteredCrops.length} {t("records in range")}</div>
                     </div>
                   </div>
                   {downloadOptions.recommendations && <Check className="w-5 h-5 text-blue-400" />}
@@ -277,7 +286,7 @@ export default function AnalysisPage() {
                 className="w-full flex justify-center items-center gap-2 px-6 py-4 rounded-xl bg-primary text-[#0b1326] font-label text-base font-bold hover:brightness-110 active:scale-95 transition-all shadow-xl shadow-primary/20 disabled:opacity-50 disabled:pointer-events-none"
               >
                 <Download className="w-5 h-5" />
-                Generate My Report
+                {t("Generate My Report")}
               </button>
             </div>
 
@@ -288,10 +297,10 @@ export default function AnalysisPage() {
       <div className="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-6">
         <div>
           <span className="font-label text-xs font-bold uppercase tracking-[0.2em] text-primary mb-2 block">
-            Data Hub
+            {t("Data Hub")}
           </span>
-          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">Full History</h2>
-          <p className="text-slate-400 mt-2">View all your chronological past logs in one place.</p>
+          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">{t("Full History")}</h2>
+          <p className="text-slate-400 mt-2">{t("View all your chronological past logs in one place.")}</p>
         </div>
         
         {/* Actions */}
@@ -301,7 +310,7 @@ export default function AnalysisPage() {
             className="flex items-center gap-2 px-6 py-4 rounded-xl bg-primary text-[#0b1326] font-label text-sm font-bold hover:brightness-110 active:scale-95 transition-all shadow-xl shadow-primary/20 whitespace-nowrap"
           >
             <Download className="w-5 h-5" />
-            Download Now
+            {t("Download Now")}
           </button>
         </div>
       </div>
@@ -311,23 +320,23 @@ export default function AnalysisPage() {
           onClick={() => setActiveTab("yield")}
           className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-label text-sm transition-all duration-300 ${activeTab === 'yield' ? 'bg-primary/20 text-primary font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <Tractor className="w-4 h-4" /> Yields ({history.yield_predictions.length})
+          <Tractor className="w-4 h-4" /> {t("Yields")} ({history.yield_predictions.length})
         </button>
         <button 
           onClick={() => setActiveTab("disease")}
           className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-label text-sm transition-all duration-300 ${activeTab === 'disease' ? 'bg-red-400/20 text-red-400 font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <Activity className="w-4 h-4" /> Diseases ({history.disease_detections.length})
+          <Activity className="w-4 h-4" /> {t("Diseases")} ({history.disease_detections.length})
         </button>
         <button 
           onClick={() => setActiveTab("recommend")}
           className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-label text-sm transition-all duration-300 ${activeTab === 'recommend' ? 'bg-blue-400/20 text-blue-400 font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
-          <Lightbulb className="w-4 h-4" /> Recommendations ({history.crop_recommendations.length})
+          <Lightbulb className="w-4 h-4" /> {t("Recommendations")} ({history.crop_recommendations.length})
         </button>
       </div>
 
-      <div className="glass-panel rounded-xl overflow-hidden border border-outline-variant/5">
+      <div className="glass-panel rounded-xl overflow-hidden border border-outline-variant/5 shadow-2xl">
         
         {/* Yield Tab */}
         {activeTab === "yield" && (
@@ -335,14 +344,14 @@ export default function AnalysisPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-white/5 text-slate-300 font-label text-xs uppercase tracking-wider border-b border-primary/20">
-                  <th className="p-4 py-5">Date</th>
-                  <th className="p-4 py-5">Crop</th>
-                  <th className="p-4 py-5">Location</th>
-                  <th className="p-4 py-5">Area (ha)</th>
-                  <th className="p-4 py-5 text-right">Yield (kg/ha)</th>
+                  <th className="p-4 py-5 font-bold">{t("Date")}</th>
+                  <th className="p-4 py-5 font-bold">{t("Crop")}</th>
+                  <th className="p-4 py-5 font-bold">{t("Location")}</th>
+                  <th className="p-4 py-5 font-bold">{t("Area (ha)")}</th>
+                  <th className="p-4 py-5 font-bold text-right">{t("Yield (kg/ha)")}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5 text-sm text-slate-300">
+              <tbody className="divide-y divide-white/5 text-sm text-slate-300 font-label">
                 {history.yield_predictions.length > 0 ? history.yield_predictions.map((y) => (
                   <tr key={y.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="p-4">{new Date(y.created_at).toLocaleDateString()}</td>
@@ -354,8 +363,8 @@ export default function AnalysisPage() {
                 )) : (
                   <tr>
                     <td colSpan={5} className="p-12 text-center text-slate-500 font-label flex-col items-center flex justify-center">
-                      <Tractor className="w-8 h-8 mb-4 opacity-50"/>
-                      No yield predictions found.
+                      <Tractor className="w-12 h-12 mb-4 opacity-50 text-primary"/>
+                      <p className="text-lg font-bold">{t("No yield predictions found.")}</p>
                     </td>
                   </tr>
                 )}
@@ -370,29 +379,29 @@ export default function AnalysisPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-red-400/5 text-slate-300 font-label text-xs uppercase tracking-wider border-b border-red-400/20">
-                  <th className="p-4 py-5">Date</th>
-                  <th className="p-4 py-5">Crop</th>
-                  <th className="p-4 py-5">Disease</th>
-                  <th className="p-4 py-5">Confidence</th>
-                  <th className="p-4 py-5">Remedy Action</th>
+                  <th className="p-4 py-5 font-bold">{t("Date")}</th>
+                  <th className="p-4 py-5 font-bold">{t("Crop")}</th>
+                  <th className="p-4 py-5 font-bold">{t("Disease")}</th>
+                  <th className="p-4 py-5 font-bold">{t("Confidence")}</th>
+                  <th className="p-4 py-5 font-bold">{t("Remedy Action")}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5 text-sm text-slate-300">
+              <tbody className="divide-y divide-white/5 text-sm text-slate-300 font-label">
                 {history.disease_detections.length > 0 ? history.disease_detections.map((d) => (
                   <tr key={d.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="p-4">{new Date(d.created_at).toLocaleDateString()}</td>
                     <td className="p-4 font-bold text-white">{d.crop}</td>
                     <td className="p-4"><span className="px-2 py-1 bg-red-400/10 rounded border border-red-400/20 text-red-400 font-bold inline-block">{d.disease_name}</span></td>
                     <td className="p-4">{(d.confidence * 100).toFixed(1)}%</td>
-                    <td className="p-4 text-slate-400 max-w-sm" title={d.remedy}>
+                    <td className="p-4 text-slate-300 max-w-sm" title={d.remedy}>
                       <span className="line-clamp-2">{d.remedy}</span>
                     </td>
                   </tr>
                 )) : (
                   <tr>
                     <td colSpan={5} className="p-12 text-center text-slate-500 font-label flex-col items-center flex justify-center">
-                      <Activity className="w-8 h-8 mb-4 opacity-50"/>
-                      No disease detections found.
+                      <Activity className="w-12 h-12 mb-4 opacity-50 text-red-400"/>
+                      <p className="text-lg font-bold">{t("No disease detections found.")}</p>
                     </td>
                   </tr>
                 )}
@@ -407,13 +416,13 @@ export default function AnalysisPage() {
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="bg-blue-400/5 text-slate-300 font-label text-xs uppercase tracking-wider border-b border-blue-400/20">
-                  <th className="p-4 py-5">Date</th>
-                  <th className="p-4 py-5 font-bold text-blue-400">Match</th>
-                  <th className="p-4 py-5">Confidence</th>
-                  <th className="p-4 py-5">Other Options Analyzed</th>
+                  <th className="p-4 py-5 font-bold">{t("Date")}</th>
+                  <th className="p-4 py-5 font-bold text-blue-400">{t("Match")}</th>
+                  <th className="p-4 py-5 font-bold">{t("Confidence")}</th>
+                  <th className="p-4 py-5 font-bold">{t("Other Options Analyzed")}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5 text-sm text-slate-300">
+              <tbody className="divide-y divide-white/5 text-sm text-slate-300 font-label">
                 {history.crop_recommendations.length > 0 ? history.crop_recommendations.map((c) => (
                   <tr key={c.id} className="hover:bg-white/[0.02] transition-colors">
                     <td className="p-4">{new Date(c.created_at).toLocaleDateString()}</td>
@@ -430,8 +439,8 @@ export default function AnalysisPage() {
                 )) : (
                   <tr>
                     <td colSpan={4} className="p-12 text-center text-slate-500 font-label flex-col items-center flex justify-center">
-                      <Lightbulb className="w-8 h-8 mb-4 opacity-50"/>
-                      No crop recommendations logged.
+                      <Lightbulb className="w-12 h-12 mb-4 opacity-50 text-blue-400"/>
+                      <p className="text-lg font-bold">{t("No crop recommendations logged.")}</p>
                     </td>
                   </tr>
                 )}

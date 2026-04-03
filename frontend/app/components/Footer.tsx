@@ -1,9 +1,11 @@
+"use client";
+
 import { Globe, Share2 } from "lucide-react";
-import Link from "next/link";
-import { useLanguage } from "./../context/LanguageContext";
+import { Link } from "../../i18n/routing";
+import { useTranslations } from "next-intl";
 
 export default function Footer() {
-  const { t } = useLanguage();
+  const t = useTranslations();
   return (
     <footer className="w-full bg-[#0b1326] border-t border-white/5">
       <div className="flex flex-col md:flex-row justify-between items-center px-12 py-16 w-full gap-8 max-w-7xl mx-auto">
@@ -14,10 +16,10 @@ export default function Footer() {
           </p>
         </div>
         <div className="flex flex-wrap justify-center gap-8 font-label text-xs uppercase tracking-[0.1em]">
-          <Link href="#" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
+          <Link href="/dashboard/map-insights" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
             {t("Ecosystem")}
           </Link>
-          <Link href="#" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
+          <Link href="/dashboard/disease-detection" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
             {t("Intelligence")}
           </Link>
           <Link href="#" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
