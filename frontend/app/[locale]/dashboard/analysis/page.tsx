@@ -6,12 +6,45 @@ import { useTranslations } from "next-intl";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 
+interface jsPDFWithAutoTable extends jsPDF {
+  lastAutoTable: {
+    finalY: number;
+  };
+}
+
+interface YieldPrediction {
+  id: string;
+  crop: string;
+  state_name: string;
+  district_name: string;
+  area_ha: number;
+  predicted_yield: number;
+  created_at: string;
+}
+
+interface DiseaseDetection {
+  id: string;
+  crop: string;
+  disease_name: string;
+  confidence: number;
+  remedy: string;
+  created_at: string;
+}
+
+interface CropRecommendation {
+  id: string;
+  top_crop: string;
+  confidence: number;
+  recommendations_json: { crop: string; confidence: number }[];
+  created_at: string;
+}
+
 export default function AnalysisPage() {
   const t = useTranslations();
   const [history, setHistory] = useState<{
-    yield_predictions: any[],
-    disease_detections: any[],
-    crop_recommendations: any[]
+    yield_predictions: YieldPrediction[],
+    disease_detections: DiseaseDetection[],
+    crop_recommendations: CropRecommendation[]
   }>({
     yield_predictions: [],
     disease_detections: [],
@@ -52,7 +85,7 @@ export default function AnalysisPage() {
     fetchFullHistory();
   }, []);
 
-  const filterByDate = (items: any[]) => {
+  const filterByDate = <T extends { created_at: string }>(items: T[]): T[] => {
     return items.filter(item => {
       if (!startDate && !endDate) return true;
       const date = new Date(item.created_at).getTime();
@@ -109,7 +142,7 @@ export default function AnalysisPage() {
         theme: 'grid',
         headStyles: { fillColor: [34, 197, 94] }
       });
-      finalY = (doc as any).lastAutoTable.finalY + 15;
+      finalY = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 15;
     }
 
     // 2. Disease Detections
@@ -135,7 +168,7 @@ export default function AnalysisPage() {
         headStyles: { fillColor: [239, 68, 68] },
         columnStyles: { 4: { cellWidth: 70 } }
       });
-      finalY = (doc as any).lastAutoTable.finalY + 15;
+      finalY = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 15;
     }
 
     // 3. Crop Recommendations
@@ -149,7 +182,7 @@ export default function AnalysisPage() {
         new Date(c.created_at).toLocaleDateString(),
         c.top_crop,
         `${(c.confidence * 100).toFixed(1)}%`,
-        c.recommendations_json ? c.recommendations_json.map((r: any) => r.crop).join(", ") : '-'
+        c.recommendations_json ? c.recommendations_json.map((r: { crop: string }) => r.crop).join(", ") : '-'
       ]);
 
       autoTable(doc, {
@@ -433,7 +466,7 @@ export default function AnalysisPage() {
                     </td>
                     <td className="p-4 text-white font-bold">{(c.confidence * 100).toFixed(1)}%</td>
                     <td className="p-4 text-slate-400">
-                      {c.recommendations_json?.map((r: any) => r.crop).join(", ") || "-"}
+                      {c.recommendations_json?.map((r: { crop: string }) => r.crop).join(", ") || "-"}
                     </td>
                   </tr>
                 )) : (

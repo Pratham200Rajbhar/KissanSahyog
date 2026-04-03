@@ -51,7 +51,7 @@ export default function DashboardSidebar() {
           return (
             <Link
               key={link.name}
-              href={link.href as any}
+              href={link.href}
               className={clsx(
                 "flex items-center gap-4 px-6 py-4 font-label text-[13px] tracking-wide uppercase rounded-full transition-all duration-500",
                 isActive

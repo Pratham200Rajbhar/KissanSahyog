@@ -1,9 +1,9 @@
 "use client";
 
-import { Search, Languages, Bell, Sun, Moon, Globe, ChevronDown, LogOut } from "lucide-react";
+import { Search, Bell, Sun, Moon, Globe, ChevronDown, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
-import { usePathname, useRouter } from "../../i18n/routing";
+import { usePathname, useRouter, routing } from "../../i18n/routing";
 import { useTranslations, useLocale } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
 
@@ -17,11 +17,9 @@ export default function DashboardTopNav() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    if (document.documentElement.classList.contains("light")) {
-      setTheme("light");
-    } else {
-      setTheme("dark");
-    }
+    const isLight = typeof document !== 'undefined' && document.documentElement.classList.contains("light");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTheme(isLight ? "light" : "dark");
   }, []);
 
   const toggleTheme = () => {
@@ -37,7 +35,7 @@ export default function DashboardTopNav() {
   };
 
   const handleLangChange = (selectedLocale: string) => {
-    router.replace(pathname, { locale: selectedLocale } as any);
+    router.replace(pathname, { locale: selectedLocale } as { locale: typeof routing.locales[number] });
     setLangDropdownOpen(false);
   };
 

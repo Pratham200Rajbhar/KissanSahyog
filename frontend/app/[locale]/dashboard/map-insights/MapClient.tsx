@@ -15,6 +15,7 @@ import "leaflet/dist/leaflet.css";
 import axios from "axios";
 import { getSentinelHubToken } from "./actions";
 import { Search, MapPin, Navigation } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 // Fix default leaflet marker icons (broken in webpack/Next.js)
 delete (L.Icon.Default.prototype as { _getIconUrl?: string })._getIconUrl;
@@ -52,16 +53,17 @@ function FlyToLocation({ lat, lng }: { lat: number; lng: number }) {
   return null;
 }
 
-const NDVI_LEGEND = [
-  { color: "#155F8F", label: "Water Body" },
-  { color: "#C29A6B", label: "Bare / Dry Soil" },
-  { color: "#CCDC33", label: "Sparse Vegetation" },
-  { color: "#4CB828", label: "Moderate Crop Cover" },
-  { color: "#0D610D", label: "Healthy / Dense Crops" },
-];
-
 export default function MapClient() {
+  const t = useTranslations();
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
+  
+  const NDVI_LEGEND = [
+    { color: "#155F8F", label: t("Water Body") },
+    { color: "#C29A6B", label: t("Bare / Dry Soil") },
+    { color: "#CCDC33", label: t("Sparse Vegetation") },
+    { color: "#4CB828", label: t("Moderate Crop Cover") },
+    { color: "#0D610D", label: t("Healthy / Dense Crops") },
+  ];
 
   // Search state
   interface NominatimSuggestion {
@@ -119,7 +121,7 @@ export default function MapClient() {
       }
     }, 400);
     return () => clearTimeout(timer);
-  }, [searchQuery, showSuggestions]);
+  }, [searchQuery, showSuggestions, location]);
 
   const reverseGeocode = async (lat: number, lng: number) => {
     try {
@@ -136,7 +138,7 @@ export default function MapClient() {
 
   const locateUser = () => {
     if (!navigator.geolocation) {
-      alert("GPS not supported by browser.");
+      alert(t("GPS not supported by browser."));
       return;
     }
     navigator.geolocation.getCurrentPosition(
@@ -147,7 +149,7 @@ export default function MapClient() {
         setNdviUrl(null); // Clear previous map layer
       },
       () => {
-        alert("Unable to get your GPS location.");
+        alert(t("Unable to get your GPS location."));
       },
       { timeout: 8000 }
     );
@@ -175,16 +177,16 @@ export default function MapClient() {
 
   const loadNDVI = async () => {
     if (!location) {
-      alert("Please select a location first.");
+      alert(t("Please select a location first."));
       return;
     }
     setLoading(true);
-    setStatus("Connecting to Satellite...");
+    setStatus(t("Connecting to Satellite..."));
     try {
       const token = await getSentinelHubToken();
       const bbox = bboxFromLatLng(location.lat, location.lng);
 
-      setStatus("Scanning field vegetation...");
+      setStatus(t("Scanning field vegetation..."));
       const payload = {
         input: {
           bounds: {
@@ -233,7 +235,7 @@ export default function MapClient() {
       setNdviBbox(bbox);
       setStatus("");
     } catch {
-      const msg = "Processing failed.";
+      const msg = t("Processing failed.");
       setStatus("⚠️ " + msg);
     } finally {
       setLoading(false);
@@ -266,7 +268,7 @@ export default function MapClient() {
         <div className="flex flex-col gap-2 min-w-[280px] flex-1 relative" ref={wrapperRef}>
           <span className="text-[10px] font-bold text-on-surface-muted uppercase tracking-[0.15em] flex items-center gap-1.5">
             <MapPin className="text-error w-3 h-3" />
-            Field Location
+            {t("Field Location")}
           </span>
           <div className="relative group">
             <input
@@ -277,14 +279,14 @@ export default function MapClient() {
                 setShowSuggestions(true);
               }}
               onFocus={() => setShowSuggestions(true)}
-              placeholder="Search farm, village, or state..."
+              placeholder={t("Search farm, village, or state...")}
               className="w-full bg-background border border-outline-variant group-hover:border-primary/50 transition-colors rounded-xl pl-9 pr-10 py-2.5 text-sm text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
             />
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-on-surface-muted" />
 
             <button
               onClick={locateUser}
-              title="Use current GPS"
+              title={t("Use current GPS")}
               className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-lg hover:bg-white/10 text-primary transition-colors"
             >
               <Navigation className="w-4 h-4" />
@@ -312,7 +314,7 @@ export default function MapClient() {
 
         <div className="flex gap-4 flex-wrap">
           <label className="flex flex-col gap-2">
-            <span className="text-[10px] font-bold text-on-surface-muted uppercase tracking-[0.15em]">Timeframe Start</span>
+            <span className="text-[10px] font-bold text-on-surface-muted uppercase tracking-[0.15em]">{t("Timeframe Start")}</span>
             <input
               type="date"
               value={dates.from}
@@ -322,7 +324,7 @@ export default function MapClient() {
             />
           </label>
           <label className="flex flex-col gap-2">
-            <span className="text-[10px] font-bold text-on-surface-muted uppercase tracking-[0.15em]">Timeframe End</span>
+            <span className="text-[10px] font-bold text-on-surface-muted uppercase tracking-[0.15em]">{t("Timeframe End")}</span>
             <input
               type="date"
               value={dates.to}
@@ -342,11 +344,11 @@ export default function MapClient() {
           {loading ? (
             <>
               <span className="animate-spin inline-block w-4 h-4 border-2 border-black/40 border-t-black rounded-full" />
-              Scanning...
+              {t("Scanning...")}
             </>
           ) : (
             <>
-              <span className="text-lg">🛰</span> Scan Field
+              <span className="text-lg">🛰</span> {t("Scan Field")}
             </>
           )}
         </button>
@@ -381,7 +383,7 @@ export default function MapClient() {
             <Marker position={[location.lat, location.lng]}>
               <Popup className="rounded-xl overflow-hidden">
                 <div className="text-sm font-medium p-1">
-                  <strong>Selected Farm Area</strong>
+                  <strong>{t("Selected Farm Area")}</strong>
                   <div className="text-xs text-gray-500 mt-1">{searchQuery}</div>
                 </div>
               </Popup>
@@ -412,7 +414,7 @@ export default function MapClient() {
         {ndviUrl && (
           <div className="absolute bottom-6 right-6 z-[999] bg-surface/95 backdrop-blur-xl border border-white/10 p-5 rounded-2xl shadow-[0_8px_30px_rgba(0,0,0,0.5)]">
             <h4 className="text-[11px] font-extrabold uppercase tracking-[0.2em] mb-4 text-on-surface pl-1">
-              Vegetation Index
+              {t("Vegetation Index")}
             </h4>
             <div className="flex flex-col gap-3">
               {NDVI_LEGEND.map(({ color, label }) => (

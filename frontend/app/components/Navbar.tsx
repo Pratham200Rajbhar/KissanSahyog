@@ -25,11 +25,9 @@ export default function Navbar() {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (document.documentElement.classList.contains("light")) {
-      setTheme("light");
-    } else {
-      setTheme("dark");
-    }
+    const isLight = typeof document !== 'undefined' && document.documentElement.classList.contains("light");
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setTheme(isLight ? "light" : "dark");
   }, []);
 
   const toggleTheme = () => {

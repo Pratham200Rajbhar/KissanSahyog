@@ -1,21 +1,48 @@
 "use client";
 
-import { Upload, PlusCircle, Tractor, ShieldAlert, Sun, CloudRain, Lightbulb, History, Activity, Sprout } from "lucide-react";
+import { Upload, PlusCircle, Tractor, ShieldAlert, Sun, Lightbulb, Activity, Sprout } from "lucide-react";
 import { useLocation } from "../../components/LocationContext";
 import { Link } from "../../../i18n/routing";
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+import { XAxis, YAxis, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
+
+interface YieldPrediction {
+  id: string;
+  crop: string;
+  state_name: string;
+  district_name: string;
+  area_ha: number;
+  predicted_yield: number;
+  created_at: string;
+}
+
+interface DiseaseDetection {
+  id: string;
+  crop: string;
+  disease_name: string;
+  confidence: number;
+  remedy: string;
+  created_at: string;
+}
+
+interface CropRecommendation {
+  id: string;
+  top_crop: string;
+  confidence: number;
+  recommendations_json: { crop: string; confidence: number }[];
+  created_at: string;
+}
 
 export default function DashboardOverview() {
   const { location, loading: locLoading } = useLocation();
   const t = useTranslations();
   
   const [history, setHistory] = useState<{
-    yield_predictions: any[],
-    disease_detections: any[],
-    crop_recommendations: any[]
+    yield_predictions: YieldPrediction[],
+    disease_detections: DiseaseDetection[],
+    crop_recommendations: CropRecommendation[]
   }>({
     yield_predictions: [],
     disease_detections: [],

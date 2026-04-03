@@ -2,16 +2,16 @@
 
 import { useState, useEffect } from "react";
 import { Sparkles, Leaf, TestTube, Thermometer, CloudRain, Droplets, FlaskConical } from "lucide-react";
-import { useLocation } from "../../components/LocationContext";
-import { LocationDetector } from "../../components/LocationDetector";
-import { GpsIndicator } from "../../components/GpsIndicator";
-import { useLanguage } from "../../context/LanguageContext";
+import { useLocation } from "../../../components/LocationContext";
+import { LocationDetector } from "../../../components/LocationDetector";
+import { GpsIndicator } from "../../../components/GpsIndicator";
+import { useTranslations } from "next-intl";
 
 export default function FertilizerGuide() {
   type FormDataKey = 'N' | 'P' | 'K' | 'pH' | 'temperature' | 'humidity' | 'rainfall';
 
   const { location } = useLocation();
-  const { t } = useLanguage();
+  const t = useTranslations();
   const [formData, setFormData] = useState<Record<FormDataKey, number>>({
     N: 0,
     P: 0,
@@ -49,7 +49,7 @@ export default function FertilizerGuide() {
     setResult(null);
 
     try {
-      const apiUrl = "/api";
+      const apiUrl = "http://localhost:8000/api";
       
       const res = await fetch(`${apiUrl}/recommend/fertilizer`, {
         method: "POST",
@@ -98,13 +98,13 @@ export default function FertilizerGuide() {
           <form onSubmit={handlePredict} className="space-y-6">
             <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
               {[
-                { name: "N", label: "Nitrogen (N)", icon: FlaskConical },
-                { name: "P", label: "Phosphorus (P)", icon: FlaskConical },
-                { name: "K", label: "Potassium (K)", icon: FlaskConical },
-                { name: "pH", label: "Soil pH", icon: TestTube, step: "0.1" },
-                { name: "temperature", label: "Temperature (°C)", icon: Thermometer, step: "0.1" },
-                { name: "humidity", label: "Humidity (%)", icon: Droplets, step: "0.1" },
-                { name: "rainfall", label: "Rainfall (mm)", icon: CloudRain, step: "0.1" },
+                { name: "N", label: t("Nitrogen (N)"), icon: FlaskConical },
+                { name: "P", label: t("Phosphorus (P)"), icon: FlaskConical },
+                { name: "K", label: t("Potassium (K)"), icon: FlaskConical },
+                { name: "pH", label: t("Soil pH"), icon: TestTube, step: "0.1" },
+                { name: "temperature", label: t("Temperature (°C)"), icon: Thermometer, step: "0.1" },
+                { name: "humidity", label: t("Humidity (%)"), icon: Droplets, step: "0.1" },
+                { name: "rainfall", label: t("Rainfall (mm)"), icon: CloudRain, step: "0.1" },
               ].map((field) => {
                 const isGpsFilled = (
                   (field.name === 'temperature' && location.temperature === formData.temperature) ||

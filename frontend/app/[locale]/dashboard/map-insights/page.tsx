@@ -1,12 +1,12 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useLanguage } from "../../context/LanguageContext";
+import { useTranslations } from "next-intl";
 
 const MapClient = dynamic(() => import("./MapClient"), { ssr: false });
 
 export default function MapInsights() {
-  const { t } = useLanguage();
+  const t = useTranslations();
   return (
     <div className="mt-6 animate-fade-in flex flex-col h-[calc(100vh-140px)]">
       <div className="mb-5 shrink-0">
