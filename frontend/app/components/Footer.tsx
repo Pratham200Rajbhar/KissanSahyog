@@ -19,8 +19,8 @@ export default function Footer() {
           <Link href="/dashboard/map-insights" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
             {t("nav.ecosystem")}
           </Link>
-          <Link href="/dashboard/disease-detection" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
-            {t("nav.intelligence")}
+          <Link href="/dashboard/analysis" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
+            {t("sidebar.analysis")}
           </Link>
           <Link href="#" className="text-slate-500 hover:text-tertiary transition-colors opacity-80 hover:opacity-100">
             {t("footer.network")}

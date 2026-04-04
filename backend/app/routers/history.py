@@ -16,15 +16,12 @@ async def get_history_summary(current_user: dict = Depends(get_current_user)):
         # Get latest yield prediction
         yield_res = supabase.table("yield_predictions").select("*").eq("user_id", user_id).order("created_at", desc=True).limit(5).execute()
         
-        # Get latest disease detections
-        disease_res = supabase.table("disease_detections").select("*").eq("user_id", user_id).order("created_at", desc=True).limit(5).execute()
         
         # Get latest crop recommendations
         crop_res = supabase.table("crop_recommendations").select("*").eq("user_id", user_id).order("created_at", desc=True).limit(5).execute()
         
         return {
             "yield_predictions": yield_res.data,
-            "disease_detections": disease_res.data,
             "crop_recommendations": crop_res.data
         }
     except Exception as e:
@@ -40,12 +37,10 @@ async def get_history_full(current_user: dict = Depends(get_current_user)):
     try:
         # Get all history up to 1000 items
         yield_res = supabase.table("yield_predictions").select("*").eq("user_id", user_id).order("created_at", desc=True).limit(1000).execute()
-        disease_res = supabase.table("disease_detections").select("*").eq("user_id", user_id).order("created_at", desc=True).limit(1000).execute()
         crop_res = supabase.table("crop_recommendations").select("*").eq("user_id", user_id).order("created_at", desc=True).limit(1000).execute()
         
         return {
             "yield_predictions": yield_res.data,
-            "disease_detections": disease_res.data,
             "crop_recommendations": crop_res.data
         }
     except Exception as e:

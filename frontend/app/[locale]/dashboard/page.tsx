@@ -1,6 +1,6 @@
 "use client";
 
-import { Upload, PlusCircle, Tractor, ShieldAlert, Sun, Lightbulb, Activity, Sprout } from "lucide-react";
+import { Upload, PlusCircle, Tractor, Sun, Lightbulb, Sprout } from "lucide-react";
 import { useLocation } from "../../components/LocationContext";
 import { Link } from "../../../i18n/routing";
 import { useTranslations } from "next-intl";
@@ -18,14 +18,6 @@ interface YieldPrediction {
   created_at: string;
 }
 
-interface DiseaseDetection {
-  id: string;
-  crop: string;
-  disease_name: string;
-  confidence: number;
-  remedy: string;
-  created_at: string;
-}
 
 interface CropRecommendation {
   id: string;
@@ -41,11 +33,9 @@ export default function DashboardOverview() {
   
   const [history, setHistory] = useState<{
     yield_predictions: YieldPrediction[],
-    disease_detections: DiseaseDetection[],
     crop_recommendations: CropRecommendation[]
   }>({
     yield_predictions: [],
-    disease_detections: [],
     crop_recommendations: []
   });
   const [loading, setLoading] = useState(true);
@@ -67,7 +57,6 @@ export default function DashboardOverview() {
   }, []);
 
   const latestYield = history.yield_predictions.length > 0 ? history.yield_predictions[0] : null;
-  const latestDisease = history.disease_detections.length > 0 ? history.disease_detections[0] : null;
   const latestCrop = history.crop_recommendations.length > 0 ? history.crop_recommendations[0] : null;
 
   // Prepare chart data for Yield History
@@ -98,15 +87,6 @@ export default function DashboardOverview() {
       pill: latestCrop ? `${(latestCrop.confidence * 100).toFixed(0)}% Match` : t("common.syncing"),
     },
     {
-      title: t("dashboard.recent_disease"),
-      value: latestDisease ? latestDisease.disease_name : "---",
-      unit: "",
-      icon: Activity,
-      iconClass: "text-[#10b981]",
-      bgClass: "bg-[#10b981]/10",
-      pill: latestDisease ? latestDisease.crop : t("dashboard.no_issues"),
-    },
-    {
       title: t("dashboard.live_temperature"),
       value: location.temperature ? Math.round(location.temperature).toString() : "---",
       unit: "°C",
@@ -127,12 +107,6 @@ export default function DashboardOverview() {
           <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">{t("navigation.main_dashboard")}</h2>
         </div>
         <div className="flex gap-4">
-          <Link href="/dashboard/disease-detection">
-            <button className="flex items-center gap-2 px-6 py-3 rounded-full bg-surface-container-high border border-outline-variant/10 text-slate-200 font-label text-sm font-semibold hover:bg-surface-container-highest transition-all duration-300">
-              <Upload className="text-primary w-5 h-5" />
-              {t("disease.upload_title")}
-            </button>
-          </Link>
           <Link href="/dashboard/yield-prediction">
             <button className="flex items-center gap-2 px-6 py-3 rounded-full liquid-pill text-[#0b1326] font-label text-sm font-bold hover:brightness-110 active:scale-95 transition-all shadow-xl shadow-primary/20">
               <PlusCircle className="w-5 h-5" />
@@ -271,35 +245,6 @@ export default function DashboardOverview() {
               </div>
             )}
 
-            {/* Disease Action Item */}
-            {latestDisease ? (
-              <div className="flex items-start gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all duration-300 group">
-                <div className="w-12 h-12 shrink-0 rounded-full bg-red-400/10 flex items-center justify-center text-red-400">
-                  <ShieldAlert className="w-5 h-5" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-red-400 text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-red-400/10">{t("dashboard.post_scan")}</span>
-                    <span className="text-[10px] text-slate-500 font-medium">For {latestDisease.crop}</span>
-                  </div>
-                  <h5 className="font-headline text-base font-bold text-white group-hover:text-red-400 transition-colors">Treat {latestDisease.disease_name}</h5>
-                  <p className="text-sm text-slate-400 mt-1 line-clamp-2" title={latestDisease.remedy}>{latestDisease.remedy}</p>
-                </div>
-              </div>
-            ) : (
-              <div className="flex items-start gap-4 p-5 rounded-2xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.05] transition-all duration-300 group">
-                <div className="w-12 h-12 shrink-0 rounded-full bg-[#10b981]/10 flex items-center justify-center text-[#10b981]">
-                  <Upload className="w-5 h-5" />
-                </div>
-                <div className="flex-1">
-                  <div className="flex justify-between items-center mb-1">
-                    <span className="text-[#10b981] text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider bg-[#10b981]/10">{t("dashboard.suggestion")}</span>
-                  </div>
-                  <h5 className="font-headline text-base font-bold text-white group-hover:text-[#10b981] transition-colors">Scan Your Crops</h5>
-                  <p className="text-sm text-slate-400 mt-1">Found a suspicious leaf? Take a photo and upload it anomaly detection.</p>
-                </div>
-              </div>
-            )}
 
             {/* Recommendation Action Item */}
             {latestCrop ? (

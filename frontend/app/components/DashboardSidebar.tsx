@@ -4,7 +4,6 @@ import { Link, usePathname } from "../../i18n/routing";
 import {
   LayoutDashboard,
   TrendingUp,
-  Stethoscope,
   Sparkles,
   Map as MapIcon,
   Settings,
@@ -23,7 +22,6 @@ export default function DashboardSidebar() {
   const navLinks = [
     { name: "Dashboard", key: "sidebar.dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Yield Prediction", key: "sidebar.yield", href: "/dashboard/yield-prediction", icon: TrendingUp },
-    { name: "Disease Detection", key: "sidebar.disease", href: "/dashboard/disease-detection", icon: Stethoscope },
     { name: "Crop Recommendation", key: "sidebar.crop", href: "/dashboard/crop-recommendation", icon: Sprout },
     { name: "Fertilizer Recommendation", key: "sidebar.fertilizer", href: "/dashboard/recommendations", icon: Sparkles },
     { name: "Map Insights", key: "sidebar.map", href: "/dashboard/map-insights", icon: MapIcon },
