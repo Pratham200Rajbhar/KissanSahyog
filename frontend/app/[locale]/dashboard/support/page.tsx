@@ -54,12 +54,12 @@ export default function SupportPage() {
   });
 
   return (
-    <div className="mt-8 animate-fade-in pb-12">
-      <div className="mb-10">
+    <div className="mt-2 sm:mt-4 animate-fade-in pb-10">
+      <div className="mb-8 sm:mb-10">
         <span className="font-label text-xs font-bold uppercase tracking-[0.2em] text-primary mb-2 block">
           Farmer Assistance
         </span>
-        <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white mb-4">
+        <h2 className="font-headline text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-4">
           {t("title")}
         </h2>
         <p className="text-slate-400 max-w-2xl leading-relaxed">
@@ -68,7 +68,7 @@ export default function SupportPage() {
       </div>
 
       {/* Search Bar */}
-      <div className="relative mb-12 max-w-xl group">
+      <div className="relative mb-8 sm:mb-12 max-w-xl group">
         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
           <Search className="h-5 w-5 text-slate-500 group-focus-within:text-primary transition-colors" />
         </div>
@@ -81,13 +81,13 @@ export default function SupportPage() {
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-7">
         {filteredSchemes.map((key) => {
           const Icon = schemeIcons[key] || Info;
           return (
             <div
               key={key}
-              className="glass-panel group relative overflow-hidden p-8 rounded-3xl border border-white/5 hover:border-primary/20 transition-all duration-500 hover:translate-y-[-4px]"
+              className="glass-panel group relative overflow-hidden p-5 sm:p-7 rounded-3xl border border-white/5 hover:border-primary/20 transition-all duration-300 hover:translate-y-[-2px]"
             >
               {/* Background Glow */}
               <div className="absolute -right-10 -top-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl group-hover:bg-primary/10 transition-all duration-500" />

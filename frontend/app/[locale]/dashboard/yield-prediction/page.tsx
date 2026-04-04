@@ -151,26 +151,26 @@ export default function YieldPrediction() {
   };
 
   return (
-    <div className="mt-8 animate-fade-in px-4 pb-12">
-      <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+    <div className="mt-2 sm:mt-4 animate-fade-in pb-10">
+      <div className="mb-8 sm:mb-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
         <div>
           <span className="font-label text-xs font-bold uppercase tracking-[0.2em] text-primary mb-2 block">
             {t("dashboard.intelligence")}
           </span>
-          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">{t("yield.simulation_title")}</h2>
+          <h2 className="font-headline text-3xl sm:text-4xl font-extrabold tracking-tight text-white">{t("yield.simulation_title")}</h2>
         </div>
         <LocationDetector />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-        <div className="md:col-span-8 glass-panel p-8 rounded-2xl border border-outline-variant/10 shadow-2xl">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 sm:gap-7">
+        <div className="xl:col-span-8 glass-panel p-5 sm:p-7 rounded-2xl border border-outline-variant/10 shadow-2xl">
           <h3 className="font-headline text-xl font-bold mb-8 flex items-center gap-3 text-white">
             <Calculator className="w-6 h-6 text-primary" />
             {t("yield.field_parameters")}
           </h3>
           
           <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
               {/* Categorical Inputs */}
               <div className="space-y-2">
                 <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("yield.crop_variety")}</label>
@@ -345,7 +345,7 @@ export default function YieldPrediction() {
 
             <button 
               disabled={loading}
-              className={`w-full py-5 rounded-2xl liquid-pill text-surface font-label font-bold text-xl shadow-2xl shadow-primary/30 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
+              className={`w-full py-4 rounded-2xl liquid-pill text-surface font-label font-bold text-base sm:text-lg shadow-2xl shadow-primary/30 hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
             >
               {loading ? (
                 <>
@@ -359,8 +359,8 @@ export default function YieldPrediction() {
           </form>
         </div>
 
-        <div className="md:col-span-4 space-y-8">
-          <div className="glass-panel p-8 rounded-2xl border border-outline-variant/10 shadow-xl overflow-hidden relative group">
+        <div className="xl:col-span-4 space-y-5 sm:space-y-7">
+          <div className="glass-panel p-5 sm:p-7 rounded-2xl border border-outline-variant/10 shadow-xl overflow-hidden relative group">
              <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full -mr-16 -mt-16 blur-3xl group-hover:scale-150 transition-all duration-700"></div>
              <div className="flex items-center gap-4 mb-6 relative">
                <div className="w-14 h-14 rounded-xl bg-primary/20 flex items-center justify-center text-primary border border-primary/20">
@@ -418,7 +418,7 @@ export default function YieldPrediction() {
              )}
           </div>
           
-          <div className="glass-panel p-6 rounded-2xl border border-outline-variant/10 flex items-start gap-4 shadow-lg group hover:border-tertiary/30 transition-all">
+          <div className="glass-panel p-5 sm:p-6 rounded-2xl border border-outline-variant/10 flex items-start gap-4 shadow-lg group hover:border-tertiary/30 transition-all">
              <div className="w-12 h-12 rounded-xl bg-tertiary/20 flex items-center justify-center text-tertiary border border-tertiary/20">
                <CloudSun className="w-6 h-6" />
              </div>

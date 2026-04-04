@@ -7,6 +7,11 @@ import { LocationDetector } from "../../../components/LocationDetector";
 import { GpsIndicator } from "../../../components/GpsIndicator";
 import { useTranslations } from "next-intl";
 
+interface ApiValidationError {
+  loc: Array<string | number>;
+  msg: string;
+}
+
 export default function FertilizerGuide() {
   type FormDataKey = 'N' | 'P' | 'K' | 'pH' | 'temperature' | 'humidity' | 'rainfall';
 
@@ -68,7 +73,9 @@ export default function FertilizerGuide() {
         let message = "Failed to fetch recommendation";
         if (errorData.detail) {
           if (Array.isArray(errorData.detail)) {
-            message = errorData.detail.map((d: any) => `${d.loc[d.loc.length - 1]}: ${d.msg}`).join(", ");
+            message = (errorData.detail as ApiValidationError[])
+              .map((d) => `${d.loc[d.loc.length - 1]}: ${d.msg}`)
+              .join(", ");
           } else {
             message = errorData.detail;
           }
@@ -86,8 +93,8 @@ export default function FertilizerGuide() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 animate-in fade-in duration-700">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+    <div className="py-4 sm:py-6 animate-in fade-in duration-700 pb-10">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 gap-5">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-lg bg-tertiary/10 flex items-center justify-center">
@@ -97,7 +104,7 @@ export default function FertilizerGuide() {
               {t("fertilizer.advisory")}
             </span>
           </div>
-          <h1 className="font-headline text-4xl md:text-5xl font-black tracking-tight text-white">
+          <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
             {t("fertilizer.title_fert")} <span className="text-tertiary">{t("fertilizer.title_rec")}</span>
           </h1>
           <p className="mt-3 text-slate-400 font-label max-w-xl">
@@ -111,10 +118,10 @@ export default function FertilizerGuide() {
 
 
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-        <div className="md:col-span-8 glass-panel p-8 rounded-xl border border-outline-variant/5">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 sm:gap-7">
+        <div className="xl:col-span-8 glass-panel p-5 sm:p-7 rounded-xl border border-outline-variant/5">
           <form onSubmit={handlePredict} className="space-y-6">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {[
                 { name: "N", label: t("fertilizer.n"), icon: FlaskConical },
                 { name: "P", label: t("fertilizer.p"), icon: FlaskConical },
@@ -154,7 +161,7 @@ export default function FertilizerGuide() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 rounded-xl liquid-pill text-surface font-label font-bold text-lg shadow-xl shadow-primary/20 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50"
+              className="w-full py-4 rounded-xl liquid-pill text-surface font-label font-bold text-base sm:text-lg shadow-xl shadow-primary/20 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50"
             >
               {loading ? t("fertilizer.analyzing") : t("fertilizer.predict_btn")}
             </button>
@@ -162,8 +169,8 @@ export default function FertilizerGuide() {
           </form>
         </div>
 
-        <div className="md:col-span-4">
-          <div className="glass-panel p-8 rounded-xl border border-outline-variant/5 h-full flex flex-col justify-center transition-all">
+        <div className="xl:col-span-4">
+          <div className="glass-panel p-5 sm:p-7 rounded-xl border border-outline-variant/5 h-full flex flex-col justify-center transition-all">
             {result ? (
               <div className="animate-scale-in text-center">
                 <div className="w-16 h-16 rounded-full bg-tertiary/20 flex items-center justify-center mx-auto mb-6">

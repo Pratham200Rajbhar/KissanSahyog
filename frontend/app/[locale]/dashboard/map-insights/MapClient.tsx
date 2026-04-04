@@ -294,12 +294,12 @@ export default function MapClient() {
   }
 
   return (
-    <div className="flex flex-col gap-6 flex-1 min-h-0 relative">
+    <div className="flex flex-col gap-4 sm:gap-6 flex-1 min-h-0 relative">
       {/* Search & Date Controls */}
-      <div className="bg-surface/60 backdrop-blur-md rounded-2xl border border-outline-variant p-4 flex flex-wrap gap-5 items-end shrink-0 shadow-lg relative z-20">
+      <div className="bg-surface/60 backdrop-blur-md rounded-2xl border border-outline-variant p-3 sm:p-4 flex flex-wrap gap-4 items-end shrink-0 shadow-lg relative z-20">
 
         {/* Location Search API */}
-        <div className="flex flex-col gap-2 min-w-[280px] flex-1 relative" ref={wrapperRef}>
+        <div className="flex flex-col gap-2 min-w-0 w-full lg:w-auto lg:flex-1 relative" ref={wrapperRef}>
           <span className="text-[10px] font-bold text-on-surface-muted uppercase tracking-[0.15em] flex items-center gap-1.5">
             <MapPin className="text-error w-3 h-3" />
             {t("map.field_location")}
@@ -346,7 +346,7 @@ export default function MapClient() {
           )}
         </div>
 
-        <div className="flex gap-4 flex-wrap">
+        <div className="flex gap-3 sm:gap-4 flex-wrap w-full lg:w-auto">
           <label className="flex flex-col gap-2">
             <span className="text-[10px] font-bold text-on-surface-muted uppercase tracking-[0.15em]">{t("map.start_date")}</span>
             <input
@@ -373,7 +373,7 @@ export default function MapClient() {
         <button
           onClick={loadNDVI}
           disabled={loading || !location}
-          className="bg-gradient-to-r from-[#4CB828] to-[#15a855] hover:opacity-90 text-black font-extrabold px-8 py-2.5 rounded-xl transition-all disabled:opacity-40 disabled:grayscale text-sm tracking-wide flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(76,184,40,0.3)] hover:shadow-[0_4px_25px_rgba(76,184,40,0.5)] min-w-[160px] ml-auto"
+          className="w-full sm:w-auto bg-gradient-to-r from-[#4CB828] to-[#15a855] hover:opacity-90 text-black font-extrabold px-6 sm:px-8 py-2.5 rounded-xl transition-all disabled:opacity-40 disabled:grayscale text-sm tracking-wide flex items-center justify-center gap-2 shadow-[0_4px_20px_rgba(76,184,40,0.3)] hover:shadow-[0_4px_25px_rgba(76,184,40,0.5)] min-w-[160px] lg:ml-auto"
         >
           {loading ? (
             <>
@@ -389,7 +389,7 @@ export default function MapClient() {
       </div>
 
       {status && !loading && (
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 z-[30] bg-background/90 text-on-surface px-6 py-2 rounded-full border border-outline-variant shadow-xl text-sm font-medium backdrop-blur-md">
+        <div className="absolute top-[5.6rem] sm:top-24 left-1/2 -translate-x-1/2 z-[30] bg-background/90 text-on-surface px-5 py-2 rounded-full border border-outline-variant shadow-xl text-xs sm:text-sm font-medium backdrop-blur-md">
           {status}
         </div>
       )}
@@ -397,11 +397,11 @@ export default function MapClient() {
       {/* Map Section */}
       <div 
         ref={mapRef}
-        className={`relative flex-1 rounded-2xl overflow-hidden glass-panel border border-outline-variant shadow-2xl min-h-[400px] z-10 ${isFullscreen ? 'fixed inset-0 z-[9999] rounded-none' : ''}`}
+        className={`relative flex-1 rounded-2xl overflow-hidden glass-panel border border-outline-variant shadow-2xl min-h-[420px] sm:min-h-[500px] z-10 ${isFullscreen ? 'fixed inset-0 z-[9999] rounded-none' : ''}`}
       >
         <button
           onClick={toggleFullscreen}
-          className="absolute top-[80px] left-3 z-[1000] bg-surface/90 hover:bg-surface border border-white/10 p-2 rounded-lg shadow-lg text-white/80 hover:text-white transition-all backdrop-blur-md"
+          className="absolute top-3 left-3 z-[1000] bg-surface/90 hover:bg-surface border border-white/10 p-2 rounded-lg shadow-lg text-white/80 hover:text-white transition-all backdrop-blur-md"
           title={isFullscreen ? "Exit Fullscreen" : "Fullscreen View"}
         >
           {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
@@ -457,7 +457,7 @@ export default function MapClient() {
 
         {/* Active Insight Panel */}
         {location && showInsights && (
-          <div className="absolute top-6 right-6 z-[999] bg-surface/80 backdrop-blur-2xl border border-white/10 p-5 rounded-[20px] shadow-[0_12px_40px_rgba(0,0,0,0.5)] w-[300px] flex flex-col gap-4 text-white text-left font-sans animate-fade-in-down overflow-hidden">
+          <div className="absolute top-4 right-4 z-[999] bg-surface/80 backdrop-blur-2xl border border-white/10 p-4 sm:p-5 rounded-[20px] shadow-[0_12px_40px_rgba(0,0,0,0.5)] w-[min(88vw,300px)] flex flex-col gap-3 sm:gap-4 text-white text-left font-sans animate-fade-in-down overflow-hidden">
             {/* Subtle glow effect behind */}
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
             
@@ -525,7 +525,7 @@ export default function MapClient() {
 
         {/* Bottom Left Panel: Vegetation Index */}
         {location && (
-          <div className="absolute bottom-6 left-6 z-[999] bg-surface/80 backdrop-blur-2xl border border-white/10 p-4 rounded-[20px] shadow-[0_12px_40px_rgba(0,0,0,0.5)] w-[260px] text-white font-sans animate-fade-in-up">
+          <div className="hidden md:block absolute bottom-6 left-6 z-[999] bg-surface/80 backdrop-blur-2xl border border-white/10 p-4 rounded-[20px] shadow-[0_12px_40px_rgba(0,0,0,0.5)] w-[260px] text-white font-sans animate-fade-in-up">
             <div className="flex items-center gap-2 mb-3 text-primary">
               <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center border border-primary/20">
                 <TrendingUp className="w-3.5 h-3.5" />

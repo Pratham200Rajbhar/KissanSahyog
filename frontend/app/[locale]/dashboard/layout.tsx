@@ -19,11 +19,13 @@ export default async function DashboardLayout({
 
   return (
     <LocationProvider>
-      <div className="relative min-h-screen bg-background text-on-surface">
+      <div className="relative min-h-screen bg-background text-on-surface muted-grid-bg">
         <DashboardSidebar />
-        <main className="ml-[22rem] min-h-screen pt-20 px-8 pb-12">
-          <DashboardTopNav />
-          {children}
+        <main className="min-h-screen lg:ml-[20.5rem]">
+          <div className="dashboard-content dashboard-shell">
+            <DashboardTopNav />
+            <div className="pt-4 sm:pt-5">{children}</div>
+          </div>
         </main>
         <Suspense fallback={null}>
           <SettingsModal />

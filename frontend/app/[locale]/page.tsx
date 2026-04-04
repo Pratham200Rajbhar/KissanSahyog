@@ -10,34 +10,34 @@ export default async function LandingPage() {
   return (
     <>
       <Navbar />
-      <main className="relative overflow-hidden min-h-[calc(100vh-80px)] flex flex-col items-center liquid-bg">
+      <main className="relative overflow-hidden min-h-[calc(100vh-72px)] flex flex-col items-center liquid-bg">
         {/* Hero Section */}
-        <section className="relative w-full max-w-7xl px-6 pt-24 pb-32 flex flex-col items-center text-center z-10">
+        <section className="relative app-shell pt-14 sm:pt-20 pb-16 sm:pb-24 flex flex-col items-center text-center z-10 app-section">
           {/* Floating Decorative Element */}
-          <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/10 blur-[120px] rounded-full -z-10 animate-fade-in" />
+          <div className="absolute -top-16 left-1/2 -translate-x-1/2 w-[18rem] sm:w-[26rem] h-[18rem] sm:h-[26rem] bg-primary/10 blur-[110px] rounded-full -z-10 animate-fade-in" />
 
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border border-white/5 text-primary text-xs font-bold uppercase tracking-widest mb-8 animate-slide-up animation-delay-100">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             {t("landing.v4_live")}
           </div>
 
-          <h1 className="font-headline text-5xl md:text-8xl font-extrabold tracking-tight text-on-surface mb-8 max-w-5xl leading-[1.1] animate-slide-up animation-delay-200">
+          <h1 className="font-headline text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-on-surface mb-6 sm:mb-8 max-w-5xl leading-[1.07] animate-slide-up animation-delay-200">
             {t("landing.future_of")} <br />
             <span className="bg-gradient-to-r from-primary via-primary-container to-tertiary bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(78,222,163,0.3)]">
               {t("landing.fertile_intelligence")}
             </span>
           </h1>
 
-          <p className="font-body text-on-surface-variant text-lg md:text-xl max-w-2xl mb-12 leading-relaxed animate-slide-up animation-delay-300">
+          <p className="font-body text-on-surface-variant text-base sm:text-lg max-w-2xl mb-8 sm:mb-10 leading-relaxed animate-slide-up animation-delay-300">
             {t("landing.hero_subtitle")}
           </p>
 
           <HeroActions label={t("landing.start_prediction")} />
 
           {/* Dashboard Preview / Bento Grid Section */}
-          <div className="mt-32 w-full grid grid-cols-1 md:grid-cols-12 gap-6 animate-scale-in animation-delay-600">
+          <div className="mt-12 sm:mt-16 lg:mt-20 w-full grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6 animate-scale-in animation-delay-600">
             {/* Main Preview */}
-            <div className="md:col-span-8 rounded-xl overflow-hidden glass-panel border border-white/5 relative group">
+            <div className="lg:col-span-8 rounded-xl overflow-hidden glass-panel border border-white/5 relative group min-h-[260px] sm:min-h-[320px]">
               <Image
                 className="w-full h-auto object-cover opacity-60 group-hover:scale-110 transition-transform duration-1000"
                 alt="Cinematic aerial view of modern circular farm fields"
@@ -47,11 +47,11 @@ export default async function LandingPage() {
                 priority
               />
               <div className="absolute inset-0 bg-gradient-to-t from-surface via-transparent to-transparent" />
-              <div className="absolute bottom-8 left-8 text-left">
+              <div className="absolute bottom-5 sm:bottom-8 left-5 sm:left-8 text-left">
                 <p className="text-primary font-bold tracking-widest text-xs uppercase mb-2">{t("landing.monitor_title")}</p>
-                <h3 className="text-2xl font-headline font-bold">{t("landing.monitor_sector")}</h3>
+                <h3 className="text-xl sm:text-2xl font-headline font-bold">{t("landing.monitor_sector")}</h3>
               </div>
-              <div className="absolute top-8 right-8 flex gap-4">
+              <div className="absolute top-4 sm:top-8 right-4 sm:right-8 flex gap-4">
                 <div className="px-3 py-1 rounded-full glass-panel border border-white/10 flex items-center gap-2 text-xs">
                   <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
                   {t("landing.soil_sensor")}
@@ -60,7 +60,7 @@ export default async function LandingPage() {
             </div>
 
             {/* Metric Card 1 */}
-            <div className="md:col-span-4 rounded-xl glass-panel border border-white/5 p-8 flex flex-col justify-between text-left">
+            <div className="lg:col-span-4 rounded-xl glass-panel border border-white/5 p-6 sm:p-8 flex flex-col justify-between text-left">
               <div>
                 <div className="w-12 h-12 rounded-lg bg-tertiary/20 flex items-center justify-center text-tertiary mb-6">
                   <Droplets className="w-6 h-6" />
@@ -80,7 +80,7 @@ export default async function LandingPage() {
             </div>
 
             {/* Metric Card 2 */}
-            <div className="md:col-span-4 rounded-xl glass-panel border border-white/5 p-8 flex flex-col text-left">
+            <div className="lg:col-span-4 rounded-xl glass-panel border border-white/5 p-6 sm:p-8 flex flex-col text-left">
               <div className="w-12 h-12 rounded-lg bg-primary/20 flex items-center justify-center text-primary mb-6">
                 <TrendingUp className="w-6 h-6" />
               </div>
@@ -90,8 +90,8 @@ export default async function LandingPage() {
             </div>
 
             {/* Feature Grid */}
-            <div className="md:col-span-8 rounded-xl glass-panel border border-white/5 overflow-hidden flex flex-col md:flex-row">
-              <div className="md:w-1/2 p-8 text-left flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5">
+            <div className="lg:col-span-8 rounded-xl glass-panel border border-white/5 overflow-hidden flex flex-col md:flex-row">
+              <div className="md:w-1/2 p-6 sm:p-8 text-left flex flex-col justify-center border-b md:border-b-0 md:border-r border-white/5">
                 <h4 className="text-xl font-headline font-bold mb-4">{t("landing.algorithms_title")}</h4>
                 <p className="text-sm text-slate-400 leading-relaxed">
                   {t("landing.algorithms_desc")}
@@ -112,8 +112,8 @@ export default async function LandingPage() {
         </section>
 
         {/* Stats Section */}
-        <section className="w-full bg-surface-container-low py-24 border-y border-white/5">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-12 text-center">
+        <section className="w-full bg-surface-container-low py-14 sm:py-20 border-y border-white/5">
+          <div className="app-shell grid grid-cols-2 md:grid-cols-4 gap-8 sm:gap-12 text-center">
             <div>
               <div className="text-4xl md:text-5xl font-headline font-extrabold text-primary mb-2">1.2M</div>
               <div className="text-xs font-label uppercase tracking-widest text-slate-500">{t("landing.hectares_managed")}</div>

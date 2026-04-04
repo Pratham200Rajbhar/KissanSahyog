@@ -24,6 +24,11 @@ interface RecommendationItem {
   confidence: number;
 }
 
+interface ApiValidationError {
+  loc: Array<string | number>;
+  msg: string;
+}
+
 export default function CropRecommendationPage() {
   type FormDataKey = 'N' | 'P' | 'K' | 'pH' | 'temperature' | 'humidity' | 'rainfall';
 
@@ -88,7 +93,9 @@ export default function CropRecommendationPage() {
         if (errorData.detail) {
           if (Array.isArray(errorData.detail)) {
             // Extract field and msg from FastAPI validation error
-            message = errorData.detail.map((d: any) => `${d.loc[d.loc.length - 1]}: ${d.msg}`).join(", ");
+            message = (errorData.detail as ApiValidationError[])
+              .map((d) => `${d.loc[d.loc.length - 1]}: ${d.msg}`)
+              .join(", ");
           } else {
             message = errorData.detail;
           }
@@ -106,8 +113,8 @@ export default function CropRecommendationPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto py-8 px-4 animate-in fade-in duration-700 pb-12">
-      <div className="flex flex-col md:flex-row md:items-end justify-between mb-10 gap-6">
+    <div className="py-4 sm:py-6 animate-in fade-in duration-700 pb-10">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-10 gap-5">
         <div>
           <div className="flex items-center gap-2 mb-2">
             <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
@@ -117,7 +124,7 @@ export default function CropRecommendationPage() {
               {t("crop.advisory_engine")}
             </span>
           </div>
-          <h1 className="font-headline text-4xl md:text-5xl font-black tracking-tight text-white">
+          <h1 className="font-headline text-3xl sm:text-4xl md:text-5xl font-black tracking-tight text-white">
             {t("crop.title_crop")} <span className="text-primary">{t("crop.title_recommendation")}</span>
           </h1>
           <p className="mt-3 text-slate-400 font-label max-w-xl">
@@ -130,14 +137,14 @@ export default function CropRecommendationPage() {
       </div>
 
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 sm:gap-7">
         {/* Input Form Panel */}
-        <div className="lg:col-span-7">
-          <div className="glass-panel p-8 rounded-[2.5rem] border border-white/5 relative overflow-hidden group shadow-2xl">
+        <div className="xl:col-span-7">
+          <div className="glass-panel p-5 sm:p-7 rounded-[2rem] sm:rounded-[2.5rem] border border-white/5 relative overflow-hidden group shadow-2xl">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-primary/10 transition-colors" />
             
             <form onSubmit={handlePredict} className="relative z-10 space-y-8">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 sm:gap-x-7 gap-y-5 sm:gap-y-6">
                 {[
                   { name: "N", label: t("crop.nitrogen"), icon: FlaskConical, unit: "mg/kg" },
                   { name: "P", label: t("crop.phosphorus"), icon: FlaskConical, unit: "mg/kg" },
@@ -181,7 +188,7 @@ export default function CropRecommendationPage() {
                 type="submit"
                 disabled={loading}
                 className={clsx(
-                  "w-full py-5 rounded-2xl flex items-center justify-center gap-3 font-label font-bold text-lg transition-all active:scale-[0.98]",
+                  "w-full py-4 rounded-2xl flex items-center justify-center gap-3 font-label font-bold text-base sm:text-lg transition-all active:scale-[0.98]",
                   loading 
                     ? "bg-white/5 text-slate-500 cursor-not-allowed" 
                     : "liquid-pill text-[#0b1326] shadow-xl shadow-primary/20 hover:brightness-110"
@@ -211,8 +218,8 @@ export default function CropRecommendationPage() {
         </div>
 
         {/* Results Panel */}
-        <div className="lg:col-span-5 h-full">
-          <div className="glass-panel p-8 rounded-[2.5rem] border border-white/5 h-full flex flex-col relative overflow-hidden group shadow-2xl">
+        <div className="xl:col-span-5 h-full">
+          <div className="glass-panel p-5 sm:p-7 rounded-[2rem] sm:rounded-[2.5rem] border border-white/5 h-full flex flex-col relative overflow-hidden group shadow-2xl">
             <div className="absolute bottom-0 left-0 w-64 h-64 bg-tertiary/5 rounded-full -ml-32 -mb-32 blur-3xl group-hover:bg-tertiary/10 transition-colors" />
             
             <div className="relative z-10 flex-1 flex flex-col">
@@ -224,7 +231,7 @@ export default function CropRecommendationPage() {
                 <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
                   {recommendations.map((item: RecommendationItem, index: number) => (
                     <div key={item.crop} className={clsx(
-                      "p-6 rounded-3xl border border-white/5 transition-all hover:bg-white/[0.02]",
+                      "p-5 sm:p-6 rounded-3xl border border-white/5 transition-all hover:bg-white/[0.02]",
                       index === 0 ? "bg-white/[0.05] border-primary/20" : "bg-transparent"
                     )}>
                       <div className="flex justify-between items-end mb-4">

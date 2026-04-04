@@ -1,6 +1,6 @@
 "use client";
 
-import { Search, Bell, Sun, Moon, Globe, ChevronDown, LogOut } from "lucide-react";
+import { Bell, Sun, Moon, Globe, ChevronDown, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter, routing } from "../../i18n/routing";
@@ -53,25 +53,15 @@ export default function DashboardTopNav() {
 
 
   return (
-    <header className="fixed top-0 left-72 right-0 z-50 h-16 flex justify-between items-center px-8 bg-[#0b1326]/60 backdrop-blur-xl transition-all duration-300">
-      <div className="flex items-center gap-6">
-        <div className="relative w-80">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4" />
-          <input
-            className="w-full bg-surface-container-low border-none rounded-full pl-12 pr-4 py-2 text-sm font-label focus:ring-2 focus:ring-primary/40 transition-all placeholder:text-slate-500 outline-none"
-            placeholder={t("topnav.search_placeholder")}
-            type="text"
-          />
-        </div>
-      </div>
-      <div className="flex items-center gap-4">
+    <header className="sticky top-3 z-40 h-auto sm:h-16 surface-panel px-3 sm:px-5 py-2.5 sm:py-0 flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 sm:gap-4 transition-all duration-300">
+      <div className="flex items-center justify-end gap-2 sm:gap-3 w-full sm:w-auto sm:ml-auto">
         <div className="relative">
           <button 
             onClick={() => setLangDropdownOpen(!langDropdownOpen)}
             className="flex items-center gap-1 text-slate-400 hover:text-primary transition-colors text-sm font-medium p-2 rounded-full hover:bg-primary/10"
           >
             <Globe className="w-5 h-5" />
-            <span className="hidden sm:block">{getLangDisplay(locale)}</span>
+            <span className="hidden md:block">{getLangDisplay(locale)}</span>
             <ChevronDown className="w-3 h-3" />
           </button>
           {langDropdownOpen && (
@@ -85,30 +75,31 @@ export default function DashboardTopNav() {
         
         <button 
           onClick={toggleTheme} 
-          className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-primary/10 hover:text-primary transition-all duration-300"
+          className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-primary/10 hover:text-primary transition-all duration-300"
           aria-label="Toggle Theme"
         >
           {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>
-        <button className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-primary/10 hover:text-primary transition-all duration-300 relative">
+
+        <button className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-primary/10 hover:text-primary transition-all duration-300 relative">
           <Bell className="w-5 h-5" />
           <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_#4edea3]"></span>
         </button>
         
         <button 
           onClick={() => signOut({ callbackUrl: "/" })}
-          className="w-10 h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-300"
+          className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-red-500/10 hover:text-red-500 transition-all duration-300"
           aria-label="Sign Out"
         >
           <LogOut className="w-5 h-5" />
         </button>
 
-        <div className="h-8 w-[1px] bg-outline-variant/20 mx-2"></div>
+        <div className="hidden sm:block h-8 w-px bg-outline-variant/20 mx-1"></div>
         <div 
-          className="flex items-center gap-3 group cursor-pointer"
+          className="flex items-center gap-2 sm:gap-3 group cursor-pointer"
           onClick={() => router.push(`${pathname}?settings=true`)}
         >
-          <div className="text-right flex items-center h-full">
+          <div className="hidden md:flex text-right items-center h-full">
             <p className="font-headline text-sm font-bold text-on-surface leading-tight">{userName}</p>
           </div>
           <div className="w-10 h-10 rounded-full border-2 border-primary/20 p-0.5 transition-transform group-hover:scale-105 overflow-hidden">

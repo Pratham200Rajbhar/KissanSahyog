@@ -170,7 +170,7 @@ export default function AnalysisPage() {
   }
 
   return (
-    <div className="mt-8 animate-fade-in relative z-10 px-4 pb-12">
+    <div className="mt-2 sm:mt-4 animate-fade-in relative z-10 pb-10">
       {/* Modal Overlay */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#0b1326]/80 backdrop-blur-sm">
@@ -194,7 +194,7 @@ export default function AnalysisPage() {
                 <h4 className="font-label text-xs uppercase tracking-wider text-slate-400 mb-3 flex items-center gap-2">
                   <Calendar className="w-4 h-4"/> {t("analysis.export_range")}
                 </h4>
-                <div className="flex gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   <div className="flex-1">
                     <label className="text-[10px] uppercase font-bold text-slate-500 mb-1 block">{t("analysis.start_date")}</label>
                     <input 
@@ -270,12 +270,12 @@ export default function AnalysisPage() {
         </div>
       )}
 
-      <div className="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-6">
+      <div className="mb-6 sm:mb-8 flex flex-col md:flex-row md:items-start justify-between gap-5">
         <div>
           <span className="font-label text-xs font-bold uppercase tracking-[0.2em] text-primary mb-2 block">
             {t("analysis.data_hub")}
           </span>
-          <h2 className="font-headline text-4xl font-extrabold tracking-tight text-white">{t("analysis.full_history")}</h2>
+          <h2 className="font-headline text-3xl sm:text-4xl font-extrabold tracking-tight text-white">{t("analysis.full_history")}</h2>
           <p className="text-slate-400 mt-2">{t("analysis.history_desc")}</p>
         </div>
         
@@ -291,7 +291,7 @@ export default function AnalysisPage() {
         </div>
       </div>
 
-      <div className="glass-panel p-2 mb-6 rounded-xl flex flex-wrap gap-2 w-fit border border-outline-variant/10">
+      <div className="glass-panel p-2 mb-5 sm:mb-6 rounded-xl flex flex-wrap gap-2 w-full sm:w-fit border border-outline-variant/10">
         <button 
           onClick={() => setActiveTab("yield")}
           className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-label text-sm transition-all duration-300 ${activeTab === 'yield' ? 'bg-primary/20 text-primary font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}

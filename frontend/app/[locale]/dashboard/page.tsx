@@ -104,17 +104,17 @@ export default function DashboardOverview() {
   ];
 
   return (
-    <div className="mt-8 animate-fade-in">
-      <div className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <div className="mt-2 sm:mt-4 animate-fade-in">
+      <div className="mb-8 sm:mb-10 flex flex-col md:flex-row md:items-end justify-between gap-5">
         <div>
           <span className="font-label text-xs font-bold uppercase tracking-[0.2em] text-primary mb-2 block">
             {t("navigation.system_overview")}
           </span>
-          <h2 className="font-headline text-5xl font-extrabold tracking-tight text-white drop-shadow-sm">{t("navigation.main_dashboard")}</h2>
+          <h2 className="font-headline text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white drop-shadow-sm">{t("navigation.main_dashboard")}</h2>
         </div>
-        <div className="flex gap-4">
+        <div className="flex gap-4 w-full md:w-auto">
           <Link href="/dashboard/yield-prediction">
-            <button className="flex items-center gap-2 px-8 py-4 rounded-xl liquid-pill text-[#0b1326] font-label text-sm font-bold hover:brightness-110 active:scale-95 transition-all shadow-[0_10px_40px_rgba(78,222,163,0.3)]">
+            <button className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl liquid-pill text-[#0b1326] font-label text-sm font-bold hover:brightness-110 active:scale-95 transition-all shadow-[0_10px_40px_rgba(78,222,163,0.3)]">
               <PlusCircle className="w-5 h-5" />
               {t("yield.predict_new")}
             </button>
@@ -123,13 +123,13 @@ export default function DashboardOverview() {
       </div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-10">
         {kpis.map((kpi, idx) => {
           const Icon = kpi.icon;
           return (
             <div
               key={idx}
-              className="glass-panel p-8 rounded-2xl border border-white/5 shadow-2xl hover:translate-y-[-6px] transition-all duration-500 group"
+              className="glass-panel p-5 sm:p-7 rounded-2xl border border-white/5 shadow-2xl hover:translate-y-[-4px] transition-all duration-300 group"
             >
               <div className="flex justify-between items-start mb-6">
                 <div className={`w-14 h-14 rounded-2xl ${kpi.bgClass} flex items-center justify-center group-hover:scale-110 transition-transform`}>
@@ -150,12 +150,12 @@ export default function DashboardOverview() {
       </div>
 
       {/* Bento Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-6">
         {/* Yield Projection Chart */}
-        <div className="lg:col-span-8 glass-panel rounded-2xl p-10 border border-white/5 relative overflow-hidden flex flex-col min-h-[460px] shadow-2xl">
-          <div className="flex justify-between items-center mb-8">
+        <div className="xl:col-span-8 glass-panel rounded-2xl p-5 sm:p-8 border border-white/5 relative overflow-hidden flex flex-col min-h-[420px] shadow-2xl">
+          <div className="flex justify-between items-center mb-6 sm:mb-8">
             <div>
-              <h4 className="font-headline text-2xl font-bold text-white tracking-tight">{t("dashboard.historical_projections")}</h4>
+              <h4 className="font-headline text-xl sm:text-2xl font-bold text-white tracking-tight">{t("dashboard.historical_projections")}</h4>
               <p className="font-label text-sm text-slate-400 font-medium">{t("dashboard.recent_runs")}</p>
             </div>
           </div>
@@ -176,7 +176,7 @@ export default function DashboardOverview() {
         </div>
 
         {/* Environment Radar (Kept intact for real-time sensing) */}
-        <div className="lg:col-span-4 glass-panel rounded-xl p-8 border border-outline-variant/5">
+        <div className="xl:col-span-4 glass-panel rounded-xl p-5 sm:p-8 border border-outline-variant/5">
           <h4 className="font-headline text-xl font-bold mb-6 text-white">{t("dashboard.live_env_sync")}</h4>
           <div className="space-y-6">
             <div className="flex flex-col gap-1">
@@ -208,8 +208,8 @@ export default function DashboardOverview() {
         </div>
 
         {/* Actionable Insights Panel */}
-        <div className="lg:col-span-12 glass-panel rounded-xl p-8 border border-outline-variant/5">
-          <div className="flex justify-between items-center mb-8">
+        <div className="xl:col-span-12 glass-panel rounded-xl p-5 sm:p-8 border border-outline-variant/5">
+          <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-6 sm:mb-8">
             <div>
               <h4 className="font-headline text-xl font-bold text-white">{t("dashboard.action_items")}</h4>
               <p className="font-label text-sm text-slate-400">{t("dashboard.priority_alerts")}</p>
