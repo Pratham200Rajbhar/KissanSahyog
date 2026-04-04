@@ -101,7 +101,10 @@
     "live_alert": "જીવંત ચેતવણી",
     "suggestion": "સૂચન",
     "next_season": "આગામી સીઝન",
-    "growth_plan": "વૃદ્ધિ યોજના"
+    "growth_plan": "વૃદ્ધિ યોજના",
+    "location_permission_title": "સ્થાન આવશ્યક છે",
+    "location_permission_desc": "રીઅલ-ટાઇમ હવામાન ડેટા માટે જીપીએસ સક્ષમ કરો.",
+    "location_grant_btn": "ઍક્સેસ આપો"
   },
   "landing": {
     "meta_title": "KissanSahyog | ફળદ્રુપ બુદ્ધિનું ભવિષ્ય",

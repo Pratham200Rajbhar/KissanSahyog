@@ -1,17 +1,19 @@
-from fastapi import Request, HTTPException, Security
+import logging
+import json
+import time
+from typing import Dict, Any
+from fastapi import Request, HTTPException
 from fastapi.security import APIKeyCookie
 from jose import jwe
-import json
-from app.core.config import settings
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-from typing import Dict, Any
+from app.core.config import settings
 
-# Define the cookie name. In development it's next-auth.session-token
-# In production with secure cookies it might be __Secure-next-auth.session-token
-# We can check both or just rely on the request cookies
-cookie_sec = APIKeyCookie(name="__Secure-next-auth.session-token", auto_error=False)
-cookie_dev = APIKeyCookie(name="next-auth.session-token", auto_error=False)
+logger = logging.getLogger(__name__)
+
+# Primary cookie names for NextAuth
+COOKIE_SECURE = "__Secure-next-auth.session-token"
+COOKIE_DEV = "next-auth.session-token"
 
 def get_nextauth_decryption_key(secret: str) -> bytes:
     """
@@ -26,27 +28,37 @@ def get_nextauth_decryption_key(secret: str) -> bytes:
     )
     return hkdf.derive(secret.encode('utf-8'))
 
-async def get_current_user(
-    req: Request,
-) -> Dict[str, Any]:
-    
-    # Try dev cookie first, then secure cookie
-    token = req.cookies.get("next-auth.session-token") or req.cookies.get("__Secure-next-auth.session-token")
+async def get_current_user(req: Request) -> Dict[str, Any]:
+    """
+    Decodes and verifies a NextAuth JWE session token.
+    Raises HTTPException if the token is missing, invalid, or expired.
+    """
+    token = req.cookies.get(COOKIE_DEV) or req.cookies.get(COOKIE_SECURE)
     
     if not token:
-        raise HTTPException(status_code=401, detail="Authentication credentials were not provided (Missing Cookie)")
+        logger.warning(f"Unauthorized access attempt: No session token found.")
+        raise HTTPException(status_code=401, detail="Authentication credentials were not provided")
 
     secret = settings.nextauth_secret
     if not secret:
-        raise HTTPException(status_code=500, detail="NEXTAUTH_SECRET is not configured on the server")
-
-    key = get_nextauth_decryption_key(secret)
+        logger.error("System configuration error: NEXTAUTH_SECRET is not defined.")
+        raise HTTPException(status_code=500, detail="Internal Server Error: Auth configuration missing.")
 
     try:
-        # Decrypt JWE token
+        # Decrypt JWE token using the derived key
+        key = get_nextauth_decryption_key(secret)
         decrypted = jwe.decrypt(token, key)
         payload = json.loads(decrypted.decode('utf-8'))
+        
+        # Explicit check for token expiration
+        # NextAuth includes 'exp' in the decrypted JSON
+        exp = payload.get("exp")
+        if exp and exp < time.time():
+            logger.warning("Session expired for user.")
+            raise HTTPException(status_code=401, detail="Session expired")
+            
         return payload
+
     except Exception as e:
-        print(f"Token decryption failed: {e}")
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+        logger.error(f"Authentication failure: {str(e)}")
+        raise HTTPException(status_code=401, detail="Invalid session token")

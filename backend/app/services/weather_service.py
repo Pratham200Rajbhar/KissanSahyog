@@ -1,8 +1,14 @@
-import httpx
+from datetime import datetime, timedelta
+from typing import Dict, Any, Optional
 import pandas as pd
+import httpx
 import traceback
-from datetime import datetime
-from typing import Dict, Any
+from app.core.config import settings
+
+# Simple in-memory cache
+# Key: (lat, lon), Value: (timestamp, data)
+_weather_cache: Dict[tuple, tuple] = {}
+CACHE_TTL = timedelta(hours=1)
 
 async def _fetch_nasa_data(lat: float, lon: float) -> Dict[str, Any]:
     """
@@ -11,12 +17,14 @@ async def _fetch_nasa_data(lat: float, lon: float) -> Dict[str, Any]:
     """
     # Define date range: last ~14 days (to ensure we get at least 7 valid days, accounting for lag)
     end_date_dt = datetime.today()
-    start_date_dt = end_date_dt - pd.Timedelta(days=14)
+    start_date_dt = end_date_dt - timedelta(days=14)
     
     start_date = start_date_dt.strftime("%Y%m%d")
     end_date = end_date_dt.strftime("%Y%m%d")
     
-    url = f"https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M,PRECTOTCORR,RH2M&community=AG&longitude={lon}&latitude={lat}&start={start_date}&end={end_date}&format=JSON"
+    # Using centralized NASA POWER Source URL from settings
+    base_url = settings.nasa_power_source_url
+    url = f"{base_url}/daily/point?parameters=T2M,PRECTOTCORR,RH2M&community=AG&longitude={lon}&latitude={lat}&start={start_date}&end={end_date}&format=JSON"
     
     async with httpx.AsyncClient() as client:
         try:
@@ -72,13 +80,20 @@ async def _fetch_nasa_data(lat: float, lon: float) -> Dict[str, Any]:
             print(f"ERROR: NASA service failure: {str(e)}\n{error_trace}")
             return None
 
-async def get_weather(lat: float, lon: float) -> Dict[str, Any]:
-    """Public API for dashboard weather context."""
+async def get_weather(lat: float, lon: float) -> Optional[Dict[str, Any]]:
+    """Public API for dashboard weather context with caching."""
+    # Check cache first
+    cache_key = (round(lat, 2), round(lon, 2))
+    if cache_key in _weather_cache:
+        timestamp, data = _weather_cache[cache_key]
+        if datetime.now() - timestamp < CACHE_TTL:
+            return data
+
     d = await _fetch_nasa_data(lat, lon)
     if not d:
         return None
     
-    return {
+    weather_data = {
         "temperature": d.get("avg_temp"),
         "humidity": d.get("avg_humidity"),
         "rainfall": d.get("avg_rainfall"),
@@ -86,6 +101,11 @@ async def get_weather(lat: float, lon: float) -> Dict[str, Any]:
         "description": "7-Day NASA Average"
     }
 
-async def get_nasa_averages(lat: float, lon: float) -> Dict[str, Any]:
+    # Update cache
+    _weather_cache[cache_key] = (datetime.now(), weather_data)
+    
+    return weather_data
+
+async def get_nasa_averages(lat: float, lon: float) -> Optional[Dict[str, Any]]:
     """Public utility for location sync."""
     return await _fetch_nasa_data(lat, lon)

@@ -1,14 +1,12 @@
-"use client";
-
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 import Image from "next/image";
-import { ArrowRight, PlayCircle, Droplets, TrendingUp } from "lucide-react";
-import { useTranslations } from "next-intl";
-import { signIn } from "next-auth/react";
+import { Droplets, TrendingUp } from "lucide-react";
+import { getTranslations } from "next-intl/server";
+import HeroActions from "../components/HeroActions";
 
-export default function LandingPage() {
-  const t = useTranslations();
+export default async function LandingPage() {
+  const t = await getTranslations();
   return (
     <>
       <Navbar />
@@ -18,36 +16,26 @@ export default function LandingPage() {
           {/* Floating Decorative Element */}
           <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-96 h-96 bg-primary/10 blur-[120px] rounded-full -z-10 animate-fade-in" />
 
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border border-white/5 text-primary text-xs font-bold uppercase tracking-widest mb-8 animate-slide-up" style={{ animationDelay: "0.1s" }}>
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-panel border border-white/5 text-primary text-xs font-bold uppercase tracking-widest mb-8 animate-slide-up animation-delay-100">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
             {t("landing.v4_live")}
           </div>
 
-          <h1 className="font-headline text-5xl md:text-8xl font-extrabold tracking-tight text-on-surface mb-8 max-w-5xl leading-[1.1] animate-slide-up" style={{ animationDelay: "0.2s" }}>
+          <h1 className="font-headline text-5xl md:text-8xl font-extrabold tracking-tight text-on-surface mb-8 max-w-5xl leading-[1.1] animate-slide-up animation-delay-200">
             {t("landing.future_of")} <br />
             <span className="bg-gradient-to-r from-primary via-primary-container to-tertiary bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(78,222,163,0.3)]">
               {t("landing.fertile_intelligence")}
             </span>
           </h1>
 
-          <p className="font-body text-on-surface-variant text-lg md:text-xl max-w-2xl mb-12 leading-relaxed animate-slide-up" style={{ animationDelay: "0.3s" }}>
+          <p className="font-body text-on-surface-variant text-lg md:text-xl max-w-2xl mb-12 leading-relaxed animate-slide-up animation-delay-300">
             {t("landing.hero_subtitle")}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-6 animate-slide-up" style={{ animationDelay: "0.4s" }}>
-            <button 
-              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
-              className="px-8 py-4 bg-gradient-to-br from-primary to-primary-container text-on-primary-container font-bold rounded-xl shadow-[0_0_40px_rgba(78,222,163,0.2)] hover:shadow-[0_0_60px_rgba(78,222,163,0.4)] hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2 group"
-            >
-              {t("landing.start_prediction")}
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-
-          </div>
-
+          <HeroActions label={t("landing.start_prediction")} />
 
           {/* Dashboard Preview / Bento Grid Section */}
-          <div className="mt-32 w-full grid grid-cols-1 md:grid-cols-12 gap-6 animate-scale-in" style={{ animationDelay: "0.6s" }}>
+          <div className="mt-32 w-full grid grid-cols-1 md:grid-cols-12 gap-6 animate-scale-in animation-delay-600">
             {/* Main Preview */}
             <div className="md:col-span-8 rounded-xl overflow-hidden glass-panel border border-white/5 relative group">
               <Image

@@ -14,7 +14,7 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
 import { getSentinelHubToken } from "./actions";
-import { Search, MapPin, Navigation, Droplet, AlertTriangle, Download, X, Lightbulb, TrendingUp, CheckCircle, Maximize, Minimize } from "lucide-react";
+import { Search, MapPin, Navigation, Droplet, AlertTriangle, TrendingUp, CheckCircle, Maximize, Minimize } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 // Fix default leaflet marker icons (broken in webpack/Next.js)
@@ -72,13 +72,6 @@ export default function MapClient() {
   const t = useTranslations();
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
   
-  const NDVI_LEGEND = [
-    { color: "#155F8F", label: t("map.legend_water") },
-    { color: "#C29A6B", label: t("map.legend_soil") },
-    { color: "#CCDC33", label: t("map.legend_sparse") },
-    { color: "#4CB828", label: t("map.legend_moderate") },
-    { color: "#0D610D", label: t("map.legend_healthy") },
-  ];
 
   // Search state
   interface NominatimSuggestion {
@@ -254,7 +247,7 @@ export default function MapClient() {
       };
 
       const res = await axios.post(
-        "https://services.sentinel-hub.com/api/v1/process",
+        process.env.NEXT_PUBLIC_KISSAN_SENTINEL_HUB_PROCESS_URL || "https://services.sentinel-hub.com/api/v1/process",
         payload,
         {
           headers: {
@@ -424,7 +417,7 @@ export default function MapClient() {
           {/* Detailed satellite basemap for farming instead of plain streets */}
           <TileLayer
             attribution='&copy; <a href="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer">Esri</a>'
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+            url={process.env.NEXT_PUBLIC_KISSAN_ESRI_WORLD_IMAGERY_URL || "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"}
           />
 
           <MapEventsHandler />

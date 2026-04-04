@@ -63,7 +63,18 @@ export default function FertilizerGuide() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(submissionData),
       });
-      if (!res.ok) throw new Error("Failed to fetch recommendation");
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        let message = "Failed to fetch recommendation";
+        if (errorData.detail) {
+          if (Array.isArray(errorData.detail)) {
+            message = errorData.detail.map((d: any) => `${d.loc[d.loc.length - 1]}: ${d.msg}`).join(", ");
+          } else {
+            message = errorData.detail;
+          }
+        }
+        throw new Error(message);
+      }
       const data = await res.json();
       setResult(data);
     } catch (err) {

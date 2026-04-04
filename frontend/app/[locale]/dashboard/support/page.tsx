@@ -1,10 +1,10 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { ExternalLink, Search, Info, CheckCircle2, HelpingHand, Sprout, ShieldCheck, CreditCard, Droplets, Store, FileText, Pickaxe, Warehouse, Leaf, Fish } from "lucide-react";
+import { LucideIcon, ExternalLink, Search, Info, CheckCircle2, HelpingHand, ShieldCheck, CreditCard, Droplets, Store, FileText, Pickaxe, Warehouse, Leaf, Fish } from "lucide-react";
 import { useState } from "react";
 
-const schemeIcons: Record<string, any> = {
+const schemeIcons: Record<string, LucideIcon> = {
   pm_kisan: HelpingHand,
   pmfby: ShieldCheck,
   kcc: CreditCard,

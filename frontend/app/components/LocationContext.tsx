@@ -16,6 +16,7 @@ interface LocationContextType {
   location: LocationData;
   loading: boolean;
   error: string | null;
+  permissionDenied: boolean;
   refreshLocation: () => Promise<void>;
 }
 
@@ -33,6 +34,7 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [permissionDenied, setPermissionDenied] = useState(false);
   const isRefreshing = React.useRef(false);
 
   const refreshLocation = useCallback(async () => {
@@ -41,6 +43,7 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
     
     setLoading(true);
     setError(null);
+    setPermissionDenied(false);
 
     if (!navigator.geolocation) {
       setError("Geolocation is not supported by your browser");
@@ -85,7 +88,11 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
       },
       (err) => {
         console.warn("Geolocation error:", err.message);
-        setError(err.message === "User denied Geolocation" ? "Location access denied. Please enable it for better recommendations." : err.message);
+        if (err.code === 1) { // PERMISSION_DENIED
+          setPermissionDenied(true);
+        } else {
+          setError(err.message === "User denied Geolocation" ? "Location access denied. Please enable it for better recommendations." : err.message);
+        }
         setLoading(false);
         isRefreshing.current = false;
       },
@@ -105,7 +112,7 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
 
 
   return (
-    <LocationContext.Provider value={{ location, loading, error, refreshLocation }}>
+    <LocationContext.Provider value={{ location, loading, error, permissionDenied, refreshLocation }}>
       {children}
     </LocationContext.Provider>
   );

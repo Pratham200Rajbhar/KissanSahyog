@@ -28,6 +28,7 @@ export async function generateMetadata({ params }: { params: Promise<{ locale: s
   };
 }
 
+
 export default async function RootLayout({
   children,
   params
@@ -37,15 +38,13 @@ export default async function RootLayout({
 }) {
   const { locale } = await params;
   
-  // Ensure that the incoming `locale` is valid
   if (!routing.locales.includes(locale as typeof routing.locales[number])) {
     notFound();
   }
 
-  // Providing all messages to the client
-  // side is the easiest way to get started
-  const messages = await getMessages();
-
+  // Load all messages on server
+  const allMessages = await getMessages();
+  
   return (
     <html lang={locale} className="dark">
       <body
@@ -56,7 +55,7 @@ export default async function RootLayout({
         )}
       >
         <SessionProviderWrapper>
-          <NextIntlClientProvider messages={messages}>
+          <NextIntlClientProvider messages={allMessages} locale={locale}>
             {children}
           </NextIntlClientProvider>
         </SessionProviderWrapper>

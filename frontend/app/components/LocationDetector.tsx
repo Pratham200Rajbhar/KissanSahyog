@@ -1,11 +1,35 @@
 "use client";
 
 import React from "react";
-import { MapPin, RefreshCw, Loader2, AlertCircle } from "lucide-react";
+import { MapPin, RefreshCw, Loader2, AlertCircle, ShieldAlert } from "lucide-react";
 import { useLocation } from "./LocationContext";
+import { useTranslations } from "next-intl";
 
 export const LocationDetector = () => {
-  const { location, loading, error, refreshLocation } = useLocation();
+  const { location, loading, error, permissionDenied, refreshLocation } = useLocation();
+  const t = useTranslations();
+
+  if (permissionDenied) {
+    return (
+      <div className="flex items-center gap-4 px-6 py-4 bg-surface-container-high border border-primary/20 rounded-2xl animate-in slide-in-from-right-4 fade-in duration-500 shadow-xl shadow-primary/5">
+        <div className="flex flex-col">
+          <div className="flex items-center gap-2 mb-1">
+            <ShieldAlert className="w-3.5 h-3.5 text-primary" />
+            <span className="text-xs font-bold text-on-surface uppercase tracking-wider">{t("dashboard.location_permission_title")}</span>
+          </div>
+          <span className="text-[10px] text-slate-400 max-w-[200px] leading-tight font-label">
+            {t("dashboard.location_permission_desc")}
+          </span>
+        </div>
+        <button
+          onClick={refreshLocation}
+          className="px-4 py-2 bg-primary text-on-primary rounded-lg text-[11px] font-bold hover:brightness-110 active:scale-95 transition-all whitespace-nowrap shadow-lg shadow-primary/20 font-label"
+        >
+          {t("dashboard.location_grant_btn")}
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-2">

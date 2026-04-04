@@ -83,7 +83,17 @@ export default function CropRecommendationPage() {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
-        throw new Error(errorData.detail || "Failed to fetch recommendations");
+        let message = "Failed to fetch recommendations";
+        
+        if (errorData.detail) {
+          if (Array.isArray(errorData.detail)) {
+            // Extract field and msg from FastAPI validation error
+            message = errorData.detail.map((d: any) => `${d.loc[d.loc.length - 1]}: ${d.msg}`).join(", ");
+          } else {
+            message = errorData.detail;
+          }
+        }
+        throw new Error(message);
       }
 
       const data = await res.json();

@@ -1,36 +1,54 @@
 import os
+import logging
 import joblib
 import pandas as pd
+from fastapi.concurrency import run_in_threadpool
+from app.core.config import settings
 from app.schemas.recommend import FertilizerRecommendationInput, FertilizerRecommendationOutput
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_DIR = os.path.join(BASE_DIR, "models", "fertilizer_recommendation")
+logger = logging.getLogger(__name__)
 
+# Cache for models
 _model = None
 _le = None
 _columns = None
 
+# Model Directory setup
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+MODEL_DIR = os.path.join(BASE_DIR, "models", "fertilizer_recommendation")
+
 def get_fertilizer_model():
     global _model, _le, _columns
     if _model is None:
-        # Load model, label encoder, and features columns
-        _model = joblib.load(os.path.join(MODEL_DIR, "fertilizer_model.pkl"))
-        _le = joblib.load(os.path.join(MODEL_DIR, "label_encoder.pkl"))
-        _columns = joblib.load(os.path.join(MODEL_DIR, "columns.pkl"))
+        try:
+            # Load into local variables first to ensure atomicity
+            model = joblib.load(os.path.join(MODEL_DIR, "fertilizer_model.pkl"))
+            le = joblib.load(os.path.join(MODEL_DIR, "label_encoder.pkl"))
+            columns = joblib.load(os.path.join(MODEL_DIR, "columns.pkl"))
+            
+            # Update globals only after all loads succeed
+            _model = model
+            _le = le
+            _columns = columns
+            logger.info("✅ Fertilizer recommendation models loaded successfully.")
+        except Exception as e:
+            logger.error(f"❌ Failed to load fertilizer recommendation models: {e}")
+            raise
     return _model, _le, _columns
 
 
-async def recommend_fertilizer(input_data: FertilizerRecommendationInput) -> FertilizerRecommendationOutput:
+def _predict_sync(input_data: FertilizerRecommendationInput):
     model, le, columns = get_fertilizer_model()
     
+    # Input Processing: Use exact farmer values as entered
     input_dict = {
-        'N': input_data.N,
-        'P': input_data.P,
-        'K': input_data.K,
-        'temperature': input_data.temperature,
-        'humidity': input_data.humidity,
-        'ph': input_data.pH,
-        'rainfall': input_data.rainfall
+        'N': float(input_data.N),
+        'P': float(input_data.P),
+        'K': float(input_data.K),
+        'temperature': float(input_data.temperature),
+        'humidity': float(input_data.humidity),
+        'ph': float(input_data.pH),
+        'rainfall': float(input_data.rainfall)
     }
     
     # Needs a 2D array or dataframe for xgboost
@@ -38,6 +56,11 @@ async def recommend_fertilizer(input_data: FertilizerRecommendationInput) -> Fer
     
     prediction = model.predict(df)
     predicted_fertilizer = le.inverse_transform(prediction)[0]
+    return predicted_fertilizer
+
+async def recommend_fertilizer(input_data: FertilizerRecommendationInput) -> FertilizerRecommendationOutput:
+    # Run CPU-bound prediction in a threadpool
+    predicted_fertilizer = await run_in_threadpool(_predict_sync, input_data)
     
     return FertilizerRecommendationOutput(
         fertilizer=predicted_fertilizer,

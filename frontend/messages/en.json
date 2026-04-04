@@ -102,7 +102,10 @@
     "live_alert": "Live Alert",
     "suggestion": "Suggestion",
     "next_season": "Next Season",
-    "growth_plan": "Growth Plan"
+    "growth_plan": "Growth Plan",
+    "location_permission_title": "Location Required",
+    "location_permission_desc": "Enable GPS for real-time weather and environmental data.",
+    "location_grant_btn": "Grant Access"
   },
   "landing": {
     "meta_title": "KissanSahyog | The Future of Fertile Intelligence",

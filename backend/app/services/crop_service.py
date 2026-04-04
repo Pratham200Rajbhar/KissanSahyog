@@ -1,44 +1,56 @@
-import os
-import joblib
-import numpy as np
+import logging
 import pandas as pd
+import numpy as np
+from fastapi.concurrency import run_in_threadpool
+from app.core.config import settings
 from app.schemas.recommend import CropRecommendationInput, CropRecommendationOutput, CropRecommendationItem
 
-# Model path with trailing space as found in filesystem
-MODEL_PATH = "/disk2/conv/backend/app/models/crop_recommendation /"
+logger = logging.getLogger(__name__)
+
+MODEL_PATH = settings.crop_model_dir.rstrip(" ") # Safety to remove trailing spaces from configs
 
 class CropRecommendationModel:
     _instance = None
 
     def __new__(cls):
         if cls._instance is None:
-            cls._instance = super(CropRecommendationModel, cls).__new__(cls)
-            cls._instance._load_artifacts()
+            # Create a shell instance
+            instance = super(CropRecommendationModel, cls).__new__(cls)
+            try:
+                # Only assign to _instance if artifacts are successfully loaded
+                instance._load_artifacts()
+                cls._instance = instance
+            except Exception as e:
+                logger.error(f"Failed to initialize CropRecommendationModel: {e}")
+                raise
         return cls._instance
 
     def _load_artifacts(self):
-        print("DEBUG: Loading Crop Recommendation artifacts...")
+        logger.info(f"Loading Crop Recommendation artifacts from {MODEL_PATH}...")
         try:
+            import os
+            import joblib
             # Load the best model and the label encoder
             self.model = joblib.load(os.path.join(MODEL_PATH, "crop_model.pkl"))
             self.le = joblib.load(os.path.join(MODEL_PATH, "npk_label_encoder.pkl"))
             
             # Features order as confirmed via inspection
             self.feature_columns = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']
+            logger.info("✅ Crop recommendation artifacts loaded successfully.")
         except Exception as e:
-            print(f"ERROR: Failed to load crop recommendation models: {e}")
+            logger.error(f"❌ Failed to load crop recommendation models: {e}")
             raise
 
     def predict(self, input_data: CropRecommendationInput, top_k: int = 3):
-        # Prepare feature vector (mapping pH to ph as required by the model)
+        # Prepare feature vector exactly as entered by the user
         data_dict = {
-            'N': input_data.N,
-            'P': input_data.P,
-            'K': input_data.K,
-            'temperature': input_data.temperature,
-            'humidity': input_data.humidity,
-            'ph': input_data.pH,
-            'rainfall': input_data.rainfall
+            'N': float(input_data.N),
+            'P': float(input_data.P),
+            'K': float(input_data.K),
+            'temperature': float(input_data.temperature),
+            'humidity': float(input_data.humidity),
+            'ph': float(input_data.pH),
+            'rainfall': float(input_data.rainfall)
         }
         
         # Convert to DataFrame with correct column order
@@ -62,19 +74,20 @@ class CropRecommendationModel:
 # Singleton instance
 _model_instance = None
 
-async def recommend_crop(input_data: CropRecommendationInput, user_id: str = None) -> CropRecommendationOutput:
+async def recommend_crop(
+    input_data: CropRecommendationInput, 
+    user_id: str = None,
+    supabase = None
+) -> CropRecommendationOutput:
     global _model_instance
     if _model_instance is None:
         _model_instance = CropRecommendationModel()
-        
-    recommendations = _model_instance.predict(input_data)
     
-    if user_id and len(recommendations) > 0:
+    # Run CPU-bound prediction in a threadpool to avoid blocking event loop
+    recommendations = await run_in_threadpool(_model_instance.predict, input_data)
+    
+    if user_id and supabase and len(recommendations) > 0:
         try:
-            import json
-            from app.core.supabase_client import get_supabase_client
-            supabase = get_supabase_client()
-            
             top_rec = recommendations[0]
             recs_dict = [{"crop": r.crop, "confidence": r.confidence} for r in recommendations]
             
@@ -85,7 +98,7 @@ async def recommend_crop(input_data: CropRecommendationInput, user_id: str = Non
                 "recommendations_json": recs_dict
             }).execute()
         except Exception as e:
-            print(f"Failed to persist crop recommendation: {e}")
+            logger.error(f"Failed to persist crop recommendation: {e}")
             
     return CropRecommendationOutput(recommendations=recommendations)
 

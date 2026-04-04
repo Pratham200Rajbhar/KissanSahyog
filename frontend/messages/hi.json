@@ -102,7 +102,10 @@
     "live_alert": "लाइव अलर्ट",
     "suggestion": "सुझाव",
     "next_season": "अगला सीजन",
-    "growth_plan": "विकास योजना"
+    "growth_plan": "विकास योजना",
+    "location_permission_title": "स्थान आवश्यक है",
+    "location_permission_desc": "वास्तविक समय के मौसम के लिए जीपीएस सक्षम करें।",
+    "location_grant_btn": "अनुमति दें"
   },
   "landing": {
     "meta_title": "KissanSahyog | Fertile Intelligence का भविष्य",

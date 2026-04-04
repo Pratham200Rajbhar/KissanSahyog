@@ -1,24 +1,47 @@
+import os
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from typing import List
 
 
 class Settings(BaseSettings):
-    project_name: str = "AgriAI API"
-    supabase_url: str
-    supabase_service_role_key: str
-    supabase_jwt_secret: str
-    open_meteo_api_url: str = "https://api.open-meteo.com/v1/forecast"
-    soilgrids_api_url: str = "https://rest.isric.org/soilgrids/v2.0/properties/query"
-    cors_origins: str | List[str] = "*"
-    rate_limit_per_minute: int = 100
-    nextauth_secret: str = ""
-    google_client_id: str = ""
-    google_client_secret: str = ""
+    project_name: str = "KissanSahyog API"
+    
+    # Kissan DB Provider (Supabase)
+    supabase_url: str = Field(..., alias="KISSAN_DB_PROVIDER_URL")
+    supabase_service_role_key: str = Field(..., alias="KISSAN_DB_SERVICE_KEY")
+    supabase_jwt_secret: str = Field(..., alias="KISSAN_DB_JWT_SECRET")
+    
+    # External API Endpoints (Public/Non-sensitive)
+    meteo_source_url: str = Field(default="https://api.open-meteo.com/v1/forecast", alias="KISSAN_METEO_SOURCE_URL")
+    soil_data_source_url: str = Field(default="https://rest.isric.org/soilgrids/v2.0/properties/query", alias="KISSAN_SOIL_DATA_SOURCE_URL")
+    nasa_power_source_url: str = Field(default="https://power.larc.nasa.gov/api/temporal", alias="KISSAN_NASA_POWER_SOURCE_URL")
+    geo_nominatim_source_url: str = Field(default="https://nominatim.openstreetmap.org/reverse", alias="KISSAN_GEO_NOMINATIM_SOURCE_URL")
+    
+    # Security & CORS
+    cors_origins: str | List[str] = Field(default=["http://localhost:3000"], alias="KISSAN_API_CORS_ORIGINS")
+    rate_limit_per_minute: int = Field(default=100, alias="KISSAN_API_RATE_LIMIT")
+    
+    # Identity & Auth (NextAuth Shared Secrets)
+    nextauth_secret: str = Field(..., alias="KISSAN_AUTH_ENCRYPTION_SECRET")
+    google_auth_client_id: str = Field(..., alias="KISSAN_GOOGLE_AUTH_CLIENT_ID")
+    google_auth_client_secret: str = Field(..., alias="KISSAN_GOOGLE_AUTH_CLIENT_SECRET")
+
+    # ML Model Storage Paths
+    yield_model_path: str = Field(
+        default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models/yield_prediction/yield_pipeline.pkl"),
+        description="Path to the yield prediction pickle file"
+    )
+    crop_model_dir: str = Field(
+        default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models/crop_recommendation/"),
+        description="Directory containing crop recommendation models"
+    )
 
     model_config = SettingsConfigDict(
         env_file=".env", 
         env_file_encoding="utf-8",
-        extra="ignore"
+        extra="ignore",
+        populate_by_name=True
     )
 
 settings = Settings()

@@ -17,10 +17,12 @@ const nextConfig: NextConfig = {
     ],
   },
   async rewrites() {
+    const API_URL = process.env.NEXT_PUBLIC_KISSAN_GATEWAY_ENDPOINT || 'http://backend:8000';
+    console.log(`📡 API Rewrites enabled for: ${API_URL}`);
     return [
       {
         source: '/api/:path((?!auth).*)',
-        destination: 'http://localhost:8000/api/:path*',
+        destination: `${API_URL}/api/v1/:path*`,
       },
     ];
   },
