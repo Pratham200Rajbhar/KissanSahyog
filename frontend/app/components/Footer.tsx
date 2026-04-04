@@ -7,7 +7,7 @@ import { useTranslations } from "next-intl";
 export default function Footer() {
   const t = useTranslations();
   return (
-    <footer className="w-full bg-[#0b1326] border-t border-white/5">
+    <footer className="w-full bg-background border-t border-white/5">
       <div className="app-shell py-10 sm:py-12 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-8">
         <div className="flex flex-col gap-3 items-start">
           <div className="text-lg font-bold text-slate-100 tracking-tight">KissanSahyog</div>

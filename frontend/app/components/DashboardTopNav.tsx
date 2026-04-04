@@ -4,34 +4,32 @@ import { Bell, Sun, Moon, Globe, ChevronDown, LogOut } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter, routing } from "../../i18n/routing";
-import { useTranslations, useLocale } from "next-intl";
+import { useLocale } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
+import { ThemeMode, THEME_CHANGE_EVENT, getActiveTheme, toggleThemeWithAnimation } from "./theme";
 
 export default function DashboardTopNav() {
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState<ThemeMode>(() => getActiveTheme());
+  const [mounted, setMounted] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-  const t = useTranslations();
   const { data: session } = useSession();
 
   useEffect(() => {
-    const isLight = typeof document !== 'undefined' && document.documentElement.classList.contains("light");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTheme(isLight ? "light" : "dark");
+    setMounted(true);
+    const handleThemeChange = (event: Event) => {
+      const customEvent = event as CustomEvent<ThemeMode>;
+      setTheme(customEvent.detail);
+    };
+
+    window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange as EventListener);
+    return () => window.removeEventListener(THEME_CHANGE_EVENT, handleThemeChange as EventListener);
   }, []);
 
   const toggleTheme = () => {
-    if (theme === "dark") {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.add("light");
-      setTheme("light");
-    } else {
-      document.documentElement.classList.remove("light");
-      document.documentElement.classList.add("dark");
-      setTheme("dark");
-    }
+    toggleThemeWithAnimation(theme);
   };
 
   const handleLangChange = (selectedLocale: string) => {
@@ -78,7 +76,7 @@ export default function DashboardTopNav() {
           className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-primary/10 hover:text-primary transition-all duration-300"
           aria-label="Toggle Theme"
         >
-          {theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+          {mounted && (theme === "dark" ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />)}
         </button>
 
         <button className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full text-slate-400 hover:bg-primary/10 hover:text-primary transition-all duration-300 relative">

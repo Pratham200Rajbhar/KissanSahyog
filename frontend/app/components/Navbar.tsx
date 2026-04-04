@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
 import { Link, usePathname, useRouter } from "../../i18n/routing";
 import { signIn } from "next-auth/react";
+import { ThemeMode, THEME_CHANGE_EVENT, getActiveTheme, toggleThemeWithAnimation } from "./theme";
 
 const localeNames: Record<string, string> = {
   en: "English",
@@ -13,7 +14,7 @@ const localeNames: Record<string, string> = {
 };
 
 export default function Navbar() {
-  const [theme, setTheme] = useState("dark");
+  const [theme, setTheme] = useState<ThemeMode>(() => getActiveTheme());
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -23,21 +24,17 @@ export default function Navbar() {
   const pathname = usePathname();
 
   useEffect(() => {
-    const isLight = typeof document !== 'undefined' && document.documentElement.classList.contains("light");
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setTheme(isLight ? "light" : "dark");
+    const handleThemeChange = (event: Event) => {
+      const customEvent = event as CustomEvent<ThemeMode>;
+      setTheme(customEvent.detail);
+    };
+
+    window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange as EventListener);
+    return () => window.removeEventListener(THEME_CHANGE_EVENT, handleThemeChange as EventListener);
   }, []);
 
   const toggleTheme = () => {
-    if (theme === "dark") {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.add("light");
-      setTheme("light");
-    } else {
-      document.documentElement.classList.remove("light");
-      document.documentElement.classList.add("dark");
-      setTheme("dark");
-    }
+    toggleThemeWithAnimation(theme);
   };
 
   const handleLangChange = (nextLocale: string) => {
@@ -47,7 +44,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="sticky top-0 w-full z-50 border-b border-white/5 bg-[#0b1326]/70 backdrop-blur-[20px] shadow-[0_8px_32px_0_rgba(0,0,0,0.25)]">
+    <nav className="sticky top-0 w-full z-50 border-b border-white/5 bg-background/70 backdrop-blur-[20px] shadow-[0_8px_32px_0_rgba(0,0,0,0.25)]">
       <div className="app-shell flex items-center justify-between py-3 sm:py-4">
         <Link href="/" className="text-xl sm:text-2xl font-extrabold tracking-tighter text-primary">
           KissanSahyog
@@ -64,7 +61,7 @@ export default function Navbar() {
               <ChevronDown className="w-3 h-3" />
             </button>
             {langDropdownOpen && (
-              <div className="absolute top-full right-0 mt-2 w-32 bg-[#0b1326] border border-white/10 rounded-xl shadow-xl overflow-hidden py-1 z-50">
+              <div className="absolute top-full right-0 mt-2 w-32 bg-surface-container border border-white/10 rounded-xl shadow-xl overflow-hidden py-1 z-50">
                 {Object.entries(localeNames).map(([code, name]) => (
                   <button 
                     key={code}

@@ -30,7 +30,7 @@ export default function DashboardSidebar() {
 
   return (
     <>
-      <aside className="hidden lg:flex fixed left-4 top-4 bottom-4 z-[60] bg-[#0b1326]/85 backdrop-blur-2xl w-[19rem] rounded-[2rem] shadow-2xl overflow-hidden border border-white/5 flex-col">
+      <aside className="hidden lg:flex fixed left-4 top-4 bottom-4 z-[60] bg-surface-container-high/90 backdrop-blur-2xl w-[19rem] rounded-[2rem] shadow-2xl overflow-hidden border border-white/5 flex-col">
         <div className="p-6 xl:p-7">
           <Link href="/" className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl liquid-pill flex items-center justify-center shadow-lg shadow-primary/20">
@@ -54,7 +54,7 @@ export default function DashboardSidebar() {
                 className={clsx(
                   "flex items-center gap-3.5 px-5 py-3.5 font-label text-[12px] tracking-wide uppercase rounded-2xl transition-all duration-300",
                   isActive
-                    ? "bg-gradient-to-br from-[#4edea3] to-[#10b981] text-[#0b1326] shadow-[0_0_20px_rgba(78,222,163,0.25)]"
+                      ? "bg-gradient-to-br from-primary to-primary-container text-on-primary-container shadow-[0_0_20px_rgba(78,222,163,0.25)]"
                     : "text-slate-400 hover:text-white hover:bg-white/5"
                 )}
               >
@@ -78,7 +78,7 @@ export default function DashboardSidebar() {
             className={clsx(
               "w-full flex items-center gap-3.5 px-5 py-3.5 font-label text-[12px] tracking-wide uppercase rounded-2xl transition-all duration-300",
               pathname === "/dashboard/support"
-                ? "bg-gradient-to-br from-[#4edea3] to-[#10b981] text-[#0b1326] shadow-[0_0_20px_rgba(78,222,163,0.25)]"
+                ? "bg-gradient-to-br from-primary to-primary-container text-on-primary-container shadow-[0_0_20px_rgba(78,222,163,0.25)]"
                 : "text-slate-400 hover:text-white hover:bg-white/5"
             )}
           >
@@ -88,7 +88,7 @@ export default function DashboardSidebar() {
         </div>
       </aside>
 
-      <nav className="lg:hidden fixed bottom-3 inset-x-3 z-[70] bg-[#0b1326]/90 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl px-2 py-2">
+      <nav className="lg:hidden fixed bottom-3 inset-x-3 z-[70] bg-surface-container-high/95 backdrop-blur-2xl border border-white/10 rounded-2xl shadow-2xl px-2 py-2">
         <div className="flex items-center justify-between gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {[
             navLinks[0],

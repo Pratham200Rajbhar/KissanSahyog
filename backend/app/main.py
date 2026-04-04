@@ -6,7 +6,9 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from app.core.config import settings
 from app.core.logging_config import setup_logging
+from app.core import logging_context
 import logging
+import time
 
 setup_logging()
 logger = logging.getLogger(__name__)
@@ -44,11 +46,14 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # Global Exception handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
+    # Log the full exception with context
     logger.error(f"Unhandled Exception: {exc}", exc_info=True)
     
     # In production, mask the actual error details
+    is_production = settings.model_config.get("env_file") == ".env.production"
     error_detail = "Internal Server Error"
-    if settings.model_config.get("env_file") != ".env.production": # Basic check for dev env
+    
+    if not is_production:
          error_detail = str(exc)
          
     return JSONResponse(
@@ -56,7 +61,8 @@ async def global_exception_handler(request: Request, exc: Exception):
         content={
             "error": "Internal Server Error", 
             "status_code": 500, 
-            "message": error_detail
+            "message": error_detail,
+            "request_id": logging_context.get_request_id()
         },
     )
 
@@ -70,23 +76,54 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Request logging middleware
+# Security Headers Middleware
+@app.middleware("http")
+async def add_security_headers(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    return response
+
+# Request logging middleware with Context Tracking
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    import time
+    # 1. Start timer and setup request ID
     start_time = time.time()
-    response = await call_next(request)
-    process_time = time.time() - start_time
-    logger.info(
-        f"Request: {request.method} {request.url.path} handled in {process_time:.4f}s",
-        extra={
-            "method": request.method,
-            "path": request.url.path,
-            "process_time": process_time,
-            "status_code": response.status_code
-        }
-    )
-    return response
+    request_id = request.headers.get("X-Request-ID")
+    request_id = logging_context.set_request_id(request_id)
+    
+    # 2. Extract user identity if available (e.g. from a previous auth check or cookie)
+    # Note: Full auth check usually happens in routers, but we can peek at the session token
+    # to identify the user for logging purposes without full decryption if needed.
+    # For now, we'll let routers/dependencies set this if they want more detail.
+    
+    logger.info(f"Incoming Request: {request.method} {request.url.path}")
+    
+    try:
+        response = await call_next(request)
+        process_time = time.time() - start_time
+        
+        # 3. Log completion with status code and duration
+        logger.info(
+            f"Request Completed: {request.method} {request.url.path} with status {response.status_code} in {process_time:.4f}s",
+            extra={
+                "extra_info": {
+                    "method": request.method,
+                    "path": request.url.path,
+                    "status_code": response.status_code,
+                    "process_time": process_time,
+                }
+            }
+        )
+        # 4. Attach request ID to response headers for debugging
+        response.headers["X-Request-ID"] = request_id
+        return response
+        
+    except Exception as e:
+        # Exceptions are handled by the global handler, but we can log context here too if needed
+        raise e
 
 # Include routers
 api_prefix = "/api/v1"

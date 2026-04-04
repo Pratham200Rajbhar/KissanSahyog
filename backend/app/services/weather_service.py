@@ -2,8 +2,10 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional
 import pandas as pd
 import httpx
-import traceback
+import logging
 from app.core.config import settings
+
+logger = logging.getLogger(__name__)
 
 # Simple in-memory cache
 # Key: (lat, lon), Value: (timestamp, data)
@@ -35,7 +37,7 @@ async def _fetch_nasa_data(lat: float, lon: float) -> Dict[str, Any]:
             # Accessing properties/parameter as per nasa_api.py
             p = data.get('properties', {}).get('parameter', {})
             if not p or 'T2M' not in p:
-                print(f"WARNING: NASA data incomplete for ({lat}, {lon})")
+                logger.warning(f"NASA data incomplete for ({lat}, {lon})")
                 return None
 
             # Standardized DataFrame creation
@@ -76,8 +78,7 @@ async def _fetch_nasa_data(lat: float, lon: float) -> Dict[str, Any]:
                 "days_sampled": len(last_7_valid)
             }
         except Exception as e:
-            error_trace = traceback.format_exc()
-            print(f"ERROR: NASA service failure: {str(e)}\n{error_trace}")
+            logger.error(f"NASA service failure for ({lat}, {lon}): {str(e)}", exc_info=True)
             return None
 
 async def get_weather(lat: float, lon: float) -> Optional[Dict[str, Any]]:
