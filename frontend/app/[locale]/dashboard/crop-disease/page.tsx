@@ -78,7 +78,7 @@ export default function CropDiseaseDetection() {
     <div className="mt-4 sm:mt-6 animate-fade-in pb-12 overflow-x-hidden">
       <div className="mb-10 px-1">
         <span className="font-label text-xs font-bold uppercase tracking-[0.2em] text-primary mb-2 block">
-          Machine Intelligence
+          Simple Farm Help
         </span>
         <h2 className="font-headline text-3xl sm:text-4xl font-extrabold tracking-tight text-white">{t("title")}</h2>
         <p className="mt-3 text-slate-400 max-w-2xl leading-relaxed text-sm sm:text-base font-label">
@@ -145,7 +145,7 @@ export default function CropDiseaseDetection() {
                           onClick={reset}
                           className="flex-1 py-3.5 rounded-2xl bg-surface-container-high/90 backdrop-blur-md border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all"
                         >
-                          Cancel
+                          Clear
                         </button>
                         <button 
                           onClick={handleAnalyze}
@@ -175,9 +175,9 @@ export default function CropDiseaseDetection() {
               <ShieldCheck className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-bold text-white text-sm mb-1">Encrypted speciman analysis</h4>
+              <h4 className="font-bold text-white text-sm mb-1">Safe and Private Check</h4>
               <p className="text-xs text-slate-400 leading-relaxed font-label max-w-sm">
-                Specimen images are processed in a temporary secure memory and are not stored permanently to protect your farm data.
+                Your leaf photos are only checked once and are not saved anywhere. Your farm data is safe.
               </p>
             </div>
           </div>
@@ -206,7 +206,7 @@ export default function CropDiseaseDetection() {
               </h3>
               {results && (
                 <button onClick={reset} className="text-[10px] uppercase tracking-wider text-slate-400 hover:text-white transition-colors">
-                  Reset
+                  Check Again
                 </button>
               )}
             </div>
@@ -256,7 +256,7 @@ export default function CropDiseaseDetection() {
                   {aiInsights && (
                     <AIExplanationCard 
                       explanation={aiInsights} 
-                      title={`${results[0].class} - AI Details`} 
+                      title={`${results[0].class} - Smart Advice`} 
                     />
                   )}
 
@@ -276,7 +276,7 @@ export default function CropDiseaseDetection() {
                     onClick={reset}
                     className="w-full py-4 rounded-2xl bg-white/5 border border-white/10 text-white font-bold text-sm hover:bg-white/10 transition-all flex items-center justify-center gap-2 mt-4"
                   >
-                   Scan New Specimen
+                   Check Another Leaf
                   </button>
                 </motion.div>
               ) : error ? (
@@ -284,10 +284,10 @@ export default function CropDiseaseDetection() {
                   <div className="w-16 h-16 rounded-full bg-error/10 border border-error/20 flex items-center justify-center text-error mb-6">
                     <AlertCircle className="w-8 h-8" />
                   </div>
-                  <h4 className="text-error font-headline font-bold text-xl mb-2">Analysis Interrupted</h4>
+                  <h4 className="text-error font-headline font-bold text-xl mb-2">Check Failed</h4>
                   <p className="text-slate-400 text-sm max-w-xs mb-8">{error}</p>
                   <button onClick={reset} className="text-sm py-3 px-8 rounded-2xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition-all">
-                    Dismiss and Retry
+                    Dismiss and Try Again
                   </button>
                 </div>
               ) : (
@@ -296,7 +296,7 @@ export default function CropDiseaseDetection() {
                      <div className="absolute inset-0 rounded-full animate-pulse-slow bg-primary/10 blur-xl opacity-30" />
                      <ImageIcon className="w-10 h-10 opacity-20" />
                   </div>
-                  <h4 className="text-slate-400 font-headline font-bold mb-2 z-10">Awaiting Specimen</h4>
+                  <h4 className="text-slate-400 font-headline font-bold mb-2 z-10">Waiting for Photo</h4>
                   <p className="text-slate-500 font-label text-xs leading-relaxed max-w-[220px] mx-auto z-10 opacity-70">
                     {t("no_image")}
                   </p>
