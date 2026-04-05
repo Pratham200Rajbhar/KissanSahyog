@@ -26,6 +26,7 @@ export default function DashboardSidebar() {
   const navLinks = [
     { name: "Dashboard", key: "sidebar.dashboard", href: "/dashboard", icon: LayoutDashboard },
     { name: "Yield Prediction", key: "sidebar.yield", href: "/dashboard/yield-prediction", icon: TrendingUp },
+    { name: "Crop Disease", key: "sidebar.crop_disease", href: "/dashboard/crop-disease", icon: Leaf },
     { name: "Crop Recommendation", key: "sidebar.crop", href: "/dashboard/crop-recommendation", icon: Sprout },
     { name: "Fertilizer Recommendation", key: "sidebar.fertilizer", href: "/dashboard/recommendations", icon: Sparkles },
     { name: "Map Insights", key: "sidebar.map", href: "/dashboard/map-insights", icon: MapIcon },
@@ -80,40 +81,40 @@ export default function DashboardSidebar() {
                 href={link.href}
                 className={clsx(
                   "group flex items-center gap-3.5 px-5 py-3.5 font-label text-[12px] tracking-wide uppercase rounded-2xl transition-all duration-300",
-                  isActive
-                    ? "bg-linear-to-br from-primary to-primary-container text-black shadow-[0_0_20px_rgba(78,222,163,0.25)]"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
-                )}
-              >
-                <Icon className="w-4.5 h-4.5" />
-                <span>{t(link.key)}</span>
-                <span
-                  className={clsx(
-                    "ml-auto h-1.5 w-1.5 rounded-full transition-all duration-300",
-                    isActive ? "bg-on-primary-container" : "bg-transparent group-hover:bg-slate-400"
-                  )}
-                />
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="relative px-3 py-5 space-y-1.5 border-t border-white/10">
-          <Link
-            href={`${pathname}?settings=true`}
-            className="w-full flex items-center gap-3.5 text-slate-400 hover:text-white px-5 py-3.5 font-label text-[12px] tracking-wide uppercase hover:bg-white/5 rounded-2xl transition-all duration-300"
-          >
-            <Settings className="w-4.5 h-4.5" />
-            <span>{t("sidebar.settings")}</span>
-          </Link>
-          <Link
-            href="/dashboard/support"
-            className={clsx(
-              "w-full flex items-center gap-3.5 px-5 py-3.5 font-label text-[12px] tracking-wide uppercase rounded-2xl transition-all duration-300",
-              isActiveRoute("/dashboard/support")
-                ? "bg-linear-to-br from-primary to-primary-container text-black shadow-[0_0_20px_rgba(78,222,163,0.25)]"
+              isActive
+                ? "bg-linear-to-br from-primary to-primary-container !text-black font-bold shadow-[0_0_20px_rgba(78,222,163,0.25)]"
                 : "text-slate-400 hover:text-white hover:bg-white/5"
             )}
+          >
+            <Icon className="w-4.5 h-4.5" />
+            <span>{t(link.key)}</span>
+            <span
+              className={clsx(
+                "ml-auto h-1.5 w-1.5 rounded-full transition-all duration-300",
+                isActive ? "bg-black/40" : "bg-transparent group-hover:bg-slate-400"
+              )}
+            />
+          </Link>
+        );
+      })}
+    </nav>
+
+    <div className="relative px-3 py-5 space-y-1.5 border-t border-white/10">
+      <Link
+        href={`${pathname}?settings=true`}
+        className="w-full flex items-center gap-3.5 text-slate-400 hover:text-white px-5 py-3.5 font-label text-[12px] tracking-wide uppercase hover:bg-white/5 rounded-2xl transition-all duration-300"
+      >
+        <Settings className="w-4.5 h-4.5" />
+        <span>{t("sidebar.settings")}</span>
+      </Link>
+      <Link
+        href="/dashboard/support"
+        className={clsx(
+          "w-full flex items-center gap-3.5 px-5 py-3.5 font-label text-[12px] tracking-wide uppercase rounded-2xl transition-all duration-300",
+          isActiveRoute("/dashboard/support")
+            ? "bg-linear-to-br from-primary to-primary-container !text-black font-bold shadow-[0_0_20px_rgba(78,222,163,0.25)]"
+            : "text-slate-400 hover:text-white hover:bg-white/5"
+        )}
           >
             <HelpCircle className="w-4.5 h-4.5" />
             <span>{t("sidebar.support")}</span>
@@ -180,7 +181,7 @@ export default function DashboardSidebar() {
                   className={clsx(
                     "group flex items-center gap-3.5 px-4 py-3.5 font-label text-[11px] tracking-wide uppercase rounded-xl transition-all duration-300",
                     isActive
-                      ? "bg-linear-to-br from-primary to-primary-container text-black shadow-[0_0_18px_rgba(78,222,163,0.2)]"
+                      ? "bg-linear-to-br from-primary to-primary-container !text-black font-bold shadow-[0_0_18px_rgba(78,222,163,0.2)]"
                       : "text-slate-300 hover:text-white hover:bg-white/5"
                   )}
                 >
@@ -189,7 +190,7 @@ export default function DashboardSidebar() {
                   <span
                     className={clsx(
                       "ml-auto h-1.5 w-1.5 rounded-full transition-all duration-300",
-                      isActive ? "bg-on-primary-container" : "bg-transparent group-hover:bg-slate-400"
+                      isActive ? "bg-black/40" : "bg-transparent group-hover:bg-slate-400"
                     )}
                   />
                 </Link>
@@ -212,7 +213,7 @@ export default function DashboardSidebar() {
               className={clsx(
                 "w-full flex items-center gap-3.5 px-4 py-3.5 font-label text-[11px] tracking-wide uppercase rounded-xl transition-all duration-300",
                 isActiveRoute("/dashboard/support")
-                  ? "bg-linear-to-br from-primary to-primary-container text-black shadow-[0_0_18px_rgba(78,222,163,0.2)]"
+                  ? "bg-linear-to-br from-primary to-primary-container !text-black font-bold shadow-[0_0_18px_rgba(78,222,163,0.2)]"
                   : "text-slate-300 hover:text-white hover:bg-white/5"
               )}
             >

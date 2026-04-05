@@ -16,3 +16,6 @@ certifi>=2023.7.22
 xgboost>=2.0.0
 python-jose[cryptography]>=3.3.0
 google-genai
+torch
+torchvision
+Pillow

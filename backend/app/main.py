@@ -14,9 +14,10 @@ setup_logging()
 logger = logging.getLogger(__name__)
 
 from contextlib import asynccontextmanager
-from app.routers import predict, recommend, weather, geo, history
+from app.routers import predict, recommend, weather, geo, history, crop_disease
 from app.services.yield_service import get_yield_model
 from app.services.fertilizer_service import get_fertilizer_model
+from app.services.crop_disease_service import crop_disease_service
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -27,6 +28,8 @@ async def lifespan(app: FastAPI):
         ee.Initialize(project=settings.google_ee_project_id)
         get_yield_model()
         get_fertilizer_model()
+        # Trigger model loading for crop disease
+        _ = crop_disease_service.model
         logger.info("🚀 All ML models and GEE initialized and ready.")
     except Exception as e:
         logger.error(f"⚠️ Initialization failed: {e}")
@@ -134,6 +137,7 @@ app.include_router(recommend.router, prefix=api_prefix)
 app.include_router(weather.router_weather, prefix=api_prefix)
 app.include_router(geo.router, prefix=api_prefix)
 app.include_router(history.router, prefix=api_prefix)
+app.include_router(crop_disease.router, prefix=api_prefix)
 
 from app.routers import protected, chatbot
 app.include_router(protected.router, prefix=api_prefix)

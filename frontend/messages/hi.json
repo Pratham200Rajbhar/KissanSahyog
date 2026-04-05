@@ -32,7 +32,8 @@
     "yield_kg_ha": "उपज (किग्रा/हेक्टेयर)",
     "match": "मैच",
     "to": "से",
-    "present": "वर्तमान"
+    "present": "वर्तमान",
+    "crop_disease": "Crop Disease Detection"
   },
   "sidebar": {
     "app_name": "KissanSahyog",
@@ -44,7 +45,8 @@
     "fertilizer": "उर्वरक सिफारिश",
     "map": "मानचित्र अंतर्दृष्टि",
     "settings": "सेटिंग्स",
-    "support": "सहायता"
+    "support": "सहायता",
+    "crop_disease": "Crop Disease"
   },
   "nav": {
     "ecosystem": "पारिस्थितिकी तंत्र",
@@ -328,5 +330,22 @@
         "benefits": "हैचरी, कोल्ड चेन और परिवहन सुविधाओं की स्थापना के लिए सब्सिडी।"
       }
     }
+  },
+  "crop_disease_page": {
+    "title": "Crop Disease Detection",
+    "description": "Upload a high-quality photo of your crop\"s leaf to identify potential diseases and get immediate treatment advice.",
+    "upload_title": "Upload Leaf Specimen",
+    "upload_desc": "Compatible formats: JPG, PNG, WEBP (Max 10MB)",
+    "select_btn": "Select Image",
+    "scanning": "Scanning Specimen...",
+    "scan_btn": "Analyze Health",
+    "results_title": "Diagnosis Report",
+    "top_prediction": "Primary Diagnosis",
+    "confidence": "Confidence Score",
+    "other_possibilities": "Other Potential Matches",
+    "no_image": "Please upload a leaf photo to begin analysis.",
+    "error_upload": "Failed to process image. Please try again.",
+    "prevention": "Prevention Tip",
+    "prevention_desc": "Ensure proper spacing and avoid overhead watering to reduce fungal growth."
   }
 }
