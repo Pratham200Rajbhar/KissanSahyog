@@ -15,14 +15,14 @@ const authMiddleware = withAuth(
       authorized: ({ token }) => !!token,
     },
     pages: {
-      signIn: "/", 
+      signIn: "/",
     },
   }
 );
 
-export default async function middleware(req: NextRequest) {
-  const publicPages = ["/", "/api/auth/.*"]; 
-  
+export default async function proxy(req: NextRequest) {
+  const publicPages = ["/", "/api/auth/.*"];
+
   const isPublicPage = publicPages.some((path) => {
     const localePattern = `^/(${routing.locales.join("|")})?`;
     const fullPattern = new RegExp(`${localePattern}${path === "/" ? "(/)?$" : path}`);
@@ -30,26 +30,23 @@ export default async function middleware(req: NextRequest) {
   });
 
   if (isPublicPage) {
-    // REDIRECTION LOGIC: If user is logged in and visits Landing Page, go to Dashboard
-    const isRootPath = req.nextUrl.pathname === "/" || 
-                       routing.locales.some(locale => req.nextUrl.pathname === `/${locale}`);
-    
+    const isRootPath = req.nextUrl.pathname === "/" || routing.locales.some((locale) => req.nextUrl.pathname === `/${locale}`);
+
     if (isRootPath) {
       const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
       if (token) {
-        // Find current locale or default to 'en'
-        const locale = routing.locales.find(l => req.nextUrl.pathname.startsWith(`/${l}`)) || 'en';
+        const locale = routing.locales.find((l) => req.nextUrl.pathname.startsWith(`/${l}`)) || "en";
         const url = new URL(`/${locale}/dashboard`, req.url);
         return NextResponse.redirect(url);
       }
     }
-    
+
     return intlMiddleware(req);
-  } else {
-    return authMiddleware(req as NextRequestWithAuth, {} as NextFetchEvent);
   }
+
+  return authMiddleware(req as NextRequestWithAuth, {} as NextFetchEvent);
 }
 
 export const config = {
-  matcher: ['/((?!api|_next|_vercel|.*\\..*).*)']
+  matcher: ["/((?!api|_next|_vercel|.*\\..*).*)"],
 };

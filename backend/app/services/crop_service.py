@@ -100,5 +100,17 @@ async def recommend_crop(
         except Exception as e:
             logger.error(f"Failed to persist crop recommendation: {e}")
             
-    return CropRecommendationOutput(recommendations=recommendations)
+    # Generate AI Explanation
+    from app.services.chatbot_service import explain_prediction
+    top_crops = [r.crop for r in recommendations]
+    ai_explanation = await explain_prediction(
+        prediction_type="Crop Recommendation",
+        input_data=input_data.model_dump(),
+        result={"recommended_crops": top_crops}
+    )
+    
+    return CropRecommendationOutput(
+        recommendations=recommendations,
+        ai_explanation=ai_explanation
+    )
 

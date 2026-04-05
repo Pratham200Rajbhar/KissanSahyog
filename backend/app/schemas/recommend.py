@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List
+from typing import List, Optional
 
 class CropRecommendationInput(BaseModel):
     N: float = Field(..., description="Nitrogen content (mg/kg)")
@@ -16,6 +16,7 @@ class CropRecommendationItem(BaseModel):
 
 class CropRecommendationOutput(BaseModel):
     recommendations: List[CropRecommendationItem]
+    ai_explanation: Optional[str] = None
 
 class FertilizerRecommendationInput(BaseModel):
     N: float = Field(..., description="Nitrogen content (mg/kg)")
@@ -30,3 +31,4 @@ class FertilizerRecommendationOutput(BaseModel):
     fertilizer: str
     dosage: str
     notes: str
+    ai_explanation: Optional[str] = None

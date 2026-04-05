@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict, Field
-from typing import Dict
+from typing import Dict, Optional
 
 class YieldPredictionInput(BaseModel):
     model_config = ConfigDict(strict=True)
@@ -22,3 +22,4 @@ class YieldPredictionOutput(BaseModel):
     unit: str
     risk_score: float
     shap_values: Dict[str, float]
+    ai_explanation: Optional[str] = None

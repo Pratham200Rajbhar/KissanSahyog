@@ -18,10 +18,16 @@ import { useLocation } from "../../../components/LocationContext";
 import { LocationDetector } from "../../../components/LocationDetector";
 import { GpsIndicator } from "../../../components/GpsIndicator";
 import { useTranslations } from "next-intl";
+import { AIExplanationCard } from "../../../components/AIExplanationCard";
 
 interface RecommendationItem {
   crop: string;
   confidence: number;
+}
+
+interface ApiResponse {
+  recommendations: RecommendationItem[];
+  ai_explanation?: string;
 }
 
 interface ApiValidationError {
@@ -46,19 +52,24 @@ export default function CropRecommendationPage() {
 
   const [loading, setLoading] = useState(false);
   const [recommendations, setRecommendations] = useState<RecommendationItem[]>([]);
+  const [aiExplanation, setAiExplanation] = useState<string>("");
   const [error, setError] = useState("");
 
   // Auto-fill from location
   useEffect(() => {
-    if (location.temperature !== null) {
+    if (location.lastUpdated) {
       setFormData((prev: Record<FormDataKey, number | "">) => ({
         ...prev,
+        N: location.nitrogen ?? prev.N,
+        P: location.phosphorus ?? prev.P,
+        K: location.potassium ?? prev.K,
+        pH: location.ph ?? prev.pH,
         temperature: location.temperature ?? prev.temperature,
         humidity: location.humidity ?? prev.humidity,
         rainfall: location.rainfall ?? prev.rainfall,
       }));
     }
-  }, [location]);
+  }, [location.lastUpdated, location.nitrogen, location.phosphorus, location.potassium, location.ph, location.temperature, location.humidity, location.rainfall]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -70,11 +81,11 @@ export default function CropRecommendationPage() {
     setLoading(true);
     setError("");
     setRecommendations([]);
+    setAiExplanation("");
 
     try {
       const apiUrl = "/api";
       
-      // Convert empty strings to 0 for backend validation
       const submissionData = Object.entries(formData).reduce((acc, [key, value]) => {
         acc[key] = value === "" ? 0 : value;
         return acc;
@@ -89,10 +100,8 @@ export default function CropRecommendationPage() {
       if (!res.ok) {
         const errorData = await res.json().catch(() => ({}));
         let message = "Failed to fetch recommendations";
-        
         if (errorData.detail) {
           if (Array.isArray(errorData.detail)) {
-            // Extract field and msg from FastAPI validation error
             message = (errorData.detail as ApiValidationError[])
               .map((d) => `${d.loc[d.loc.length - 1]}: ${d.msg}`)
               .join(", ");
@@ -103,8 +112,9 @@ export default function CropRecommendationPage() {
         throw new Error(message);
       }
 
-      const data = await res.json();
+      const data: ApiResponse = await res.json();
       setRecommendations(data.recommendations);
+      if (data.ai_explanation) setAiExplanation(data.ai_explanation);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
@@ -139,7 +149,7 @@ export default function CropRecommendationPage() {
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 sm:gap-7">
         {/* Input Form Panel */}
-        <div className="xl:col-span-7">
+        <div className="xl:col-span-12 lg:xl:col-span-7">
           <div className="glass-panel p-5 sm:p-7 rounded-[2rem] sm:rounded-[2.5rem] border border-white/5 relative overflow-hidden group shadow-2xl">
             <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-primary/10 transition-colors" />
             
@@ -155,6 +165,10 @@ export default function CropRecommendationPage() {
                   { name: "rainfall", label: t("crop.rainfall"), icon: CloudRain, step: "0.1", unit: "mm" },
                 ].map((field) => {
                   const isGpsFilled = (
+                    (field.name === 'N' && location.nitrogen === formData.N) ||
+                    (field.name === 'P' && location.phosphorus === formData.P) ||
+                    (field.name === 'K' && location.potassium === formData.K) ||
+                    (field.name === 'pH' && location.ph === formData.pH) ||
                     (field.name === 'temperature' && location.temperature === formData.temperature) ||
                     (field.name === 'humidity' && location.humidity === formData.humidity) ||
                     (field.name === 'rainfall' && location.rainfall === formData.rainfall)
@@ -218,76 +232,72 @@ export default function CropRecommendationPage() {
         </div>
 
         {/* Results Panel */}
-        <div className="xl:col-span-5 h-full">
-          <div className="glass-panel p-5 sm:p-7 rounded-[2rem] sm:rounded-[2.5rem] border border-white/5 h-full flex flex-col relative overflow-hidden group shadow-2xl">
-            <div className="absolute bottom-0 left-0 w-64 h-64 bg-tertiary/5 rounded-full -ml-32 -mb-32 blur-3xl group-hover:bg-tertiary/10 transition-colors" />
-            
-            <div className="relative z-10 flex-1 flex flex-col">
-              <h3 className="font-label text-xs uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-primary" /> {t("crop.matrix")}
-              </h3>
+        <div className="xl:col-span-12 lg:xl:col-span-5">
+           <div className="flex flex-col h-full gap-6">
+            <div className="glass-panel p-5 sm:p-7 rounded-[2rem] sm:rounded-[2.5rem] border border-white/5 flex-1 relative overflow-hidden group shadow-2xl">
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-tertiary/5 rounded-full -ml-32 -mb-32 blur-3xl group-hover:bg-tertiary/10 transition-colors" />
+              
+              <div className="relative z-10 flex-1 flex flex-col">
+                <h3 className="font-label text-xs uppercase tracking-widest text-slate-400 mb-6 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-primary" /> {t("crop.matrix")}
+                </h3>
 
-              {recommendations.length > 0 ? (
-                <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-                  {recommendations.map((item: RecommendationItem, index: number) => (
-                    <div key={item.crop} className={clsx(
-                      "p-5 sm:p-6 rounded-3xl border border-white/5 transition-all hover:bg-white/[0.02]",
-                      index === 0 ? "bg-white/[0.05] border-primary/20" : "bg-transparent"
-                    )}>
-                      <div className="flex justify-between items-end mb-4">
-                        <div>
-                          <span className={clsx(
-                            "font-label text-[10px] uppercase tracking-widest",
-                            index === 0 ? "text-primary" : "text-slate-500"
-                          )}>
-                            {index === 0 ? t("crop.top_selection") : `${t("crop.alternative")} ${index}`}
-                          </span>
-                          <h4 className="text-3xl font-headline font-black text-white capitalize">
-                            {item.crop}
-                          </h4>
-                        </div>
-                        <div className="text-right">
-                          <div className={clsx(
-                            "text-2xl font-headline font-black",
-                            index === 0 ? "text-primary" : "text-slate-200"
-                          )}>
-                            {(item.confidence * 100).toFixed(1)}%
+                {recommendations.length > 0 ? (
+                  <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
+                    {recommendations.map((item: RecommendationItem, index: number) => (
+                      <div key={item.crop} className={clsx(
+                        "p-5 sm:p-6 rounded-3xl border border-white/5 transition-all hover:bg-white/[0.02]",
+                        index === 0 ? "bg-white/[0.05] border-primary/20" : "bg-transparent"
+                      )}>
+                        <div className="flex justify-between items-end mb-4">
+                          <div>
+                            <span className={clsx(
+                              "font-label text-[10px] uppercase tracking-widest",
+                              index === 0 ? "text-primary" : "text-slate-500"
+                            )}>
+                              {index === 0 ? t("crop.top_selection") : `${t("crop.alternative")} ${index}`}
+                            </span>
+                            <h4 className="text-xl sm:text-3xl font-headline font-black text-white capitalize">
+                              {item.crop}
+                            </h4>
                           </div>
-                          <p className="text-[10px] uppercase tracking-widest text-slate-500 font-label">{t("crop.confidence")}</p>
+                          <div className="text-right">
+                            <div className={clsx(
+                              "text-xl sm:text-2xl font-headline font-black",
+                              index === 0 ? "text-primary" : "text-slate-200"
+                            )}>
+                              {(item.confidence * 100).toFixed(1)}%
+                            </div>
+                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-label">{t("crop.confidence")}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                          <div 
+                            className={clsx(
+                              "h-full rounded-full transition-all duration-1000",
+                              index === 0 ? "bg-primary" : "bg-slate-500"
+                            )}
+                            style={{ width: `${item.confidence * 100}%` }}
+                          />
                         </div>
                       </div>
-                      
-                      {/* Confidence Bar */}
-                      <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                        <div 
-                          className={clsx(
-                            "h-full rounded-full transition-all duration-1000",
-                            index === 0 ? "bg-primary" : "bg-slate-500"
-                          )}
-                          style={{ width: `${item.confidence * 100}%` }}
-                        />
-                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex-1 flex flex-col items-center justify-center text-center opacity-40 py-12">
+                    <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6">
+                      <Leaf className="w-10 h-10 text-slate-500" />
                     </div>
-                  ))}
-                  
-                  <div className="mt-8 p-6 rounded-3xl bg-primary/5 border border-primary/10">
-                    <p className="text-xs text-slate-300 font-label leading-relaxed">
-                      <strong className="text-primary uppercase tracking-widest block mb-1">{t("crop.ai_insight")}</strong>
-                      {t("crop.adaptability_note")} ({formData.pH}) {t("crop.rainfall_note")} ({formData.rainfall}mm). {t("crop.potential_note")}
+                    <p className="font-label text-sm text-slate-400 max-w-[200px]">
+                      {t("crop.initialize_engine")}
                     </p>
                   </div>
-                </div>
-              ) : (
-                <div className="flex-1 flex flex-col items-center justify-center text-center opacity-40 py-12">
-                  <div className="w-20 h-20 rounded-full bg-white/5 flex items-center justify-center mb-6">
-                    <Leaf className="w-10 h-10 text-slate-500" />
-                  </div>
-                  <p className="font-label text-sm text-slate-400 max-w-[200px]">
-                    {t("crop.initialize_engine")}
-                  </p>
-                </div>
-              )}
+                )}
+              </div>
             </div>
+            
+            <AIExplanationCard explanation={aiExplanation} />
           </div>
         </div>
       </div>

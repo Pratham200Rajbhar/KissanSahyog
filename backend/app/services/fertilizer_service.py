@@ -62,8 +62,17 @@ async def recommend_fertilizer(input_data: FertilizerRecommendationInput) -> Fer
     # Run CPU-bound prediction in a threadpool
     predicted_fertilizer = await run_in_threadpool(_predict_sync, input_data)
     
+    # Generate AI Explanation
+    from app.services.chatbot_service import explain_prediction
+    ai_explanation = await explain_prediction(
+        prediction_type="Fertilizer Recommendation",
+        input_data=input_data.model_dump(),
+        result={"recommended_fertilizer": predicted_fertilizer}
+    )
+    
     return FertilizerRecommendationOutput(
         fertilizer=predicted_fertilizer,
         dosage="Please adjust dosage based on soil deficiency tests.",
-        notes=f"Predicted optimal fertilizer formulation is {predicted_fertilizer} based on given soil parameters."
+        notes=f"Predicted optimal fertilizer formulation is {predicted_fertilizer} based on given soil parameters.",
+        ai_explanation=ai_explanation
     )

@@ -6,6 +6,7 @@ import { useLocation } from "../../../components/LocationContext";
 import { LocationDetector } from "../../../components/LocationDetector";
 import { GpsIndicator } from "../../../components/GpsIndicator";
 import { useTranslations } from "next-intl";
+import { AIExplanationCard } from "../../../components/AIExplanationCard";
 
 const CROPS = ['chickpea', 'cotton', 'maize', 'rice'];
 const STATES = [
@@ -31,7 +32,7 @@ const DISTRICTS_BY_STATE: Record<string, string[]> = {
   'Orissa': ['Angul', 'Balangir', 'Balasore', 'Bargarh', 'Bhadrak', 'Boudh', 'Cuttack', 'Deogarh', 'Dhenkanal', 'Gajapati', 'Ganjam', 'Jagatsinghapur', 'Jajpur', 'Jharsuguda', 'Kalahandi', 'Kandhamal', 'Kendrapara', 'Kendujhar', 'Khordha', 'Koraput', 'Malkangiri', 'Mayurbhanj', 'Nabarangpur', 'Nayagarh', 'Nuapada', 'Puri', 'Rayagada', 'Sambalpur', 'Sonepur', 'Sundargarh'],
   'Punjab': ['Amritsar', 'Barnala', 'Bathinda', 'Faridkot', 'Fatehgarh Sahib', 'Fazilka', 'Ferozepur', 'Gurdaspur', 'Hoshiarpur', 'Jalandhar', 'Kapurthala', 'Ludhiana', 'Mansa', 'Moga', 'Muktsar', 'Pathankot', 'Patiala', 'Rupnagar', 'Sahibzada Ajit Singh Nagar', 'Sangrur', 'Shahid Bhagat Singh Nagar', 'Sri Muktsar Sahib', 'Tarn Taran'],
   'Rajasthan': ['Ajmer', 'Alwar', 'Banswara', 'Baran', 'Barmer', 'Bharatpur', 'Bhilwara', 'Bikaner', 'Bundi', 'Chittorgarh', 'Churu', 'Dausa', 'Dholpur', 'Dungarpur', 'Hanumangarh', 'Jaipur', 'Jaisalmer', 'Jalore', 'Jhalawar', 'Jhunjhunu', 'Jodhpur', 'Karauli', 'Kota', 'Nagaur', 'Pali', 'Pratapgarh', 'Rajsamand', 'Sawai Madhopur', 'Sikar', 'Sirohi', 'Sri Ganganagar', 'Tonk', 'Udaipur'],
-  'Tamil Nadu': ['Ariyalur', 'Chengalpattu', 'Chennai', 'Coimbatore', 'Cuddalore', 'Dharmapuri', 'Dindigul', 'Erode', 'Kallakurichi', 'Kancheepuram', 'Karur', 'Krishnagiri', 'Madurai', 'Mayiladuthurai', 'Nagapattinam', 'Namakkal', 'Nilgiris', 'Perambalur', 'Pudukkottai', 'Ramanathapuram', 'Ranipet', 'Salem', 'Sivaganga', 'Tenkasi', 'Thanjavur', 'Theni', 'Thoothukudi', 'Tiruchirappalli', 'Tirunelveli', 'Tirupathur', 'Tiruppur', 'Tiruvallur', 'Tiruvannamalai', 'Tiruvarur', 'Vellore', 'Viluppuram', 'Virudhunagar'],
+  'Tamil Nadu': ['Ariyalur', 'Chengalpattu', 'Chennai', 'Coimbatore', 'Cuddalore', 'Dharmapuri', 'Dindigul', 'Erode', 'Kallakurichi', 'Kancheepuram', 'Karur', 'Krishnagiri', 'Madurai', 'Mayiladuthurai', 'Nagapattinam', 'Namakal', 'Nilgiris', 'Perambalur', 'Pudukkottai', 'Ramanathapuram', 'Ranipet', 'Salem', 'Sivaganga', 'Tenkasi', 'Thanjavur', 'Theni', 'Thoothukudi', 'Tiruchirappalli', 'Tirunelveli', 'Tirupathur', 'Tiruppur', 'Tiruvallur', 'Tiruvannamalai', 'Tiruvarur', 'Vellore', 'Viluppuram', 'Virudhunagar'],
   'Telangana': ['Adilabad', 'Bhadradri Kothagudem', 'Hyderabad', 'Jagtial', 'Jangaon', 'Jayashankar Bhupalpally', 'Jogulamba Gadwal', 'Kamareddy', 'Karimnagar', 'Khammam', 'Kumuram Bheem Asifabad', 'Mahabubabad', 'Mahabubnagar', 'Mancherial', 'Medak', 'Medchal Malkajgiri', 'Mulugu', 'Nagarkurnool', 'Nalgonda', 'Narayanpet', 'Nirmal', 'Nizamabad', 'Peddapalli', 'Rajanna Sircilla', 'Rangareddy', 'Sangareddy', 'Siddipet', 'Suryapet', 'Vikarabad', 'Wanaparthy', 'Warangal Rural', 'Warangal Urban', 'Yadadri Bhuvanagiri'],
   'Uttar Pradesh': ['Agra', 'Aligarh', 'Allahabad', 'Ambedkar Nagar', 'Amethi', 'Amroha', 'Auraiya', 'Azamgarh', 'Baghpat', 'Bahraich', 'Ballia', 'Balrampur', 'Banda', 'Barabanki', 'Bareilly', 'Basti', 'Bhadohi', 'Bijnor', 'Budaun', 'Bulandshahr', 'Chandauli', 'Chitrakoot', 'Deoria', 'Etah', 'Etawah', 'Faizabad', 'Farrukhabad', 'Fatehpur', 'Firozabad', 'Gautam Buddha Nagar', 'Ghaziabad', 'Ghazipur', 'Gonda', 'Gorakhpur', 'Hamirpur', 'Hapur', 'Hardoi', 'Hathras', 'Jalaun', 'Jaunpur', 'Jhansi', 'Kannauj', 'Kanpur Dehat', 'Kanpur Nagar', 'Kasganj', 'Kaushambi', 'Kheri', 'Kushinagar', 'Lalitpur', 'Lucknow', 'Maharajganj', 'Mahoba', 'Mainpuri', 'Mathura', 'Mau', 'Meerut', 'Mirzapur', 'Moradabad', 'Muzaffarnagar', 'Pilibhit', 'Pratapgarh', 'Raebareli', 'Rampur', 'Saharanpur', 'Sambhal', 'Sant Kabir Nagar', 'Shahjahanpur', 'Shamli', 'Shravasti', 'Siddharthnagar', 'Sitapur', 'Sonbhadra', 'Sultanpur', 'Unnao', 'Varanasi'],
   'Uttarakhand': ['Almora', 'Bageshwar', 'Chamoli', 'Champawat', 'Dehradun', 'Haridwar', 'Nainital', 'Pauri Garhwal', 'Pithoragarh', 'Rudraprayag', 'Tehri Garhwal', 'Udham Singh Nagar', 'Uttarkashi'],
@@ -42,6 +43,7 @@ interface YieldResult {
   predicted_yield: number;
   unit: string;
   shap_values: Record<string, number>;
+  ai_explanation?: string;
 }
 
 interface YieldFormData {
@@ -79,11 +81,12 @@ export default function YieldPrediction() {
 
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<YieldResult | null>(null);
+  const [aiExplanation, setAiExplanation] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
 
   // Auto-fill from location
   useEffect(() => {
-    if (location.state || location.temperature !== null) {
+    if (location.lastUpdated) {
       setFormData((prev: YieldFormData) => ({
         ...prev,
         state_name: location.state || prev.state_name,
@@ -91,9 +94,11 @@ export default function YieldPrediction() {
         temperature_c: location.temperature ?? prev.temperature_c,
         humidity_percentage: location.humidity ?? prev.humidity_percentage,
         rainfall_mm: location.rainfall ?? prev.rainfall_mm,
+        wind_speed_m_s: location.wind_speed ?? prev.wind_speed_m_s,
+        solar_radiation_mj_m2_day: location.solar_radiation ?? prev.solar_radiation_mj_m2_day,
       }));
     }
-  }, [location]);
+  }, [location.lastUpdated, location.state, location.district, location.temperature, location.humidity, location.rainfall, location.wind_speed, location.solar_radiation]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -118,11 +123,11 @@ export default function YieldPrediction() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setAiExplanation("");
 
     try {
       const apiUrl = "/api";
       
-      // Convert empty strings to 0 for backend validation
       const submissionData = Object.entries(formData).reduce((acc, [key, value]) => {
         acc[key] = value === "" ? 0 : value;
         return acc;
@@ -140,8 +145,9 @@ export default function YieldPrediction() {
         throw new Error("Failed to fetch prediction");
       }
 
-      const data = await response.json();
+      const data: YieldResult = await response.json();
       setResult(data);
+      if (data.ai_explanation) setAiExplanation(data.ai_explanation);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred during prediction";
       setError(errorMessage);
@@ -170,177 +176,75 @@ export default function YieldPrediction() {
           </h3>
           
           <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
-              {/* Categorical Inputs */}
-              <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("yield.crop_variety")}</label>
-                <select 
-                  name="crop"
-                  value={formData.crop}
-                  onChange={handleInputChange}
-                  className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
-                >
-                  {CROPS.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
-                </select>
-              </div>
-              
-              <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("yield.state_registry")}
-                  <GpsIndicator isVisible={!!location.state && formData.state_name === location.state} />
-                </label>
-                <select 
-                  name="state_name"
-                  value={formData.state_name}
-                  onChange={handleInputChange}
-                  className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
-                >
-                  {STATES.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
+             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6">
+                <div className="space-y-2">
+                  <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("yield.crop_variety")}</label>
+                  <select 
+                    name="crop"
+                    value={formData.crop}
+                    onChange={handleInputChange}
+                    className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
+                  >
+                    {CROPS.map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
+                  </select>
+                </div>
+                
+                <div className="space-y-2">
+                  <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
+                    {t("yield.state_registry")}
+                    <GpsIndicator isVisible={!!location.state && formData.state_name === location.state} />
+                  </label>
+                  <select 
+                    name="state_name"
+                    value={formData.state_name}
+                    onChange={handleInputChange}
+                    className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
+                  >
+                    {STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                  </select>
+                </div>
 
-              <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("yield.district_focus")}
-                  <GpsIndicator isVisible={!!location.district && formData.dist_name === location.district} />
-                </label>
-                <select 
-                  name="dist_name"
-                  value={formData.dist_name}
-                  onChange={handleInputChange}
-                  className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
-                >
-                  {(DISTRICTS_BY_STATE[formData.state_name] || []).map(d => (
-                    <option key={d} value={d}>{d}</option>
-                  ))}
-                </select>
-              </div>
+                <div className="space-y-2">
+                  <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
+                    {t("yield.district_focus")}
+                    <GpsIndicator isVisible={!!location.district && formData.dist_name === location.district} />
+                  </label>
+                  <select 
+                    name="dist_name"
+                    value={formData.dist_name}
+                    onChange={handleInputChange}
+                    className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
+                  >
+                    {(DISTRICTS_BY_STATE[formData.state_name] || []).map(d => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
 
-              <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("yield.area_ha")}</label>
-                <input 
-                  type="number" 
-                  step="0.01"
-                  name="area_ha"
-                  value={formData.area_ha}
-                  onChange={handleInputChange}
-                  placeholder="e.g. 5.5"
-                  className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all" 
-                />
-              </div>
-
-              {/* Environmental Details */}
-              <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("yield.temp")}
-                  <GpsIndicator isVisible={location.temperature !== null && formData.temperature_c === location.temperature} />
-                </label>
-                <input 
-                  type="number"
-                  name="temperature_c"
-                  value={formData.temperature_c}
-                  onChange={handleInputChange}
-                  placeholder="e.g. 28.5"
-                  className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("yield.humidity")}
-                  <GpsIndicator isVisible={location.humidity !== null && formData.humidity_percentage === location.humidity} />
-                </label>
-                <input 
-                  type="number"
-                  name="humidity_percentage"
-                  value={formData.humidity_percentage}
-                  onChange={handleInputChange}
-                  placeholder="e.g. 60.0"
-                  className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("yield.rainfall")}
-                  <GpsIndicator isVisible={location.rainfall !== null && formData.rainfall_mm === location.rainfall} />
-                </label>
-                <input 
-                  type="number"
-                  name="rainfall_mm"
-                  value={formData.rainfall_mm}
-                  onChange={handleInputChange}
-                  placeholder="e.g. 100.0"
-                  className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("yield.wind")}</label>
-                <input 
-                  type="number"
-                  name="wind_speed_m_s"
-                  value={formData.wind_speed_m_s}
-                  onChange={handleInputChange}
-                  placeholder="e.g. 15.0"
-                  className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{t("yield.solar")}</label>
-                <input 
-                  type="number"
-                  name="solar_radiation_mj_m2_day"
-                  value={formData.solar_radiation_mj_m2_day}
-                  onChange={handleInputChange}
-                  placeholder="e.g. 20.0"
-                  className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
-                />
-              </div>
-
-              {/* Nutrients - User requirements */}
-              <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("yield.n_cap")}
-                </label>
-                <input 
-                  type="number"
-                  name="n_req_kg_per_ha"
-                  value={formData.n_req_kg_per_ha}
-                  onChange={handleInputChange}
-                  placeholder="e.g. 120"
-                  className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("yield.p_cap")}
-                </label>
-                <input 
-                  type="number"
-                  name="p_req_kg_per_ha"
-                  value={formData.p_req_kg_per_ha}
-                  onChange={handleInputChange}
-                  placeholder="e.g. 60"
-                  className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1 flex items-center">
-                  {t("yield.k_cap")}
-                </label>
-                <input 
-                  type="number"
-                  name="k_req_kg_per_ha"
-                  value={formData.k_req_kg_per_ha}
-                  onChange={handleInputChange}
-                  placeholder="e.g. 40"
-                  className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all"
-                />
-              </div>
+                {[
+                  { name: "area_ha", label: t("yield.area_ha"), step: "0.01", placeholder: "e.g. 5.5" },
+                  { name: "temperature_c", label: t("yield.temp"), placeholder: "e.g. 28.5" },
+                  { name: "humidity_percentage", label: t("yield.humidity"), placeholder: "e.g. 60.0" },
+                  { name: "rainfall_mm", label: t("yield.rainfall"), placeholder: "e.g. 100.0" },
+                  { name: "wind_speed_m_s", label: t("yield.wind"), placeholder: "e.g. 15.0" },
+                  { name: "solar_radiation_mj_m2_day", label: t("yield.solar"), placeholder: "e.g. 20.0" },
+                  { name: "n_req_kg_per_ha", label: t("yield.n_cap"), placeholder: "e.g. 120" },
+                  { name: "p_req_kg_per_ha", label: t("yield.p_cap"), placeholder: "e.g. 60" },
+                  { name: "k_req_kg_per_ha", label: t("yield.k_cap"), placeholder: "e.g. 40" },
+                ].map(field => (
+                  <div key={field.name} className="space-y-2">
+                    <label className="font-label text-xs uppercase tracking-widest text-slate-400 font-bold ml-1">{field.label}</label>
+                    <input 
+                      type="number" 
+                      step={field.step || "1"}
+                      name={field.name}
+                      value={formData[field.name as keyof YieldFormData]}
+                      onChange={handleInputChange}
+                      placeholder={field.placeholder}
+                      className="w-full bg-surface-container-low border border-outline/10 rounded-xl p-4 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200 outline-none transition-all" 
+                    />
+                  </div>
+                ))}
             </div>
 
             <button 
@@ -418,6 +322,8 @@ export default function YieldPrediction() {
              )}
           </div>
           
+          <AIExplanationCard explanation={aiExplanation} />
+
           <div className="glass-panel p-5 sm:p-6 rounded-2xl border border-outline-variant/10 flex items-start gap-4 shadow-lg group hover:border-tertiary/30 transition-all">
              <div className="w-12 h-12 rounded-xl bg-tertiary/20 flex items-center justify-center text-tertiary border border-tertiary/20">
                <CloudSun className="w-6 h-6" />

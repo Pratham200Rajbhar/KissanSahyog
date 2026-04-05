@@ -4,6 +4,7 @@ import traceback
 from fastapi import APIRouter, Query, HTTPException, Depends
 from typing import Dict, Any
 from app.services.weather_service import get_nasa_averages
+from app.services.environmental_service import get_comprehensive_environmental_data
 from app.core.security import get_current_user
 from app.core.config import settings
 import logging
@@ -16,7 +17,7 @@ router = APIRouter(prefix="/geo", tags=["Geocoding"], dependencies=[Depends(get_
 async def reverse_geocode(lat: float = Query(...), lon: float = Query(...)) -> Dict[str, Any]:
     """
     Reverse geocode latitude and longitude to State and District using Nominatim,
-    and fetch recent environmental averages from NASA POWER.
+    and fetch recent environmental averages (Soil & Meteo).
     """
     # Using centralized Nominatim Source URL from settings
     base_url = settings.geo_nominatim_source_url
@@ -25,7 +26,7 @@ async def reverse_geocode(lat: float = Query(...), lon: float = Query(...)) -> D
     
     async with httpx.AsyncClient() as client:
         try:
-            # 1. Fetch Location Details with extended timeout
+            # 1. Fetch Location Details
             geo_response = await client.get(url, headers=headers, timeout=12.0)
             geo_response.raise_for_status()
             geo_data = geo_response.json()
@@ -41,19 +42,32 @@ async def reverse_geocode(lat: float = Query(...), lon: float = Query(...)) -> D
                         address.get("town") or 
                         address.get("suburb"))
 
-            # 2. Fetch NASA data (Treat as optional fallback)
-            nasa_data = await get_nasa_averages(lat, lon)
+            # 2. Parallel fetch NASA and GEE/Meteo data
+            nasa_task = get_nasa_averages(lat, lon)
+            env_task = get_comprehensive_environmental_data(lat, lon)
             
-            # If NASA is unavailable, we still provide location data with null climate info
+            nasa_data, env_data = await asyncio.gather(nasa_task, env_task)
+            
             nasa_vals = nasa_data or {}
+            env_vals = env_data or {}
 
             return {
                 "state": state,
                 "district": district or "Unknown",
                 "full_address": geo_data.get("display_name", ""),
+                # Climate (NASA)
                 "temperature": nasa_vals.get("avg_temp"),
                 "humidity": nasa_vals.get("avg_humidity"),
-                "rainfall": nasa_vals.get("avg_rainfall")
+                "rainfall": nasa_vals.get("avg_rainfall"),
+                # Environmental (GEE + Open-Meteo)
+                "nitrogen": env_vals.get("nitrogen"),
+                "phosphorus": env_vals.get("phosphorus"),
+                "potassium": env_vals.get("potassium"),
+                "ph": env_vals.get("ph"),
+                "clay": env_vals.get("clay"),
+                "carbon": env_vals.get("carbon"),
+                "wind_speed": env_vals.get("wind_speed"),
+                "solar_radiation": env_vals.get("solar_radiation")
             }
             
         except httpx.HTTPStatusError as hse:

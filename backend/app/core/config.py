@@ -12,20 +12,22 @@ class Settings(BaseSettings):
     supabase_service_role_key: str = Field(..., alias="KISSAN_DB_SERVICE_KEY")
     supabase_jwt_secret: str = Field(..., alias="KISSAN_DB_JWT_SECRET")
     
-    # External API Endpoints (Public/Non-sensitive)
-    meteo_source_url: str = Field(default="https://api.open-meteo.com/v1/forecast", alias="KISSAN_METEO_SOURCE_URL")
-    soil_data_source_url: str = Field(default="https://rest.isric.org/soilgrids/v2.0/properties/query", alias="KISSAN_SOIL_DATA_SOURCE_URL")
-    nasa_power_source_url: str = Field(default="https://power.larc.nasa.gov/api/temporal", alias="KISSAN_NASA_POWER_SOURCE_URL")
-    geo_nominatim_source_url: str = Field(default="https://nominatim.openstreetmap.org/reverse", alias="KISSAN_GEO_NOMINATIM_SOURCE_URL")
+    # External API Endpoints (Required via .env)
+    meteo_source_url: str = Field(..., alias="KISSAN_METEO_SOURCE_URL")
+    soil_data_source_url: str = Field(..., alias="KISSAN_SOIL_DATA_SOURCE_URL")
+    nasa_power_source_url: str = Field(..., alias="KISSAN_NASA_POWER_SOURCE_URL")
+    geo_nominatim_source_url: str = Field(..., alias="KISSAN_GEO_NOMINATIM_SOURCE_URL")
     
     # Security & CORS
-    cors_origins: str | List[str] = Field(default=["http://localhost:3000"], alias="KISSAN_API_CORS_ORIGINS")
-    rate_limit_per_minute: int = Field(default=100, alias="KISSAN_API_RATE_LIMIT")
+    cors_origins: str | List[str] = Field(..., alias="KISSAN_API_CORS_ORIGINS")
+    rate_limit_per_minute: int = Field(..., alias="KISSAN_API_RATE_LIMIT")
     
     # Identity & Auth (NextAuth Shared Secrets)
     nextauth_secret: str = Field(..., alias="KISSAN_AUTH_ENCRYPTION_SECRET")
     google_auth_client_id: str = Field(..., alias="KISSAN_GOOGLE_AUTH_CLIENT_ID")
     google_auth_client_secret: str = Field(..., alias="KISSAN_GOOGLE_AUTH_CLIENT_SECRET")
+    google_ee_project_id: str = Field(..., alias="KISSAN_GEE_PROJECT_ID")
+    gemini_api_key: str = Field(..., alias="GEMINI_API_KEY")
 
     # ML Model Storage Paths
     yield_model_path: str = Field(

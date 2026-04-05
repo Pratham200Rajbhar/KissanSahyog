@@ -48,7 +48,7 @@ export const LocationDetector = () => {
         
         <div className="flex flex-col items-start">
           <span className="text-on-surface">
-            {loading ? "Synchronizing Context..." : location.state ? "Location Active" : "Detect Location"}
+            {loading ? "Syncing Env Data..." : location.lastUpdated ? "Parameters Synced" : "Detect Location"}
           </span>
           {location.state && !loading && (
             <span className="text-[10px] text-primary/70 uppercase tracking-widest font-black">

@@ -21,13 +21,15 @@ from app.services.fertilizer_service import get_fertilizer_model
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Eager load ML models on startup
-    logger.info("Initializing ML models...")
+    logger.info("Initializing ML models and Earth Engine...")
     try:
+        import ee
+        ee.Initialize(project=settings.google_ee_project_id)
         get_yield_model()
         get_fertilizer_model()
-        logger.info("🚀 All ML models pre-loaded and ready.")
+        logger.info("🚀 All ML models and GEE initialized and ready.")
     except Exception as e:
-        logger.error(f"⚠️ Model pre-loading failed: {e}")
+        logger.error(f"⚠️ Initialization failed: {e}")
     yield
 
 limiter = Limiter(key_func=get_remote_address, default_limits=[f"{settings.rate_limit_per_minute}/minute"])
@@ -133,8 +135,9 @@ app.include_router(weather.router_weather, prefix=api_prefix)
 app.include_router(geo.router, prefix=api_prefix)
 app.include_router(history.router, prefix=api_prefix)
 
-from app.routers import protected
+from app.routers import protected, chatbot
 app.include_router(protected.router, prefix=api_prefix)
+app.include_router(chatbot.router, prefix=api_prefix)
 
 @app.get("/health/live", tags=["Health"])
 async def liveness_check():

@@ -6,10 +6,18 @@ import { useLocation } from "../../../components/LocationContext";
 import { LocationDetector } from "../../../components/LocationDetector";
 import { GpsIndicator } from "../../../components/GpsIndicator";
 import { useTranslations } from "next-intl";
+import { AIExplanationCard } from "../../../components/AIExplanationCard";
 
 interface ApiValidationError {
   loc: Array<string | number>;
   msg: string;
+}
+
+interface FertilizerResult {
+  fertilizer: string;
+  dosage: string;
+  notes: string;
+  ai_explanation?: string;
 }
 
 export default function FertilizerGuide() {
@@ -28,20 +36,25 @@ export default function FertilizerGuide() {
   });
 
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ fertilizer: string; dosage: string; notes: string } | null>(null);
+  const [result, setResult] = useState<FertilizerResult | null>(null);
+  const [aiExplanation, setAiExplanation] = useState<string>("");
   const [error, setError] = useState("");
 
   // Auto-fill from location
   useEffect(() => {
-    if (location.temperature !== null) {
+    if (location.lastUpdated) {
       setFormData((prev: Record<FormDataKey, number | "">) => ({
         ...prev,
+        N: location.nitrogen ?? prev.N,
+        P: location.phosphorus ?? prev.P,
+        K: location.potassium ?? prev.K,
+        pH: location.ph ?? prev.pH,
         temperature: location.temperature ?? prev.temperature,
         humidity: location.humidity ?? prev.humidity,
         rainfall: location.rainfall ?? prev.rainfall,
       }));
     }
-  }, [location]);
+  }, [location.lastUpdated, location.nitrogen, location.phosphorus, location.potassium, location.ph, location.temperature, location.humidity, location.rainfall]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -53,11 +66,11 @@ export default function FertilizerGuide() {
     setLoading(true);
     setError("");
     setResult(null);
+    setAiExplanation("");
 
     try {
       const apiUrl = "/api";
       
-      // Convert empty strings to 0 for backend validation
       const submissionData = Object.entries(formData).reduce((acc, [key, value]) => {
         acc[key] = value === "" ? 0 : value;
         return acc;
@@ -82,8 +95,9 @@ export default function FertilizerGuide() {
         }
         throw new Error(message);
       }
-      const data = await res.json();
+      const data: FertilizerResult = await res.json();
       setResult(data);
+      if (data.ai_explanation) setAiExplanation(data.ai_explanation);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "An error occurred";
       setError(errorMessage);
@@ -119,30 +133,39 @@ export default function FertilizerGuide() {
 
 
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-5 sm:gap-7">
-        <div className="xl:col-span-8 glass-panel p-5 sm:p-7 rounded-xl border border-outline-variant/5">
-          <form onSubmit={handlePredict} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-              {[
-                { name: "N", label: t("fertilizer.n"), icon: FlaskConical },
-                { name: "P", label: t("fertilizer.p"), icon: FlaskConical },
-                { name: "K", label: t("fertilizer.k"), icon: FlaskConical },
-                { name: "pH", label: t("fertilizer.ph"), icon: TestTube, step: "0.1" },
-                { name: "temperature", label: t("fertilizer.temp"), icon: Thermometer, step: "0.1" },
-                { name: "humidity", label: t("fertilizer.humidity"), icon: Droplets, step: "0.1" },
-                { name: "rainfall", label: t("fertilizer.rainfall"), icon: CloudRain, step: "0.1" },
-              ].map((field) => {
-                const isGpsFilled = (
-                  (field.name === 'temperature' && location.temperature === formData.temperature) ||
-                  (field.name === 'humidity' && location.humidity === formData.humidity) ||
-                  (field.name === 'rainfall' && location.rainfall === formData.rainfall)
-                );
+        <div className="xl:col-span-12 lg:xl:col-span-8">
+          <div className="glass-panel p-5 sm:p-7 rounded-[2rem] sm:rounded-[2.5rem] border border-white/5 relative overflow-hidden group shadow-2xl">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-tertiary/5 rounded-full -mr-32 -mt-32 blur-3xl group-hover:bg-tertiary/10 transition-colors" />
+            
+            <form onSubmit={handlePredict} className="relative z-10 space-y-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-5 sm:gap-x-7 gap-y-5 sm:gap-y-6">
+                {[
+                  { name: "N", label: t("fertilizer.n"), icon: FlaskConical },
+                  { name: "P", label: t("fertilizer.p"), icon: FlaskConical },
+                  { name: "K", label: t("fertilizer.k"), icon: FlaskConical },
+                  { name: "pH", label: t("fertilizer.ph"), icon: TestTube, step: "0.1" },
+                  { name: "temperature", label: t("fertilizer.temp"), icon: Thermometer, step: "0.1" },
+                  { name: "humidity", label: t("fertilizer.humidity"), icon: Droplets, step: "0.1" },
+                  { name: "rainfall", label: t("fertilizer.rainfall"), icon: CloudRain, step: "0.1" },
+                ].map((field) => {
+                  const isGpsFilled = (
+                    (field.name === 'N' && location.nitrogen === formData.N) ||
+                    (field.name === 'P' && location.phosphorus === formData.P) ||
+                    (field.name === 'K' && location.potassium === formData.K) ||
+                    (field.name === 'pH' && location.ph === formData.pH) ||
+                    (field.name === 'temperature' && location.temperature === formData.temperature) ||
+                    (field.name === 'humidity' && location.humidity === formData.humidity) ||
+                    (field.name === 'rainfall' && location.rainfall === formData.rainfall)
+                  );
 
-                return (
-                  <div key={field.name} className="space-y-2">
-                    <label className="flex items-center gap-2 font-label text-xs uppercase tracking-widest text-slate-400">
-                      <field.icon className="w-4 h-4" /> {field.label}
-                      <GpsIndicator isVisible={!!isGpsFilled} />
-                    </label>
+                  return (
+                    <div key={field.name} className="space-y-2 group/input">
+                      <label className="flex items-center justify-between font-label text-[10px] uppercase tracking-widest text-slate-400 group-focus-within/input:text-tertiary transition-colors">
+                        <span className="flex items-center gap-2">
+                          <field.icon className="w-3 h-3" /> {field.label}
+                          <GpsIndicator isVisible={!!isGpsFilled} />
+                        </span>
+                      </label>
                       <input
                         type="number"
                         name={field.name}
@@ -150,44 +173,69 @@ export default function FertilizerGuide() {
                         onChange={handleChange}
                         step={field.step || "1"}
                         placeholder={`e.g. ${field.name === 'pH' ? '6.5' : field.name === 'temperature' ? '25.0' : field.name === 'humidity' ? '80.0' : field.name === 'rainfall' ? '100.0' : '50'}`}
-                        className="w-full bg-surface-container-low border-none rounded-lg p-3 text-sm font-label focus:ring-2 focus:ring-primary/40 text-slate-200"
+                        className="w-full bg-white/[0.03] border border-white/5 rounded-2xl p-4 text-sm font-label focus:outline-none focus:ring-2 focus:ring-tertiary/20 focus:border-tertiary/30 transition-all text-white"
                         required
                       />
-                  </div>
-                );
-              })}
-            </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full py-4 rounded-xl liquid-pill text-surface font-label font-bold text-base sm:text-lg shadow-xl shadow-primary/20 hover:brightness-110 active:scale-95 transition-all disabled:opacity-50"
-            >
-              {loading ? t("fertilizer.analyzing") : t("fertilizer.predict_btn")}
-            </button>
-            {error && <p className="text-error mt-4 text-center">{error}</p>}
-          </form>
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full py-4 rounded-2xl liquid-pill text-[#0b1326] font-label font-bold text-base sm:text-lg shadow-xl shadow-tertiary/20 hover:brightness-110 active:scale-[0.98] transition-all disabled:opacity-50 flex items-center justify-center gap-3"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-[#0b1326]/30 border-t-[#0b1326] rounded-full animate-spin" />
+                    {t("fertilizer.analyzing")}
+                  </>
+                ) : (
+                  <>
+                    {t("fertilizer.predict_btn")}
+                  </>
+                )}
+              </button>
+              
+              {error && (
+                <div className="flex items-center gap-3 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-500 animate-in slide-in-from-top-2">
+                  <p className="text-sm font-label text-center w-full">{error}</p>
+                </div>
+              )}
+            </form>
+          </div>
         </div>
 
-        <div className="xl:col-span-4">
-          <div className="glass-panel p-5 sm:p-7 rounded-xl border border-outline-variant/5 h-full flex flex-col justify-center transition-all">
-            {result ? (
-              <div className="animate-scale-in text-center">
-                <div className="w-16 h-16 rounded-full bg-tertiary/20 flex items-center justify-center mx-auto mb-6">
-                  <Sparkles className="text-tertiary w-8 h-8" />
-                </div>
-                <h3 className="font-label text-xs uppercase tracking-widest text-slate-400 mb-2">{t("fertilizer.matrix")}</h3>
-                <div className="text-4xl font-headline font-black text-tertiary mb-4">
-                  {result.fertilizer}
-                </div>
-                <p className="text-sm text-slate-300 font-label">{result.notes}</p>
+        <div className="xl:col-span-12 lg:xl:col-span-4 h-full">
+          <div className="flex flex-col h-full gap-6">
+            <div className="glass-panel p-5 sm:p-7 rounded-[2rem] sm:rounded-[2.5rem] border border-white/5 flex-1 flex flex-col justify-center relative overflow-hidden group shadow-2xl">
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-tertiary/5 rounded-full -ml-32 -mb-32 blur-3xl group-hover:bg-tertiary/10 transition-colors" />
+              
+              <div className="relative z-10 flex-1 flex flex-col justify-center">
+                {result ? (
+                  <div className="animate-scale-in text-center py-8">
+                    <div className="w-20 h-20 rounded-3xl bg-tertiary/10 flex items-center justify-center mx-auto mb-6 border border-tertiary/20">
+                      <Sparkles className="text-tertiary w-10 h-10" />
+                    </div>
+                    <h3 className="font-label text-[10px] uppercase tracking-[0.2em] text-slate-400 mb-2">{t("fertilizer.matrix")}</h3>
+                    <div className="text-3xl sm:text-4xl font-headline font-black text-white mb-4">
+                      {result.fertilizer}
+                    </div>
+                    <p className="text-sm text-slate-300 font-label leading-relaxed px-4">{result.notes}</p>
+                  </div>
+                ) : (
+                  <div className="text-center opacity-30 flex flex-col items-center py-12">
+                    <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center mb-6">
+                      <Leaf className="w-8 h-8 text-slate-500" />
+                    </div>
+                    <p className="font-label text-sm text-slate-400 max-w-[180px]">{t("fertilizer.placeholder")}</p>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="text-center opacity-50 flex flex-col items-center">
-                <Leaf className="w-12 h-12 text-slate-500 mb-4" />
-                <p className="font-label text-sm text-slate-400">{t("fertilizer.placeholder")}</p>
-              </div>
-            )}
+            </div>
+
+            <AIExplanationCard explanation={aiExplanation} />
           </div>
         </div>
       </div>

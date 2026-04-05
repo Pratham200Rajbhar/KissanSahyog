@@ -5,6 +5,7 @@ import SettingsModal from "../../components/SettingsModal";
 import { Suspense } from "react";
 import { getServerSession } from "next-auth/next";
 import { redirect } from "next/navigation";
+import { ChatBot } from "../../components/ChatBot";
 
 export default async function DashboardLayout({
   children,
@@ -30,6 +31,7 @@ export default async function DashboardLayout({
         <Suspense fallback={null}>
           <SettingsModal />
         </Suspense>
+        <ChatBot />
       </div>
     </LocationProvider>
   );

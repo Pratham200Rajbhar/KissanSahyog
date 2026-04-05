@@ -107,6 +107,7 @@ export default function DashboardTopNav() {
               src={userImage}
               width={40}
               height={40}
+              loading="eager"
             />
           </div>
         </div>

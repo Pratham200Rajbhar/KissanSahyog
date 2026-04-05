@@ -59,11 +59,20 @@ async def predict_yield(
         except Exception as e:
             logger.error(f"Failed to persist yield prediction: {e}")
     
+    # Generate AI Explanation
+    from app.services.chatbot_service import explain_prediction
+    ai_explanation = await explain_prediction(
+        prediction_type="Yield Prediction",
+        input_data=input_data.model_dump(),
+        result={"predicted_yield": round(predicted_val, 2), "unit": "kg/ha"}
+    )
+    
     return YieldPredictionOutput(
         predicted_yield=round(predicted_val, 2),
         unit="kg/ha",
         risk_score=0.15,
-        shap_values=shap_vals
+        shap_values=shap_vals,
+        ai_explanation=ai_explanation
     )
 
 def _perform_prediction(model, data: YieldPredictionInput):
