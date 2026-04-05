@@ -20,5 +20,11 @@ async def recommend_crop_endpoint(
     return await crop_service.recommend_crop(input_data, user_id, db)
 
 @router.post("/fertilizer", response_model=FertilizerRecommendationOutput)
-async def recommend_fertilizer_endpoint(input_data: FertilizerRecommendationInput):
-    return await fertilizer_service.recommend_fertilizer(input_data)
+async def recommend_fertilizer_endpoint(
+    input_data: FertilizerRecommendationInput,
+    current_user: dict = Depends(get_current_user),
+    db: Client = Depends(get_db)
+):
+    user_id = current_user.get("sub")
+    return await fertilizer_service.recommend_fertilizer(input_data, user_id, db)
+

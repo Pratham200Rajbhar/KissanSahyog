@@ -31,14 +31,33 @@ interface CropRecommendation {
   created_at: string;
 }
 
+interface FertilizerRecommendation {
+  id: string;
+  fertilizer: string;
+  dosage: string;
+  notes: string;
+  created_at: string;
+}
+
+interface DiseaseDetection {
+  id: string;
+  predictions: { class: string; confidence: number }[];
+  ai_insights: string;
+  created_at: string;
+}
+
 export default function AnalysisPage() {
   const t = useTranslations();
   const [history, setHistory] = useState<{
     yield_predictions: YieldPrediction[],
-    crop_recommendations: CropRecommendation[]
+    crop_recommendations: CropRecommendation[],
+    fertilizer_recommendations: FertilizerRecommendation[],
+    disease_detections: DiseaseDetection[]
   }>({
     yield_predictions: [],
-    crop_recommendations: []
+    crop_recommendations: [],
+    fertilizer_recommendations: [],
+    disease_detections: []
   });
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("yield");
@@ -51,7 +70,9 @@ export default function AnalysisPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [downloadOptions, setDownloadOptions] = useState({
     yields: true,
-    recommendations: true
+    recommendations: true,
+    fertilizer: true,
+    diseases: true
   });
 
   useEffect(() => {
@@ -82,6 +103,8 @@ export default function AnalysisPage() {
 
   const filteredYields = filterByDate(history.yield_predictions);
   const filteredCrops = filterByDate(history.crop_recommendations);
+  const filteredFertilizers = filterByDate(history.fertilizer_recommendations);
+  const filteredDiseases = filterByDate(history.disease_detections);
 
   const triggerDownload = () => {
     setIsModalOpen(false);
@@ -151,12 +174,59 @@ export default function AnalysisPage() {
         theme: 'grid',
         headStyles: { fillColor: [59, 130, 246] }
       });
+      finalY = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 15;
+    }
+
+    // 4. Fertilizer
+    if (downloadOptions.fertilizer && filteredFertilizers.length > 0) {
+      if (finalY > 250) { doc.addPage(); finalY = 20; }
+      doc.setFontSize(14);
+      doc.setTextColor(40);
+      doc.text(t("analysis.fertilizer_history"), 14, finalY);
+      
+      const fertData = filteredFertilizers.map((f) => [
+        new Date(f.created_at).toLocaleDateString(),
+        f.fertilizer,
+        f.dosage || '-',
+        f.notes || '-'
+      ]);
+
+      autoTable(doc, {
+        startY: finalY + 5,
+        head: [[t("analysis.date"), t("analysis.fertilizer"), t("analysis.dosage"), t("analysis.notes")]],
+        body: fertData,
+        theme: 'grid',
+        headStyles: { fillColor: [16, 185, 129] }
+      });
+      finalY = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 15;
+    }
+
+    // 5. Disease
+    if (downloadOptions.diseases && filteredDiseases.length > 0) {
+      if (finalY > 250) { doc.addPage(); finalY = 20; }
+      doc.setFontSize(14);
+      doc.setTextColor(40);
+      doc.text(t("analysis.disease_history"), 14, finalY);
+      
+      const diseaseData = filteredDiseases.map((d) => [
+        new Date(d.created_at).toLocaleDateString(),
+        d.predictions && d.predictions.length > 0 ? d.predictions[0].class : 'Unknown',
+        d.predictions && d.predictions.length > 0 ? `${(d.predictions[0].confidence * 100).toFixed(1)}%` : '-'
+      ]);
+
+      autoTable(doc, {
+        startY: finalY + 5,
+        head: [[t("analysis.date"), t("analysis.disease"), t("analysis.confidence")]],
+        body: diseaseData,
+        theme: 'grid',
+        headStyles: { fillColor: [239, 68, 68] }
+      });
     }
 
     doc.save(`KissanSahyog_Custom_Report_${new Date().getTime()}.pdf`);
   };
 
-  const toggleOption = (key: 'yields' | 'recommendations') => {
+  const toggleOption = (key: 'yields' | 'recommendations' | 'fertilizer' | 'diseases') => {
     setDownloadOptions(prev => ({ ...prev, [key]: !prev[key] }));
   };
 
@@ -252,13 +322,47 @@ export default function AnalysisPage() {
                   </div>
                   {downloadOptions.recommendations && <Check className="w-5 h-5 text-blue-400" />}
                 </button>
+
+                {/* Fertilizer Option */}
+                <button 
+                  onClick={() => toggleOption('fertilizer')}
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${downloadOptions.fertilizer ? 'bg-emerald-400/10 border-emerald-400/30 text-white' : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10'}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${downloadOptions.fertilizer ? 'bg-emerald-400 text-[#0b1326]' : 'bg-white/10'}`}>
+                      <Filter className="w-4 h-4" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-bold text-sm">{t("analysis.fert_tab")}</div>
+                      <div className="text-xs opacity-70">{filteredFertilizers.length} {t("analysis.records_range")}</div>
+                    </div>
+                  </div>
+                  {downloadOptions.fertilizer && <Check className="w-5 h-5 text-emerald-400" />}
+                </button>
+
+                {/* Disease Option */}
+                <button 
+                  onClick={() => toggleOption('diseases')}
+                  className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all ${downloadOptions.diseases ? 'bg-red-400/10 border-red-400/30 text-white' : 'bg-white/5 border-white/5 text-slate-400 hover:bg-white/10'}`}
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${downloadOptions.diseases ? 'bg-red-400 text-[#0b1326]' : 'bg-white/10'}`}>
+                      <Check className="w-4 h-4" />
+                    </div>
+                    <div className="text-left">
+                      <div className="font-bold text-sm">{t("analysis.disease_tab")}</div>
+                      <div className="text-xs opacity-70">{filteredDiseases.length} {t("analysis.records_range")}</div>
+                    </div>
+                  </div>
+                  {downloadOptions.diseases && <Check className="w-5 h-5 text-red-400" />}
+                </button>
               </div>
             </div>
 
             <div className="p-6 border-t border-white/5 flex-shrink-0">
               <button 
                 onClick={triggerDownload}
-                disabled={!downloadOptions.yields && !downloadOptions.recommendations}
+                disabled={!downloadOptions.yields && !downloadOptions.recommendations && !downloadOptions.fertilizer && !downloadOptions.diseases}
                 className="w-full flex justify-center items-center gap-2 px-6 py-4 rounded-xl bg-primary text-[#0b1326] font-label text-base font-bold hover:brightness-110 active:scale-95 transition-all shadow-xl shadow-primary/20 disabled:opacity-50 disabled:pointer-events-none"
               >
                 <Download className="w-5 h-5" />
@@ -303,6 +407,18 @@ export default function AnalysisPage() {
           className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-label text-sm transition-all duration-300 ${activeTab === 'recommend' ? 'bg-blue-400/20 text-blue-400 font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
         >
           <Lightbulb className="w-4 h-4" /> {t("analysis.recommendations")} ({history.crop_recommendations.length})
+        </button>
+        <button 
+          onClick={() => setActiveTab("fert")}
+          className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-label text-sm transition-all duration-300 ${activeTab === 'fert' ? 'bg-emerald-400/20 text-emerald-400 font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+        >
+          <Filter className="w-4 h-4" /> {t("analysis.fert_tab")} ({history.fertilizer_recommendations.length})
+        </button>
+        <button 
+          onClick={() => setActiveTab("disease")}
+          className={`flex items-center gap-2 px-6 py-2.5 rounded-lg font-label text-sm transition-all duration-300 ${activeTab === 'disease' ? 'bg-red-400/20 text-red-400 font-bold' : 'text-slate-400 hover:text-white hover:bg-white/5'}`}
+        >
+          <Check className="w-4 h-4" /> {t("analysis.disease_tab")} ({history.disease_detections.length})
         </button>
       </div>
 
@@ -375,6 +491,86 @@ export default function AnalysisPage() {
                     <td colSpan={4} className="p-12 text-center text-slate-500 font-label flex-col items-center flex justify-center">
                       <Lightbulb className="w-12 h-12 mb-4 opacity-50 text-blue-400"/>
                       <p className="text-lg font-bold">{t("analysis.no_recommendations")}</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Fertilizer Tab */}
+        {activeTab === "fert" && (
+          <div className="overflow-x-auto min-h-[300px]">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-emerald-400/5 text-slate-300 font-label text-xs uppercase tracking-wider border-b border-emerald-400/20">
+                  <th className="p-4 py-5 font-bold">{t("analysis.date")}</th>
+                  <th className="p-4 py-5 font-bold text-emerald-400">{t("analysis.fertilizer")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.dosage")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.notes")}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 text-sm text-slate-300 font-label">
+                {history.fertilizer_recommendations.length > 0 ? history.fertilizer_recommendations.map((f) => (
+                  <tr key={f.id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="p-4">{new Date(f.created_at).toLocaleDateString()}</td>
+                    <td className="p-4 font-bold text-white">
+                      <span className="px-2 py-1 bg-emerald-400/10 rounded border border-emerald-400/20 text-emerald-400">{f.fertilizer}</span>
+                    </td>
+                    <td className="p-4">{f.dosage || "-"}</td>
+                    <td className="p-4 text-slate-400 italic text-xs">{f.notes || "-"}</td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan={4} className="p-12 text-center text-slate-500 font-label flex-col items-center flex justify-center">
+                      <Filter className="w-12 h-12 mb-4 opacity-50 text-emerald-400"/>
+                      <p className="text-lg font-bold">{t("analysis.no_fertilizers")}</p>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        {/* Disease Tab */}
+        {activeTab === "disease" && (
+          <div className="overflow-x-auto min-h-[300px]">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-red-400/5 text-slate-300 font-label text-xs uppercase tracking-wider border-b border-red-400/20">
+                  <th className="p-4 py-5 font-bold">{t("analysis.date")}</th>
+                  <th className="p-4 py-5 font-bold text-red-400">{t("analysis.disease")}</th>
+                  <th className="p-4 py-5 font-bold">{t("analysis.confidence")}</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 text-sm text-slate-300 font-label">
+                {history.disease_detections.length > 0 ? history.disease_detections.map((d) => (
+                  <tr key={d.id} className="hover:bg-white/[0.02] transition-colors">
+                    <td className="p-4">{new Date(d.created_at).toLocaleDateString()}</td>
+                    <td className="p-4">
+                      {d.predictions && d.predictions.length > 0 ? (
+                        <span className="px-3 py-1 bg-red-400/10 rounded border border-red-400/20 text-red-400 font-bold block w-fit">
+                          {d.predictions[0].class}
+                        </span>
+                      ) : (
+                        <span className="px-3 py-1 bg-slate-400/10 rounded border border-slate-400/20 text-slate-400 font-bold block w-fit">
+                          {t("analysis.no_data")}
+                        </span>
+                      )}
+                    </td>
+                    <td className="p-4 text-white font-bold">
+                      {d.predictions && d.predictions.length > 0 
+                        ? `${(d.predictions[0].confidence * 100).toFixed(1)}%` 
+                        : "-"}
+                    </td>
+                  </tr>
+                )) : (
+                  <tr>
+                    <td colSpan={3} className="p-12 text-center text-slate-500 font-label flex-col items-center flex justify-center">
+                      <Check className="w-12 h-12 mb-4 opacity-50 text-red-400"/>
+                      <p className="text-lg font-bold">{t("analysis.no_diseases")}</p>
                     </td>
                   </tr>
                 )}
