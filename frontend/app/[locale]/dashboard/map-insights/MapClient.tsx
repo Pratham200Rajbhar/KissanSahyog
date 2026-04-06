@@ -14,7 +14,9 @@ import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 import axios from "axios";
 import { getSentinelHubToken } from "./actions";
+import { useLocation } from "../../../components/LocationContext";
 import { Search, MapPin, Navigation, Droplet, AlertTriangle, TrendingUp, CheckCircle, Maximize, Minimize } from "lucide-react";
+
 import { useTranslations } from "next-intl";
 
 // Fix default leaflet marker icons (broken in webpack/Next.js)
@@ -70,8 +72,17 @@ function getMockData(lat: number, lng: number) {
 
 export default function MapClient() {
   const t = useTranslations();
+  const { location: globalLoc, refreshLocation, updateLocation, loading: globalLoading } = useLocation();
   const [location, setLocation] = useState<{ lat: number; lng: number } | null>(null);
-  
+ 
+  // Sync global location change (e.g. from nav or IP) to the map
+  useEffect(() => {
+    if (globalLoc.latitude && globalLoc.longitude && (!location || location.lat !== globalLoc.latitude || location.lng !== globalLoc.longitude)) {
+      setLocation({ lat: globalLoc.latitude, lng: globalLoc.longitude });
+    }
+  }, [globalLoc.latitude, globalLoc.longitude]);
+
+
 
   // Search state
   interface NominatimSuggestion {
@@ -169,35 +180,29 @@ export default function MapClient() {
     }
   };
 
-  const locateUser = () => {
+  const locateUser = async () => {
     if (!navigator.geolocation) {
       alert(t("map.gps_unsupported"));
       return;
     }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const { latitude: lat, longitude: lng } = pos.coords;
-        setLocation({ lat, lng });
-        reverseGeocode(lat, lng);
-        setNdviUrl(null); // Clear previous map layer
-      },
-      () => {
-        alert(t("map.gps_error"));
-      },
-      { timeout: 8000 }
-    );
+    await refreshLocation();
+    setNdviUrl(null); // Clear previous map layer
   };
-
-  // Auto-detect GPS on mount
+ 
+  // Auto-detect GPS on mount (Redundant if LocationProvider does it, but keeping for UX)
   useEffect(() => {
-    locateUser();
+    if (!globalLoc.latitude) {
+      locateUser();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
 
   const handleSelectLocation = (s: NominatimSuggestion) => {
     const lat = parseFloat(s.lat);
     const lng = parseFloat(s.lon);
-    setLocation({ lat, lng });
+    updateLocation(lat, lng);
+
 
     // Format nice name
     const parts = s.display_name.split(',');
@@ -285,13 +290,13 @@ export default function MapClient() {
     useMapEvents({
       contextmenu(e) {
         const { lat, lng } = e.latlng;
-        setLocation({ lat, lng });
-        reverseGeocode(lat, lng);
+        updateLocation(lat, lng);
         setNdviUrl(null); // Clear previous map layer
       }
     });
     return null;
   }
+
 
   return (
     <div className="flex flex-col gap-4 sm:gap-6 flex-1 min-h-0 relative">
@@ -395,7 +400,7 @@ export default function MapClient() {
       )}
 
       {/* Map Section */}
-      <div 
+      <div
         ref={mapRef}
         className={`relative flex-1 rounded-2xl overflow-hidden glass-panel border border-outline-variant shadow-2xl min-h-[420px] sm:min-h-[500px] z-10 ${isFullscreen ? 'fixed inset-0 z-[9999] rounded-none' : ''}`}
       >
@@ -460,7 +465,7 @@ export default function MapClient() {
           <div className="absolute top-4 right-4 z-[999] bg-surface/80 backdrop-blur-2xl border border-white/10 p-4 sm:p-5 rounded-[20px] shadow-[0_12px_40px_rgba(0,0,0,0.5)] w-[min(88vw,300px)] flex flex-col gap-3 sm:gap-4 text-white text-left font-sans animate-fade-in-down overflow-hidden">
             {/* Subtle glow effect behind */}
             <div className="absolute -top-10 -right-10 w-32 h-32 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
-            
+
             <div className="flex justify-between items-start relative z-10">
               <div className="relative z-10 mb-1">
                 <h3 className="font-headline font-extrabold text-lg mb-0.5 truncate tracking-tight">{searchQuery || "Green Valley Estate"}</h3>
@@ -538,11 +543,11 @@ export default function MapClient() {
               <span>High</span>
             </div>
             <div className="w-full h-1.5 rounded-full overflow-hidden flex mb-5 shadow-inner">
-               <div className="h-full bg-[#E85A5A] flex-[1]"></div>
-               <div className="h-full bg-[#E8B65A] flex-[1]"></div>
-               <div className="h-full bg-[#CCDC33] flex-[1]"></div>
-               <div className="h-full bg-[#4CB828] flex-[1]"></div>
-               <div className="h-full bg-[#0D610D] flex-[1]"></div>
+              <div className="h-full bg-[#E85A5A] flex-[1]"></div>
+              <div className="h-full bg-[#E8B65A] flex-[1]"></div>
+              <div className="h-full bg-[#CCDC33] flex-[1]"></div>
+              <div className="h-full bg-[#4CB828] flex-[1]"></div>
+              <div className="h-full bg-[#0D610D] flex-[1]"></div>
             </div>
 
             <div className="flex gap-3">
@@ -552,7 +557,7 @@ export default function MapClient() {
               </div>
               <div className="bg-black/20 backdrop-blur-md rounded-xl p-3 border border-white/5 flex-1 relative overflow-hidden group hover:border-white/10 transition-colors flex flex-col justify-end">
                 <div className="text-[9px] font-bold uppercase tracking-widest text-white/50 mb-1">Status</div>
-                <div className="text-sm font-bold truncate tracking-tight" style={{color: mockData.ndviStatus === 'Optimal' ? '#4CB828' : mockData.ndviStatus === 'Moderate' ? '#CCDC33' : '#E8B65A'}}>{mockData.ndviStatus}</div>
+                <div className="text-sm font-bold truncate tracking-tight" style={{ color: mockData.ndviStatus === 'Optimal' ? '#4CB828' : mockData.ndviStatus === 'Moderate' ? '#CCDC33' : '#E8B65A' }}>{mockData.ndviStatus}</div>
               </div>
             </div>
           </div>

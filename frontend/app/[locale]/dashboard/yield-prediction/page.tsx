@@ -96,9 +96,16 @@ export default function YieldPrediction() {
         rainfall_mm: location.rainfall ?? prev.rainfall_mm,
         wind_speed_m_s: location.wind_speed ?? prev.wind_speed_m_s,
         solar_radiation_mj_m2_day: location.solar_radiation ?? prev.solar_radiation_mj_m2_day,
+        n_req_kg_per_ha: location.nitrogen ?? prev.n_req_kg_per_ha,
+        p_req_kg_per_ha: location.phosphorus ?? prev.p_req_kg_per_ha,
+        k_req_kg_per_ha: location.potassium ?? prev.k_req_kg_per_ha,
       }));
     }
-  }, [location.lastUpdated, location.state, location.district, location.temperature, location.humidity, location.rainfall, location.wind_speed, location.solar_radiation]);
+  }, [
+    location.lastUpdated, location.state, location.district, location.temperature, 
+    location.humidity, location.rainfall, location.wind_speed, location.solar_radiation,
+    location.nitrogen, location.phosphorus, location.potassium
+  ]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -125,11 +132,24 @@ export default function YieldPrediction() {
     setResult(null);
     setAiExplanation("");
 
+    if (!formData.area_ha || formData.area_ha <= 0) {
+      setError(t("yield.error_invalid_area") || "Please enter a valid area greater than 0");
+      setLoading(false);
+      return;
+    }
+
     try {
       const apiUrl = "/api";
       
       const submissionData = Object.entries(formData).reduce((acc, [key, value]) => {
-        acc[key] = value === "" ? 0 : value;
+        // Root Cause Fix: Ensure all numeric fields are valid floats and not null/NaN
+        if (typeof value === "number") {
+          acc[key] = isNaN(value) ? 0 : value;
+        } else if (value === "" || value === null || value === undefined) {
+          acc[key] = 0;
+        } else {
+          acc[key] = value;
+        }
         return acc;
       }, {} as Record<string, string | number>);
 
@@ -142,7 +162,16 @@ export default function YieldPrediction() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to fetch prediction");
+        const errorData = await response.json().catch(() => ({}));
+        const detail = errorData.detail;
+        
+        // Root Cause: Handle 422 with specific field error messages
+        if (response.status === 422 && Array.isArray(detail)) {
+          const fieldErrors = detail.map((d: any) => `${d.loc[d.loc.length - 1]}: ${d.msg}`).join(", ");
+          throw new Error(`Validation Error: ${fieldErrors}`);
+        }
+        
+        throw new Error(errorData.message || "Failed to fetch prediction");
       }
 
       const data: YieldResult = await response.json();

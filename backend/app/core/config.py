@@ -29,14 +29,40 @@ class Settings(BaseSettings):
     google_ee_project_id: str = Field(..., alias="KISSAN_GEE_PROJECT_ID")
     gemini_api_key: str = Field(..., alias="GEMINI_API_KEY")
 
-    # ML Model Storage Paths
+    # ML Model Configuration (Hugging Face Hub)
+    hf_username: str = "prathamrajbhar11"
+    
+    models_root: str = Field(
+        default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models"),
+        description="Root folder for ML model artifacts"
+    )
+
+    # 🌾 Yield Prediction
+    yield_model_repo: str = "Praapthi-yield-prediction"
     yield_model_path: str = Field(
         default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models/yield_prediction/yield_pipeline.pkl"),
         description="Path to the yield prediction pickle file"
     )
+
+    # 🌱 Crop Recommendation
+    crop_model_repo: str = "Bijamitra-crop-recommendation"
     crop_model_dir: str = Field(
         default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models/crop_recommendation/"),
         description="Directory containing crop recommendation models"
+    )
+
+    # 🧪 Fertilizer Recommendation
+    fertilizer_model_repo: str = "Poshan-fertilizer-recommendation"
+    fertilizer_model_dir: str = Field(
+        default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models/fertilizer_recommendation/"),
+        description="Directory containing fertilizer models"
+    )
+
+    # 🔬 Crop Disease Prediction
+    disease_model_repo: str = "ArogyaDrishti-crop-disease"
+    disease_model_path: str = Field(
+        default=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "models/crop_disease_prediction/hybrid_resnet_densenet_checkpoint.pth"),
+        description="Path to the disease classification model"
     )
 
     model_config = SettingsConfigDict(

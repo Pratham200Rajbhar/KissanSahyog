@@ -5,11 +5,14 @@ import pandas as pd
 import numpy as np
 from fastapi.concurrency import run_in_threadpool
 from app.core.config import settings
+from app.core.hf_utils import ensure_model_file
 from app.schemas.predict import YieldPredictionInput, YieldPredictionOutput
 
 logger = logging.getLogger(__name__)
 
-MODEL_PATH = settings.yield_model_path
+# Constants
+MODEL_FILENAME = os.path.basename(settings.yield_model_path)
+MODEL_DIR = os.path.dirname(settings.yield_model_path)
 
 # Singleton instance for the model
 _yield_model = None
@@ -22,11 +25,15 @@ def get_yield_model():
     global _yield_model
     if _yield_model is None:
         try:
-            logger.info(f"Loading yield prediction pipeline from {MODEL_PATH}...")
-            if not os.path.exists(MODEL_PATH):
-                raise FileNotFoundError(f"Pipeline file not found at {MODEL_PATH}")
-                
-            with open(MODEL_PATH, "rb") as f:
+            # Ensure model artifact exists via HF Hub
+            ensure_model_file(
+                repo_name=settings.yield_model_repo, 
+                filename=MODEL_FILENAME, 
+                local_dir=MODEL_DIR
+            )
+
+            logger.info(f"Loading yield prediction pipeline from {settings.yield_model_path}...")
+            with open(settings.yield_model_path, "rb") as f:
                 _yield_model = pickle.load(f)
             logger.info("✅ Yield prediction pipeline loaded successfully.")
         except Exception as e:

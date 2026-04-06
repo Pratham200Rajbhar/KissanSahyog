@@ -22,7 +22,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: '/api/:path((?!auth).*)',
-        destination: `${API_URL}/api/v1/:path*`,
+        destination: `${API_URL}/:path*`,
       },
     ];
   },

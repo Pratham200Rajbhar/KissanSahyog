@@ -5,6 +5,7 @@ import pandas as pd
 from fastapi.concurrency import run_in_threadpool
 from supabase import Client
 from app.core.config import settings
+from app.core.hf_utils import ensure_model_file
 from app.schemas.recommend import FertilizerRecommendationInput, FertilizerRecommendationOutput
 
 logger = logging.getLogger(__name__)
@@ -14,14 +15,18 @@ _model = None
 _le = None
 _columns = None
 
-# Model Directory setup
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-MODEL_DIR = os.path.join(BASE_DIR, "models", "fertilizer_recommendation")
+# Model Directory setup from settings
+MODEL_DIR = settings.fertilizer_model_dir
 
 def get_fertilizer_model():
     global _model, _le, _columns
     if _model is None:
         try:
+            # Ensure model artifacts exist via HF Hub
+            ensure_model_file(settings.fertilizer_model_repo, "fertilizer_model.pkl", MODEL_DIR)
+            ensure_model_file(settings.fertilizer_model_repo, "label_encoder.pkl", MODEL_DIR)
+            ensure_model_file(settings.fertilizer_model_repo, "columns.pkl", MODEL_DIR)
+
             # Load into local variables first to ensure atomicity
             model = joblib.load(os.path.join(MODEL_DIR, "fertilizer_model.pkl"))
             le = joblib.load(os.path.join(MODEL_DIR, "label_encoder.pkl"))
@@ -31,7 +36,7 @@ def get_fertilizer_model():
             _model = model
             _le = le
             _columns = columns
-            logger.info("✅ Fertilizer recommendation models loaded successfully.")
+            logger.info("✅ Fertilizer recommendation models loaded successfully from HF/Local.")
         except Exception as e:
             logger.error(f"❌ Failed to load fertilizer recommendation models: {e}")
             raise

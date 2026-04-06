@@ -3,11 +3,13 @@ import pandas as pd
 import numpy as np
 from fastapi.concurrency import run_in_threadpool
 from app.core.config import settings
+from app.core.hf_utils import ensure_model_file
 from app.schemas.recommend import CropRecommendationInput, CropRecommendationOutput, CropRecommendationItem
 
 logger = logging.getLogger(__name__)
 
-MODEL_PATH = settings.crop_model_dir.rstrip(" ") # Safety to remove trailing spaces from configs
+# Model constants
+MODEL_DIR = settings.crop_model_dir.rstrip(" ")
 
 class CropRecommendationModel:
     _instance = None
@@ -26,17 +28,22 @@ class CropRecommendationModel:
         return cls._instance
 
     def _load_artifacts(self):
-        logger.info(f"Loading Crop Recommendation artifacts from {MODEL_PATH}...")
+        logger.info(f"Loading Crop Recommendation artifacts from {MODEL_DIR}...")
         try:
             import os
             import joblib
+            
+            # Ensure model artifacts exist via HF Hub
+            ensure_model_file(settings.crop_model_repo, "crop_model.pkl", MODEL_DIR)
+            ensure_model_file(settings.crop_model_repo, "npk_label_encoder.pkl", MODEL_DIR)
+
             # Load the best model and the label encoder
-            self.model = joblib.load(os.path.join(MODEL_PATH, "crop_model.pkl"))
-            self.le = joblib.load(os.path.join(MODEL_PATH, "npk_label_encoder.pkl"))
+            self.model = joblib.load(os.path.join(MODEL_DIR, "crop_model.pkl"))
+            self.le = joblib.load(os.path.join(MODEL_DIR, "npk_label_encoder.pkl"))
             
             # Features order as confirmed via inspection
             self.feature_columns = ['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']
-            logger.info("✅ Crop recommendation artifacts loaded successfully.")
+            logger.info("✅ Crop recommendation artifacts loaded successfully from HF/Local.")
         except Exception as e:
             logger.error(f"❌ Failed to load crop recommendation models: {e}")
             raise

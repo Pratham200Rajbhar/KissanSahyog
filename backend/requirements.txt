@@ -19,3 +19,5 @@ google-genai
 torch
 torchvision
 Pillow
+huggingface-hub
+earthengine-api

@@ -31,7 +31,9 @@ interface LocationContextType {
   error: string | null;
   permissionDenied: boolean;
   refreshLocation: () => Promise<void>;
+  updateLocation: (lat: number, lng: number) => Promise<void>;
 }
+
 
 const LocationContext = createContext<LocationContextType | undefined>(undefined);
 
@@ -133,13 +135,52 @@ export const LocationProvider = ({ children }: { children: ReactNode }) => {
       }
     );
   }, []);
+ 
+  const updateLocation = useCallback(async (lat: number, lng: number) => {
+    setLoading(true);
+    try {
+      const apiUrl = "/api";
+      const res = await fetch(`${apiUrl}/geo/reverse?lat=${lat}&lon=${lng}`);
+      if (!res.ok) throw new Error("Location fetch failed");
+      const data = await res.json();
+ 
+      setLocation({
+        latitude: lat,
+        longitude: lng,
+        state: data.state !== "Unknown" ? data.state : null,
+        district: data.district !== "Unknown" ? data.district : null,
+        temperature: data.temperature ?? null,
+        humidity: data.humidity ?? null,
+        rainfall: data.rainfall ?? null,
+        nitrogen: data.nitrogen ?? null,
+        phosphorus: data.phosphorus ?? null,
+        potassium: data.potassium ?? null,
+        ph: data.ph ?? null,
+        clay: data.clay ?? null,
+        carbon: data.carbon ?? null,
+        wind_speed: data.wind_speed ?? null,
+        solar_radiation: data.solar_radiation ?? null,
+        lastUpdated: Date.now(),
+      });
+    } catch (err) {
+      console.error("Error manual location update:", err);
+      // Fallback but preserve lat/lng
+      setLocation(prev => ({ ...prev, latitude: lat, longitude: lng }));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-  // [REMOVED] Auto-start location fetch on first load
-  // We want user-initiated sync only as per the new requirement.
+
+  // Auto-start location fetch on first load to populate the dashboard.
+  React.useEffect(() => {
+    refreshLocation();
+  }, [refreshLocation]);
 
 
   return (
-    <LocationContext.Provider value={{ location, loading, error, permissionDenied, refreshLocation }}>
+    <LocationContext.Provider value={{ location, loading, error, permissionDenied, refreshLocation, updateLocation }}>
+
       {children}
     </LocationContext.Provider>
   );

@@ -6,6 +6,8 @@ from torchvision import transforms, models
 from torchvision.models import resnet50, densenet121, ResNet50_Weights, DenseNet121_Weights
 from PIL import Image
 import logging
+from app.core.config import settings
+from app.core.hf_utils import ensure_model_file
 from app.services.chatbot_service import client, MODEL_NAME
 
 logger = logging.getLogger(__name__)
@@ -100,11 +102,13 @@ class CropDiseaseService:
         self._load_model()
 
     def _load_model(self):
-        if not os.path.exists(self.model_path):
-            logger.error(f"Model file not found at {self.model_path}")
-            return
-
         try:
+            # Ensure model artifact exists via HF Hub
+            model_filename = os.path.basename(self.model_path)
+            model_dir = os.path.dirname(self.model_path)
+            ensure_model_file(settings.disease_model_repo, model_filename, model_dir)
+
+            logger.info(f"Loading crop disease model from {self.model_path}...")
             checkpoint = torch.load(self.model_path, map_location=self.device, weights_only=False)
             self.class_names = checkpoint['class_names']
             num_classes = checkpoint['num_classes']
@@ -187,5 +191,5 @@ class CropDiseaseService:
             return "I could identify the disease, but I'm having trouble providing detailed insights right now. Please check standard agricultural practices for this condition."
 
 # Singleton instance
-MODEL_FILE = os.path.join(os.path.dirname(os.path.dirname(__file__)), "models", "crop_disease_prediction", "hybrid_resnet_densenet_checkpoint.pth")
+MODEL_FILE = settings.disease_model_path
 crop_disease_service = CropDiseaseService(MODEL_FILE)

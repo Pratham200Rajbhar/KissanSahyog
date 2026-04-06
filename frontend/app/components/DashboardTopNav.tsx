@@ -1,21 +1,27 @@
 "use client";
 
-import { Bell, Sun, Moon, Globe, ChevronDown, LogOut } from "lucide-react";
+import { Bell, Sun, Moon, Globe, ChevronDown, LogOut, Navigation } from "lucide-react";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { usePathname, useRouter, routing } from "../../i18n/routing";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSession, signOut } from "next-auth/react";
 import { ThemeMode, THEME_CHANGE_EVENT, getActiveTheme, toggleThemeWithAnimation } from "./theme";
+import { useLocation } from "./LocationContext";
+import clsx from "clsx";
+
 
 export default function DashboardTopNav() {
   const [theme, setTheme] = useState<ThemeMode>(() => getActiveTheme());
   const [mounted, setMounted] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const locale = useLocale();
+  const t = useTranslations();
   const router = useRouter();
   const pathname = usePathname();
   const { data: session } = useSession();
+  const { refreshLocation, loading: locationLoading } = useLocation();
+
 
   useEffect(() => {
     setMounted(true);
@@ -83,6 +89,19 @@ export default function DashboardTopNav() {
           <Bell className="w-5 h-5" />
           <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_#4edea3]"></span>
         </button>
+
+        <button 
+          onClick={() => refreshLocation()}
+          disabled={locationLoading}
+          title={t("map.use_gps")}
+          className={clsx(
+            "w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full transition-all duration-300",
+            locationLoading ? "text-primary animate-pulse bg-primary/10" : "text-slate-400 hover:bg-primary/10 hover:text-primary"
+          )}
+        >
+          <Navigation className={clsx("w-5 h-5", locationLoading && "animate-spin-slow")} />
+        </button>
+
         
         <button 
           onClick={() => signOut({ callbackUrl: "/" })}
